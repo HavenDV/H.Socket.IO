@@ -264,3 +264,4 @@ __pycache__/
 /Installer/wix/*.g.wxs
 /PinnacleClient
 /WebServer/betplacer/betplacer
+/publish.cmd

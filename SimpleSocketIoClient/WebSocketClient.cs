@@ -12,6 +12,7 @@ namespace SimpleSocketIoClient
     {
         #region Properties
 
+
         public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
 
         private Task ReceiveTask { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -12,8 +13,12 @@ namespace SimpleSocketIoClient
     {
         #region Properties
 
-
         public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
+
+        public IWebProxy Proxy { 
+            get => Socket.Options.Proxy; 
+            set => Socket.Options.Proxy = value;
+        }
 
         private Task ReceiveTask { get; set; }
         private CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();

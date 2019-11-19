@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -27,6 +28,11 @@ namespace SimpleSocketIoClient
         #region Properties
 
         public EngineIoClient EngineIoClient { get; private set; } = new EngineIoClient("socket.io");
+
+        public IWebProxy Proxy {
+            get => EngineIoClient.Proxy;
+            set => EngineIoClient.Proxy = value;
+        }
 
         private Dictionary<string, List<(Action<object, string> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
 

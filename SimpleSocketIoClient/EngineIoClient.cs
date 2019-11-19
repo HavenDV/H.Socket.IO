@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,6 +35,12 @@ namespace SimpleSocketIoClient
         #region Properties
 
         public WebSocketClient WebSocketClient { get; private set; } = new WebSocketClient();
+
+        public IWebProxy Proxy {
+            get => WebSocketClient.Proxy;
+            set => WebSocketClient.Proxy = value;
+        }
+
         public EngineIoOpenMessage OpenMessage { get; private set; }
 
         public bool IsOpened

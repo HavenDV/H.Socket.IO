@@ -140,6 +140,11 @@ namespace SimpleSocketIoClient
         {
             try
             {
+                if (WebSocketClient.Socket.State != WebSocketState.Open)
+                {
+                    await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri);
+                }
+
                 await WebSocketClient.SendTextAsync($"{PingPrefix}{PingMessage}");
 
                 OnAfterPing(PingMessage);

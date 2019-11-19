@@ -14,6 +14,7 @@ namespace SimpleSocketIoClient
         #region Properties
 
         public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
+        public Uri LastConnectUri { get; private set; }
 
         public IWebProxy Proxy { 
             get => Socket.Options.Proxy; 
@@ -70,7 +71,7 @@ namespace SimpleSocketIoClient
                 return;
             }
 
-            uri = uri ?? throw new ArgumentNullException(nameof(uri));
+            LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
 
             await Socket.ConnectAsync(uri, cancellationToken);
 
@@ -81,7 +82,8 @@ namespace SimpleSocketIoClient
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
-            if (Socket.State != WebSocketState.Open)
+            if (Socket.State != WebSocketState.Open && 
+                Socket.State != WebSocketState.CloseReceived)
             {
                 return;
             }
@@ -91,6 +93,11 @@ namespace SimpleSocketIoClient
 
         public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)
         {
+            if (Socket.State != WebSocketState.Open)
+            {
+                throw new WebSocketException(WebSocketError.InvalidState);
+            }
+
             var bytes = Encoding.UTF8.GetBytes(message);
 
             await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cancellationToken);
@@ -131,7 +138,19 @@ namespace SimpleSocketIoClient
                     await using var stream = new MemoryStream();
                     do
                     {
-                        result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
+                        try
+                        {
+                            result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
+                        }
+                        catch (WebSocketException exception)
+                        {
+                            OnAfterException(exception);
+
+                            await Socket.ConnectAsync(LastConnectUri, CancellationTokenSource.Token);
+
+                            result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
+                        }
+
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
                             OnDisconnected(result.CloseStatusDescription, result.CloseStatus);

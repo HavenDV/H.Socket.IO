@@ -15,5 +15,5 @@ jobs:
         dotnet-version: 3.0.100
     - name: Build with dotnet
       run: dotnet build --configuration Release
-    - name: Publish
-      run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Try Publish(if the version has changed)
+      run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json > nul

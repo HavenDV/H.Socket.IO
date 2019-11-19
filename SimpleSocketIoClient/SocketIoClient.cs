@@ -106,17 +106,31 @@ namespace SimpleSocketIoClient
                     {
                         OnAfterEvent(value);
 
-                        var name = value.Extract("[\"", "\"");
-                        var text = value.Extract(",")[..^1];
-
-                        if (Actions.TryGetValue(name, out var actions))
+                        try
                         {
-                            foreach (var (action, type) in actions)
-                            {
-                                var obj = JsonConvert.DeserializeObject(text, type);
+                            var name = value.Extract("[\"", "\"");
+                            var text = value.Extract(",")[..^1];
 
-                                action?.Invoke(obj, text);
+                            if (Actions.TryGetValue(name, out var actions))
+                            {
+                                foreach (var (action, type) in actions)
+                                {
+                                    try
+                                    {
+                                        var obj = JsonConvert.DeserializeObject(text, type);
+
+                                        action?.Invoke(obj, text);
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        OnAfterException(exception);
+                                    }
+                                }
                             }
+                        }
+                        catch (Exception exception)
+                        {
+                            OnAfterException(exception);
                         }
                         break;
                     }

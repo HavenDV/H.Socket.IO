@@ -11,9 +11,7 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-nuget-
+        key: ${{ runner.os }}-nuget
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

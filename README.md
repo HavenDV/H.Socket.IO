@@ -28,7 +28,7 @@ await client.DisconnectAsync();
 | master(stable) |
 |----------------|
 |    Travic CI   |  
-| [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/dotnetcore/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22) |
+| [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22) |
 
 # Contacts
 * [mail](mailto:havendv@gmail.com)

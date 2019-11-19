@@ -7,7 +7,7 @@
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.1</Version>
+    <Version>0.9.2</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>

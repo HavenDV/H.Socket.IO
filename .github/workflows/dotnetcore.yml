@@ -11,7 +11,9 @@ jobs:
     - uses: actions/cache@v1
       with:
         path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget
+        key: ${{ runner.os }}-nuget-${{ hashFiles('SimpleSocketIoClient/SimpleSocketIoClient.csproj') }}-${{ hashFiles('SimpleSocketIoClient.Tests/SimpleSocketIoClient.Tests.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

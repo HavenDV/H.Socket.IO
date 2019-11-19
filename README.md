@@ -33,6 +33,7 @@ await client.DisconnectAsync();
 ### Used documentation
 
 Socket.IO Protocol - https://github.com/socketio/socket.io-protocol
+
 Engine.IO Protocol - https://github.com/socketio/engine.io-protocol
 
 ### Contacts

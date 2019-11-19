@@ -30,5 +30,10 @@ await client.DisconnectAsync();
 | Github Actions CI |
 | [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22) |
 
+### Used documentation
+
+Socket.IO Protocol - https://github.com/socketio/socket.io-protocol
+Engine.IO Protocol - https://github.com/socketio/engine.io-protocol
+
 ### Contacts
 * [mail](mailto:havendv@gmail.com)

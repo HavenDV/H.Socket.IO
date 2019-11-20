@@ -13,7 +13,7 @@ jobs:
         path: ~/.nuget/packages
         key: ${{ runner.os }}-nuget-${{ hashFiles('**.csproj') }}
         restore-keys: |
-          ${{ runner.os }}-nuget-
+          ${{ runner.os }}-nuget
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

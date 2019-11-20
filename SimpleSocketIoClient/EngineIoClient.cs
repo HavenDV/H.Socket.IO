@@ -140,10 +140,8 @@ namespace SimpleSocketIoClient
         {
             try
             {
-                if (WebSocketClient.Socket.State != WebSocketState.Open)
-                {
-                    await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri);
-                }
+                // Reconnect if required
+                await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri);
 
                 await WebSocketClient.SendTextAsync($"{PingPrefix}{PingMessage}");
 
@@ -261,6 +259,8 @@ namespace SimpleSocketIoClient
 
         public async Task CloseAsync(CancellationToken cancellationToken = default)
         {
+            Timer.Stop();
+
             await WebSocketClient.DisconnectAsync(cancellationToken);
         }
 

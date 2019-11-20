@@ -66,7 +66,14 @@ namespace SimpleSocketIoClient
 
         public async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            if (Socket.State == WebSocketState.Open)
+            if (Socket.State == WebSocketState.Aborted ||
+                Socket.State == WebSocketState.Closed)
+            {
+                Socket?.Dispose();
+                Socket = new ClientWebSocket();
+            }
+
+            if (Socket.State != WebSocketState.None)
             {
                 return;
             }
@@ -75,7 +82,7 @@ namespace SimpleSocketIoClient
 
             await Socket.ConnectAsync(uri, cancellationToken);
 
-            ReceiveTask = Task.Run(async () => await Receive(), CancellationTokenSource.Token);
+            ReceiveTask ??= Task.Run(async () => await Receive(), CancellationTokenSource.Token);
 
             OnConnected();
         }
@@ -146,7 +153,7 @@ namespace SimpleSocketIoClient
                         {
                             OnAfterException(exception);
 
-                            await Socket.ConnectAsync(LastConnectUri, CancellationTokenSource.Token);
+                            await ConnectAsync(LastConnectUri, CancellationTokenSource.Token);
 
                             result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
                         }

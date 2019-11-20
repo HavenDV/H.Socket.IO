@@ -7,11 +7,11 @@
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.4</Version>
+    <Version>0.9.4.1</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added auto reconnect</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed auto reconnects</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -8,7 +8,9 @@ jobs:
 
     steps:
     - name: Getting context
-      run: echo "${{ toJSON(github) }}"
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: echo "$GITHUB_CONTEXT"
       
     - name: Getting code
       uses: actions/checkout@v1

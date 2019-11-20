@@ -7,6 +7,9 @@ jobs:
     runs-on: [windows-latest]
 
     steps:
+    - name: Getting context
+      run: echo "${{ toJSON(github) }}"
+      
     - name: Getting code
       uses: actions/checkout@v1
       

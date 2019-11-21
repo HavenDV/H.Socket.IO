@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace SimpleSocketIoClient
 {
@@ -8,7 +9,7 @@ namespace SimpleSocketIoClient
         public string Sid { get; set; }
 
         [JsonProperty("upgrades")]
-        public string[] Upgrades { get; set; }
+        public IReadOnlyList<string> Upgrades { get; set; }
 
         [JsonProperty("pingInterval")]
         public long PingInterval { get; set; }

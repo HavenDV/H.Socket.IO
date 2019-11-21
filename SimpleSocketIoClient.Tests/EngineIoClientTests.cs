@@ -15,6 +15,8 @@ namespace SimpleSocketIoClient.Tests
             client.WebSocketClient.AfterText += (sender, args) => Console.WriteLine($"EngineIoClient.WebSocketClient.AfterText: {args.Value}");
             client.AfterMessage += (sender, args) => Console.WriteLine($"AfterMessage: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
+            client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
+            client.Closed += (sender, args) => Console.WriteLine("Closed");
 
             await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"));
 

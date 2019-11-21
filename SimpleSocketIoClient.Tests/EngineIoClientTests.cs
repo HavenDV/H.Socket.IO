@@ -20,7 +20,7 @@ namespace SimpleSocketIoClient.Tests
 
             await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"));
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(2));
 
             await client.CloseAsync();
         }

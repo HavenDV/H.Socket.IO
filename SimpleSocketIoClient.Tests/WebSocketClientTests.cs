@@ -15,14 +15,60 @@ namespace SimpleSocketIoClient.Tests
             client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
+            client.Connected += (sender, args) => Console.WriteLine("Connected");
+            client.Disconnected += (sender, args) => Console.WriteLine("Disconnected");
+
+            Assert.IsFalse(client.IsConnected, "client.IsConnected");
 
             await client.ConnectAsync(new Uri("ws://echo.websocket.org"));
 
+            Assert.IsTrue(client.IsConnected, "client.IsConnected");
+
             await client.SendTextAsync("Test");
 
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(2));
 
             await client.DisconnectAsync();
+
+            Assert.IsFalse(client.IsConnected, "client.IsConnected");
+        }
+
+        [TestMethod]
+        public async Task DoubleConnectToWebSocketOrgTest()
+        {
+            await using var client = new WebSocketClient();
+
+            client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
+            client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
+            client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
+            client.Connected += (sender, args) => Console.WriteLine("Connected");
+            client.Disconnected += (sender, args) => Console.WriteLine("Disconnected");
+
+            Assert.IsFalse(client.IsConnected, "client.IsConnected");
+
+            await client.ConnectAsync(new Uri("ws://echo.websocket.org"));
+
+            Assert.IsTrue(client.IsConnected, "client.IsConnected");
+
+            await client.SendTextAsync("Test");
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
+            await client.DisconnectAsync();
+
+            Assert.IsFalse(client.IsConnected, "client.IsConnected");
+
+            await client.ConnectAsync(new Uri("ws://echo.websocket.org"));
+
+            Assert.IsTrue(client.IsConnected, "client.IsConnected");
+
+            await client.SendTextAsync("Test");
+
+            await Task.Delay(TimeSpan.FromSeconds(2));
+
+            await client.DisconnectAsync();
+
+            Assert.IsFalse(client.IsConnected, "client.IsConnected");
         }
     }
 }

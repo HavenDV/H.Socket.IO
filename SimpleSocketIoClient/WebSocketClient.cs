@@ -15,6 +15,7 @@ namespace SimpleSocketIoClient
 
         public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
         public Uri LastConnectUri { get; private set; }
+        public bool IsConnected => Socket.State == WebSocketState.Open;
 
         public IWebProxy Proxy { 
             get => Socket.Options.Proxy; 
@@ -66,45 +67,38 @@ namespace SimpleSocketIoClient
 
         public async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            if (Socket.State == WebSocketState.Aborted ||
-                Socket.State == WebSocketState.Closed)
+            if (IsConnected)
             {
-                Socket?.Dispose();
-                Socket = new ClientWebSocket();
+                return;
             }
 
             if (Socket.State != WebSocketState.None)
             {
-                return;
+                Socket?.Dispose();
+                Socket = new ClientWebSocket();
             }
 
             LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
 
             await Socket.ConnectAsync(uri, cancellationToken);
 
-            ReceiveTask ??= Task.Run(async () => await Receive(), CancellationTokenSource.Token);
+            if (ReceiveTask == null ||
+                ReceiveTask.IsCompleted)
+            {
+                ReceiveTask?.Dispose();
+                ReceiveTask = Task.Run(async () => await Receive(), CancellationTokenSource.Token);
+            }
 
             OnConnected();
         }
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
-            if (Socket.State != WebSocketState.Open && 
-                Socket.State != WebSocketState.CloseReceived)
-            {
-                return;
-            }
-
             await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", cancellationToken);
         }
 
         public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)
         {
-            if (Socket.State != WebSocketState.Open)
-            {
-                throw new WebSocketException(WebSocketError.InvalidState);
-            }
-
             var bytes = Encoding.UTF8.GetBytes(message);
 
             await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cancellationToken);

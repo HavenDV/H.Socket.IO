@@ -9,7 +9,12 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
-    public sealed class WebSocketClient : IAsyncDisposable
+    public sealed class WebSocketClient :
+#if NETSTANDARD2_1
+        IAsyncDisposable 
+#else
+        IDisposable
+#endif
     {
         #region Properties
 
@@ -101,9 +106,10 @@ namespace SimpleSocketIoClient
         {
             var bytes = Encoding.UTF8.GetBytes(message);
 
-            await Socket.SendAsync(bytes, WebSocketMessageType.Text, true, cancellationToken);
+            await Socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
         }
 
+#if NETSTANDARD2_1
         public async ValueTask DisposeAsync()
         {
             if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
@@ -122,6 +128,26 @@ namespace SimpleSocketIoClient
             Socket?.Dispose();
             Socket = null;
         }
+#else
+        public void Dispose()
+        {
+            if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
+            {
+                CancellationTokenSource.Cancel();
+                ReceiveTask.Wait();
+            }
+
+            CancellationTokenSource?.Dispose();
+            CancellationTokenSource = null;
+
+            ReceiveTask?.Dispose();
+            ReceiveTask = null;
+
+            Socket?.Dispose();
+            Socket = null;
+        }
+#endif
+
 
         #endregion
 
@@ -136,12 +162,16 @@ namespace SimpleSocketIoClient
                     var buffer = new byte[1024 * 1024];
 
                     WebSocketReceiveResult result;
+#if NETSTANDARD2_1
                     await using var stream = new MemoryStream();
+#else
+                    using var stream = new MemoryStream();
+#endif
                     do
                     {
                         try
                         {
-                            result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationTokenSource.Token);
                         }
                         catch (WebSocketException exception)
                         {
@@ -149,7 +179,7 @@ namespace SimpleSocketIoClient
 
                             await ConnectAsync(LastConnectUri, CancellationTokenSource.Token);
 
-                            result = await Socket.ReceiveAsync(buffer, CancellationTokenSource.Token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationTokenSource.Token);
                         }
 
                         if (result.MessageType == WebSocketMessageType.Close)

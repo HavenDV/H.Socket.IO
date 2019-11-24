@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <LangVersion>8</LangVersion>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.4.2</Version>
+    <Version>0.9.5</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed auto reconnects</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support of .NET Standard 2.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -10,8 +10,13 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
-    public sealed class EngineIoClient : IAsyncDisposable
-    {  
+    public sealed class EngineIoClient :
+#if NETSTANDARD2_1
+        IAsyncDisposable 
+#else
+        IDisposable
+#endif
+    {
         #region Fields
 
         private bool _isOpened;
@@ -269,6 +274,7 @@ namespace SimpleSocketIoClient
             await WebSocketClient.SendTextAsync($"{MessagePrefix}{message}", token);
         }
 
+#if NETSTANDARD2_1
         public async ValueTask DisposeAsync()
         {
             if (WebSocketClient != null)
@@ -280,6 +286,17 @@ namespace SimpleSocketIoClient
             Timer?.Dispose();
             Timer = null;
         }
+#else
+        public void Dispose()
+        {
+            WebSocketClient?.Dispose();
+            WebSocketClient = null;
+
+            Timer?.Dispose();
+            Timer = null;
+        }
+#endif
+
 
         #endregion
     }

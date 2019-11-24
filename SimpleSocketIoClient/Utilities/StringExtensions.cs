@@ -27,7 +27,11 @@ namespace SimpleSocketIoClient.Utilities
                 return null;
             }
 
+#if NETSTANDARD2_1
             return text[index1..index2];
+#else
+            return text.Substring(index1, index2 - index1);
+#endif
         }
     }
 }

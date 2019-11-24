@@ -9,9 +9,14 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
-    public sealed class SocketIoClient : IAsyncDisposable
+    public sealed class SocketIoClient :
+#if NETSTANDARD2_1
+        IAsyncDisposable 
+#else
+        IDisposable 
+#endif
     {
-        #region Constants
+#region Constants
 
         public const string ConnectPrefix = "0";
         public const string DisconnectPrefix = "1";
@@ -23,9 +28,9 @@ namespace SimpleSocketIoClient
 
         public const string Message = "message";
 
-        #endregion
+#endregion
 
-        #region Properties
+#region Properties
 
         public EngineIoClient EngineIoClient { get; private set; } = new EngineIoClient("socket.io");
 
@@ -36,9 +41,9 @@ namespace SimpleSocketIoClient
 
         private Dictionary<string, List<(Action<object, string> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         public event EventHandler<EventArgs> Connected;
         public event EventHandler<EventArgs> Disconnected;
@@ -66,9 +71,9 @@ namespace SimpleSocketIoClient
             AfterException?.Invoke(this, new DataEventArgs<Exception>(value));
         }
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         public SocketIoClient()
         {
@@ -76,9 +81,9 @@ namespace SimpleSocketIoClient
             EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
         }
 
-        #endregion
+#endregion
 
-        #region Event Handlers
+#region Event Handlers
 
         private void EngineIoClient_AfterMessage(object sender, DataEventArgs<string> args)
         {
@@ -115,7 +120,7 @@ namespace SimpleSocketIoClient
                         try
                         {
                             var name = value.Extract("[\"", "\"");
-                            var text = value.Extract(",")[..^1];
+                            var text = value.Extract(",").TrimEnd(']');
 
                             if (Actions.TryGetValue(name, out var actions))
                             {
@@ -148,9 +153,9 @@ namespace SimpleSocketIoClient
             }
         }
 
-        #endregion
+#endregion
 
-        #region Public methods
+#region Public methods
 
         public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds = 10, CancellationToken cancellationToken = default)
         {
@@ -244,6 +249,7 @@ namespace SimpleSocketIoClient
             On<object>(name, (obj, text) => action?.Invoke());
         }
 
+#if NETSTANDARD2_1
         public async ValueTask DisposeAsync()
         {
             if (EngineIoClient != null)
@@ -252,7 +258,14 @@ namespace SimpleSocketIoClient
                 EngineIoClient = null;
             }
         }
+#else
+        public void Dispose()
+        {
+            EngineIoClient?.Dispose();
+            EngineIoClient = null;
+        }
+#endif
 
-        #endregion
+#endregion
     }
 }

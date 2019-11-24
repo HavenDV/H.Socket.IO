@@ -1,6 +1,6 @@
-## [SimpleSocketIoClient](https://github.com/HavenDV/SimpleSocketIoClient/) [![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/SimpleSocketIoClient/search?l=C%23&o=desc&s=&type=Code) [![License](https://img.shields.io/github/license/HavenDV/SimpleSocketIoClient.svg?label=License&maxAge=86400)](LICENSE.md) [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.1-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.1.md)
+## [SimpleSocketIoClient](https://github.com/HavenDV/SimpleSocketIoClient/) [![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/SimpleSocketIoClient/search?l=C%23&o=desc&s=&type=Code) [![License](https://img.shields.io/github/license/HavenDV/SimpleSocketIoClient.svg?label=License&maxAge=86400)](LICENSE.md) [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
 
-This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.1**
+This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0**
 
 ### Nuget
 
@@ -11,7 +11,7 @@ Install-Package SimpleSocketIoClient
 ### Usage
 
 ```cs
-await using var client = new SocketIoClient();
+using var client = new SocketIoClient();
 
 client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
 client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");

@@ -216,40 +216,18 @@ namespace SimpleSocketIoClient
             };
             var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
-            var source = new TaskCompletionSource<bool>();
-            using var cancellationSource = new CancellationTokenSource();
-
-            cancellationSource.Token.Register(() => source.TrySetCanceled(), false);
-            cancellationToken.Register(() => source.TrySetCanceled(), false);
-
-            void OnOpened(object sender, DataEventArgs<EngineIoOpenMessage> args)
+            if (!await this.WaitEventAsync(async token =>
             {
-                source.TrySetResult(true);
+                await WebSocketClient.ConnectAsync(socketIoUri, token);
+            }, nameof(Opened), cancellationToken))
+            {
+                return false;
             }
 
-            try
-            {
-                Opened += OnOpened;
+            Timer.Interval = OpenMessage.PingInterval;
+            Timer.Start();
 
-                await WebSocketClient.ConnectAsync(socketIoUri, cancellationToken);
-
-                if (await source.Task)
-                {
-                    Timer.Interval = OpenMessage.PingInterval;
-                    Timer.Start();
-
-                    return true;
-                }
-            }
-            catch (TaskCanceledException)
-            {
-            }
-            finally
-            {
-                Opened -= OnOpened;
-            }
-
-            return false;
+            return true;
         }
 
         public async Task<bool> OpenAsync(Uri uri, TimeSpan timeout)

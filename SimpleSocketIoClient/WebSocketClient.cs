@@ -111,7 +111,20 @@ namespace SimpleSocketIoClient
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
-            await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", cancellationToken);
+            if (!IsConnected)
+            {
+                return;
+            }
+            
+            await this.WaitEventAsync(async token =>
+            {
+                await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", token);
+
+                if (Socket.State == WebSocketState.Aborted)
+                {
+                    OnDisconnected((Socket.CloseStatusDescription, Socket.CloseStatus));
+                }
+            }, nameof(Disconnected), cancellationToken);
         }
 
         public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)

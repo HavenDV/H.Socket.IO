@@ -12,7 +12,7 @@ namespace SimpleSocketIoClient
 {
     public sealed class SocketIoClient :
 #if NETSTANDARD2_1
-        IAsyncDisposable 
+        IAsyncDisposable
 #else
         IDisposable
 #endif
@@ -161,37 +161,10 @@ namespace SimpleSocketIoClient
 
         public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            var source = new TaskCompletionSource<bool>();
-            using var cancellationSource = new CancellationTokenSource();
-
-            cancellationSource.Token.Register(() => source.TrySetCanceled(), false);
-            cancellationToken.Register(() => source.TrySetCanceled(), false);
-
-            void OnConnected(object sender, EventArgs args)
+            return await this.WaitEventAsync(async token =>
             {
-                source.TrySetResult(true);
-            }
-
-            try
-            {
-                Connected += OnConnected;
-
-                if (!await EngineIoClient.OpenAsync(uri, cancellationToken))
-                {
-                    return false;
-                }
-
-                return await source.Task;
-            }
-            catch (TaskCanceledException)
-            {
-            }
-            finally
-            {
-                Connected -= OnConnected;
-            }
-
-            return false;
+                await EngineIoClient.OpenAsync(uri, token);
+            }, nameof(Connected), cancellationToken);
         }
 
         public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout)

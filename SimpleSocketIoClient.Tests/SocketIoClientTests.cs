@@ -20,7 +20,7 @@ namespace SimpleSocketIoClient.Tests
             client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
-            await client.ConnectAsync(new Uri("https://socket-io-chat.now.sh/"));
+            await client.ConnectAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
 
             await Task.Delay(TimeSpan.FromSeconds(2));
 

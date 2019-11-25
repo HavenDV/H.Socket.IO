@@ -97,6 +97,18 @@ namespace SimpleSocketIoClient
             OnConnected();
         }
 
+        public async Task ConnectAsync(Uri uri, TimeSpan timeout)
+        {
+            using var cancellationSource = new CancellationTokenSource(timeout);
+
+            await ConnectAsync(uri, cancellationSource.Token);
+        }
+
+        public async Task ConnectAsync(Uri uri, int timeoutInSeconds)
+        {
+            await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
+        }
+
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
             await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", cancellationToken);

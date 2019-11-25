@@ -22,7 +22,7 @@ namespace SimpleSocketIoClient.Tests
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine("Closed");
 
-            await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"));
+            await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
 
             await Task.Delay(TimeSpan.FromSeconds(2));
 

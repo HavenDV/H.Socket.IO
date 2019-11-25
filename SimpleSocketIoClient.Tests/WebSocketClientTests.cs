@@ -24,7 +24,7 @@ namespace SimpleSocketIoClient.Tests
 
             Assert.IsFalse(client.IsConnected, "client.IsConnected");
 
-            await client.ConnectAsync(new Uri("ws://echo.websocket.org"));
+            await client.ConnectAsync(new Uri("ws://echo.websocket.org"), 10);
 
             Assert.IsTrue(client.IsConnected, "client.IsConnected");
 
@@ -54,7 +54,7 @@ namespace SimpleSocketIoClient.Tests
 
             Assert.IsFalse(client.IsConnected, "client.IsConnected");
 
-            await client.ConnectAsync(new Uri("ws://echo.websocket.org"));
+            await client.ConnectAsync(new Uri("ws://echo.websocket.org"), 10);
 
             Assert.IsTrue(client.IsConnected, "client.IsConnected");
 

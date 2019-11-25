@@ -157,10 +157,10 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
-        public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds = 10, CancellationToken cancellationToken = default)
+        public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
             var source = new TaskCompletionSource<bool>();
-            using var cancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
+            using var cancellationSource = new CancellationTokenSource();
 
             cancellationSource.Token.Register(() => source.TrySetCanceled(), false);
             cancellationToken.Register(() => source.TrySetCanceled(), false);
@@ -174,7 +174,7 @@ namespace SimpleSocketIoClient
             {
                 Connected += OnConnected;
 
-                if (!await EngineIoClient.OpenAsync(uri, cancellationToken: cancellationToken))
+                if (!await EngineIoClient.OpenAsync(uri, cancellationToken))
                 {
                     return false;
                 }
@@ -190,6 +190,18 @@ namespace SimpleSocketIoClient
             }
 
             return false;
+        }
+
+        public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout)
+        {
+            using var cancellationSource = new CancellationTokenSource(timeout);
+
+            return await ConnectAsync(uri, cancellationSource.Token);
+        }
+
+        public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds)
+        {
+            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)

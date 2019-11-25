@@ -216,7 +216,7 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
-        public async Task<bool> OpenAsync(Uri uri, int timeoutInSeconds = 10, CancellationToken cancellationToken = default)
+        public async Task<bool> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
         {
             if (WebSocketClient.Socket.State == WebSocketState.Open)
             {
@@ -235,7 +235,7 @@ namespace SimpleSocketIoClient
             var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
             var source = new TaskCompletionSource<bool>();
-            using var cancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));
+            using var cancellationSource = new CancellationTokenSource();
 
             cancellationSource.Token.Register(() => source.TrySetCanceled(), false);
             cancellationToken.Register(() => source.TrySetCanceled(), false);
@@ -268,6 +268,18 @@ namespace SimpleSocketIoClient
             }
 
             return false;
+        }
+
+        public async Task<bool> OpenAsync(Uri uri, TimeSpan timeout)
+        {
+            using var cancellationSource = new CancellationTokenSource(timeout);
+
+            return await OpenAsync(uri, cancellationSource.Token);
+        }
+
+        public async Task<bool> OpenAsync(Uri uri, int timeoutInSeconds)
+        {
+            return await OpenAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
         public async Task CloseAsync(CancellationToken cancellationToken = default)

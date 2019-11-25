@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient.Tests
 {
@@ -10,6 +13,7 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 #if NETCOREAPP3_0
             await using var client = new SocketIoClient();
 #else
@@ -21,11 +25,20 @@ namespace SimpleSocketIoClient.Tests
             client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
-            await client.ConnectAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
+            var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
+            var results = await client.WaitEventsAsync(async cancellationToken =>
+            {
+                await client.ConnectAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
 
-            await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
-            await client.DisconnectAsync();
+                await client.DisconnectAsync(cancellationToken);
+            }, cancellationTokenSource.Token, events);
+
+            foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
+            {
+                Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");
+            }
         }
     }
 }

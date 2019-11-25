@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -46,7 +47,7 @@ namespace SimpleSocketIoClient
         #region Events
 
         public event EventHandler<EventArgs> Connected;
-        public event EventHandler<EventArgs> Disconnected;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Disconnected;
         public event EventHandler<DataEventArgs<string>> AfterEvent;
 
         public event EventHandler<DataEventArgs<Exception>> AfterException;
@@ -56,9 +57,9 @@ namespace SimpleSocketIoClient
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnDisconnected()
+        private void OnDisconnected((string Reason, WebSocketCloseStatus? Status) value)
         {
-            Disconnected?.Invoke(this, EventArgs.Empty);
+            Disconnected?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
         }
 
         private void OnAfterEvent(string value)
@@ -79,6 +80,7 @@ namespace SimpleSocketIoClient
         {
             EngineIoClient.AfterMessage += EngineIoClient_AfterMessage;
             EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
+            EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Value);
         }
 
         #endregion
@@ -110,7 +112,7 @@ namespace SimpleSocketIoClient
                         break;
 
                     case DisconnectPrefix:
-                        OnDisconnected();
+                        OnDisconnected(("Received disconnect message from server", null));
                         break;
 
                     case EventPrefix:
@@ -206,34 +208,36 @@ namespace SimpleSocketIoClient
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
+            await EngineIoClient.SendMessageAsync(DisconnectPrefix, cancellationToken);
+
             await EngineIoClient.CloseAsync(cancellationToken);
         }
 
-        public async Task SendEventAsync(string message, CancellationToken token = default)
+        public async Task SendEventAsync(string message, CancellationToken cancellationToken = default)
         {
-            await EngineIoClient.SendMessageAsync($"{EventPrefix}{message}", token);
+            await EngineIoClient.SendMessageAsync($"{EventPrefix}{message}", cancellationToken);
         }
 
-        public async Task Emit(string name, string message, CancellationToken token = default)
+        public async Task Emit(string name, string message, CancellationToken cancellationToken = default)
         {
-            await SendEventAsync($"[\"{name}\",{message}]", token);
+            await SendEventAsync($"[\"{name}\",{message}]", cancellationToken);
         }
 
-        public async Task Emit(string name, object value, CancellationToken token = default)
+        public async Task Emit(string name, object value, CancellationToken cancellationToken = default)
         {
             var message = JsonConvert.SerializeObject(value);
 
-            await Emit(name, message, token);
+            await Emit(name, message, cancellationToken);
         }
 
-        public async Task EmitMessage(object value, CancellationToken token = default)
+        public async Task EmitMessage(object value, CancellationToken cancellationToken = default)
         {
-            await Emit(Message, value, token);
+            await Emit(Message, value, cancellationToken);
         }
 
-        public async Task EmitMessage(string message, CancellationToken token = default)
+        public async Task EmitMessage(string message, CancellationToken cancellationToken = default)
         {
-            await Emit(Message, message, token);
+            await Emit(Message, message, cancellationToken);
         }
 
         public void On<T>(string name, Action<T, string> action)

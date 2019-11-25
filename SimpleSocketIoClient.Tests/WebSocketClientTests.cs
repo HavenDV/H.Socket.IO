@@ -20,7 +20,7 @@ namespace SimpleSocketIoClient.Tests
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
             client.Connected += (sender, args) => Console.WriteLine("Connected");
-            client.Disconnected += (sender, args) => Console.WriteLine("Disconnected");
+            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
 
             Assert.IsFalse(client.IsConnected, "client.IsConnected");
 
@@ -50,7 +50,7 @@ namespace SimpleSocketIoClient.Tests
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
             client.Connected += (sender, args) => Console.WriteLine("Connected");
-            client.Disconnected += (sender, args) => Console.WriteLine("Disconnected");
+            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
 
             Assert.IsFalse(client.IsConnected, "client.IsConnected");
 

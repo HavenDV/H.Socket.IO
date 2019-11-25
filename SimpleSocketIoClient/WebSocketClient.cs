@@ -35,7 +35,7 @@ namespace SimpleSocketIoClient
         #region Events
 
         public event EventHandler<EventArgs> Connected;
-        public event EventHandler<DataEventArgs<string, WebSocketCloseStatus?>> Disconnected;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Disconnected;
 
         public event EventHandler<DataEventArgs<string>> AfterText;
         public event EventHandler<DataEventArgs<byte[]>> AfterBinary;
@@ -46,9 +46,9 @@ namespace SimpleSocketIoClient
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnDisconnected(string value1, WebSocketCloseStatus? value2)
+        private void OnDisconnected((string Reason, WebSocketCloseStatus? Status) value)
         {
-            Disconnected?.Invoke(this, new DataEventArgs<string, WebSocketCloseStatus?>(value1, value2));
+            Disconnected?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
         }
 
         private void OnAfterText(string value)
@@ -164,7 +164,7 @@ namespace SimpleSocketIoClient
 
         #region Private methods
 
-        private async Task ReceiveAsync(CancellationToken token)
+        private async Task ReceiveAsync(CancellationToken cancellationToken)
         {
             try
             {
@@ -182,20 +182,20 @@ namespace SimpleSocketIoClient
                     {
                         try
                         {
-                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
                         }
                         catch (WebSocketException exception)
                         {
                             OnAfterException(exception);
 
-                            await ConnectAsync(LastConnectUri, token);
+                            await ConnectAsync(LastConnectUri, cancellationToken);
 
-                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
                         }
 
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            OnDisconnected(result.CloseStatusDescription, result.CloseStatus);
+                            OnDisconnected((result.CloseStatusDescription, result.CloseStatus));
                             return;
                         }
 

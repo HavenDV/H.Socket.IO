@@ -17,12 +17,6 @@ namespace SimpleSocketIoClient
         IDisposable
 #endif
     {
-        #region Fields
-
-        private bool _isOpened;
-
-        #endregion
-
         #region Constants
 
         public const string OpenPrefix = "0";
@@ -48,22 +42,7 @@ namespace SimpleSocketIoClient
 
         public EngineIoOpenMessage OpenMessage { get; private set; }
 
-        public bool IsOpened
-        {
-            get => _isOpened;
-            set
-            {
-                _isOpened = value;
-                if (value)
-                {
-                    OnOpened(OpenMessage);
-                }
-                else
-                {
-                    OnClosed();
-                }
-            }
-        }
+        public bool IsOpened { get; set; }
 
         private string Framework { get; }
         private Uri Uri { get; set; }
@@ -74,7 +53,7 @@ namespace SimpleSocketIoClient
         #region Events
 
         public event EventHandler<DataEventArgs<EngineIoOpenMessage>> Opened;
-        public event EventHandler<EventArgs> Closed;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Closed;
         public event EventHandler<DataEventArgs<string>> AfterPing;
         public event EventHandler<DataEventArgs<string>> AfterPong;
         public event EventHandler<DataEventArgs<string>> AfterMessage;
@@ -88,9 +67,9 @@ namespace SimpleSocketIoClient
             Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage>(value));
         }
 
-        private void OnClosed()
+        private void OnClosed((string Reason, WebSocketCloseStatus? Status) value)
         {
-            Closed?.Invoke(this, EventArgs.Empty);
+            Closed?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
         }
 
         private void OnAfterPing(string value)
@@ -135,6 +114,7 @@ namespace SimpleSocketIoClient
 
             WebSocketClient.AfterText += WebSocket_AfterText;
             WebSocketClient.AfterException += (sender, args) => OnAfterException(args.Value);
+            WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Value);
         }
 
         #endregion
@@ -179,10 +159,12 @@ namespace SimpleSocketIoClient
                     case OpenPrefix:
                         OpenMessage = JsonConvert.DeserializeObject<EngineIoOpenMessage>(value);
                         IsOpened = true;
+                        OnOpened(OpenMessage);
                         break;
 
                     case ClosePrefix:
                         IsOpened = false;
+                        OnClosed(("Received close message from server", null));
                         break;
 
                     case PingPrefix:
@@ -286,12 +268,14 @@ namespace SimpleSocketIoClient
         {
             Timer.Stop();
 
+            await WebSocketClient.SendTextAsync(ClosePrefix, cancellationToken);
+
             await WebSocketClient.DisconnectAsync(cancellationToken);
         }
 
-        public async Task SendMessageAsync(string message, CancellationToken token = default)
+        public async Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
         {
-            await WebSocketClient.SendTextAsync($"{MessagePrefix}{message}", token);
+            await WebSocketClient.SendTextAsync($"{MessagePrefix}{message}", cancellationToken);
         }
 
 #if NETSTANDARD2_1

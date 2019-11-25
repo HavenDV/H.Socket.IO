@@ -91,7 +91,7 @@ namespace SimpleSocketIoClient
                 ReceiveTask.IsCompleted)
             {
                 ReceiveTask?.Dispose();
-                ReceiveTask = Task.Run(async () => await Receive(), CancellationTokenSource.Token);
+                ReceiveTask = Task.Run(async () => await ReceiveAsync(CancellationTokenSource.Token), CancellationTokenSource.Token);
             }
 
             OnConnected();
@@ -134,13 +134,12 @@ namespace SimpleSocketIoClient
             if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
             {
                 CancellationTokenSource.Cancel();
-                ReceiveTask.Wait();
             }
 
             CancellationTokenSource?.Dispose();
             CancellationTokenSource = null;
 
-            ReceiveTask?.Dispose();
+            ReceiveTask?.TryDispose();
             ReceiveTask = null;
 
             Socket?.Dispose();
@@ -153,13 +152,13 @@ namespace SimpleSocketIoClient
 
         #region Private methods
 
-        private async Task Receive()
+        private async Task ReceiveAsync(CancellationToken token)
         {
             try
             {
                 while (Socket.State == WebSocketState.Open)
                 {
-                    var buffer = new byte[1024 * 1024];
+                    var buffer = new byte[1024];
 
                     WebSocketReceiveResult result;
 #if NETSTANDARD2_1
@@ -171,15 +170,15 @@ namespace SimpleSocketIoClient
                     {
                         try
                         {
-                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationTokenSource.Token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
                         }
                         catch (WebSocketException exception)
                         {
                             OnAfterException(exception);
 
-                            await ConnectAsync(LastConnectUri, CancellationTokenSource.Token);
+                            await ConnectAsync(LastConnectUri, token);
 
-                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationTokenSource.Token);
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), token);
                         }
 
                         if (result.MessageType == WebSocketMessageType.Close)

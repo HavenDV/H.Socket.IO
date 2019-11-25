@@ -10,7 +10,11 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task ConnectToWebSocketOrgTest()
         {
+#if NETCOREAPP3_0
             await using var client = new WebSocketClient();
+#else
+            using var client = new WebSocketClient();
+#endif
 
             client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
@@ -36,7 +40,11 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task DoubleConnectToWebSocketOrgTest()
         {
+#if NETCOREAPP3_0
             await using var client = new WebSocketClient();
+#else
+            using var client = new WebSocketClient();
+#endif
 
             client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");

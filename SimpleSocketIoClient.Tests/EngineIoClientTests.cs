@@ -10,7 +10,11 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
+#if NETCOREAPP3_0
             await using var client = new EngineIoClient("socket.io");
+#else
+            using var client = new EngineIoClient("socket.io");
+#endif
 
             client.WebSocketClient.AfterText += (sender, args) => Console.WriteLine($"EngineIoClient.WebSocketClient.AfterText: {args.Value}");
             client.AfterMessage += (sender, args) => Console.WriteLine($"AfterMessage: {args.Value}");

@@ -224,7 +224,15 @@ namespace SimpleSocketIoClient
             }
 
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
-            var socketIoUri = new Uri($"ws://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
+            var scheme = uri.Scheme switch
+            {
+                "http" => "ws",
+                "https" => "wss",
+                "ws" => "ws",
+                "wss" => "wss",
+                _ => throw new ArgumentException($"Scheme is not supported: {uri.Scheme}"),
+            };
+            var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
             var source = new TaskCompletionSource<bool>();
             using var cancellationSource = new CancellationTokenSource(TimeSpan.FromSeconds(timeoutInSeconds));

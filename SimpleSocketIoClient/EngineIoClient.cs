@@ -33,34 +33,38 @@ namespace SimpleSocketIoClient
 
         #region Properties
 
-        public WebSocketClient WebSocketClient { get; private set; } = new WebSocketClient();
+        public WebSocketClient? WebSocketClient { get; private set; }
 
-        public IWebProxy Proxy {
-            get => WebSocketClient.Proxy;
-            set => WebSocketClient.Proxy = value;
+        public IWebProxy? Proxy
+        {
+            get => WebSocketClient?.Proxy;
+            set
+            {
+                WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+                WebSocketClient.Proxy = value;
+            }
         }
 
-        public EngineIoOpenMessage OpenMessage { get; private set; }
+        public EngineIoOpenMessage? OpenMessage { get; private set; }
 
         public bool IsOpened { get; set; }
 
-        private string Framework { get; }
-        private Uri Uri { get; set; }
-        private System.Timers.Timer Timer { get; set; } = new System.Timers.Timer(25000);
+        private string? Framework { get; }
+        private Uri? Uri { get; set; }
+        private System.Timers.Timer? Timer { get; set; }
 
         #endregion
 
         #region Events
 
-        public event EventHandler<DataEventArgs<EngineIoOpenMessage>> Opened;
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Closed;
-        public event EventHandler<DataEventArgs<string>> AfterPing;
-        public event EventHandler<DataEventArgs<string>> AfterPong;
-        public event EventHandler<DataEventArgs<string>> AfterMessage;
-        public event EventHandler<DataEventArgs<string>> Upgraded;
-        public event EventHandler<DataEventArgs<string>> AfterNoop;
-
-        public event EventHandler<DataEventArgs<Exception>> AfterException;
+        public event EventHandler<DataEventArgs<EngineIoOpenMessage>>? Opened;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Closed;
+        public event EventHandler<DataEventArgs<string>>? AfterPing;
+        public event EventHandler<DataEventArgs<string>>? AfterPong;
+        public event EventHandler<DataEventArgs<string>>? AfterMessage;
+        public event EventHandler<DataEventArgs<string>>? Upgraded;
+        public event EventHandler<DataEventArgs<string>>? AfterNoop;
+        public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
         private void OnOpened(EngineIoOpenMessage value)
         {
@@ -110,8 +114,10 @@ namespace SimpleSocketIoClient
         {
             Framework = framework ?? throw new ArgumentNullException(nameof(framework));
 
+            Timer = new System.Timers.Timer(25000);
             Timer.Elapsed += Timer_Elapsed;
 
+            WebSocketClient = new WebSocketClient();
             WebSocketClient.AfterText += WebSocket_AfterText;
             WebSocketClient.AfterException += (sender, args) => OnAfterException(args.Value);
             WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Value);
@@ -123,6 +129,8 @@ namespace SimpleSocketIoClient
 
         private async void Timer_Elapsed(object sender, ElapsedEventArgs args)
         {
+            WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+            
             try
             {
                 // Reconnect if required
@@ -200,7 +208,8 @@ namespace SimpleSocketIoClient
 
         public async Task<bool> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            if (WebSocketClient.Socket.State == WebSocketState.Open)
+            WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+            if (WebSocketClient.IsConnected)
             {
                 return true;
             }
@@ -224,7 +233,8 @@ namespace SimpleSocketIoClient
                 return false;
             }
 
-            Timer.Interval = OpenMessage.PingInterval;
+            Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
+            Timer.Interval = OpenMessage?.PingInterval ?? 25000;
             Timer.Start();
 
             return true;
@@ -244,6 +254,9 @@ namespace SimpleSocketIoClient
 
         public async Task CloseAsync(CancellationToken cancellationToken = default)
         {
+            WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+            Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
+
             Timer.Stop();
 
             await WebSocketClient.SendTextAsync(ClosePrefix, cancellationToken);
@@ -253,6 +266,8 @@ namespace SimpleSocketIoClient
 
         public async Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
         {
+            WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+
             await WebSocketClient.SendTextAsync($"{MessagePrefix}{message}", cancellationToken);
         }
 

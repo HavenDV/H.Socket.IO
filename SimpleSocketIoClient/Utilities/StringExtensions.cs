@@ -4,7 +4,7 @@ namespace SimpleSocketIoClient.Utilities
 {
     public static class StringExtensions
     {
-        public static string Extract(this string text, string start, string end = null)
+        public static string? Extract(this string text, string start, string? end = null)
         {
             text = text ?? throw new ArgumentNullException(nameof(text));
             start = start ?? throw new ArgumentNullException(nameof(start));

@@ -9,7 +9,7 @@ namespace SimpleSocketIoClient.Utilities
     {
         private class WaitObject
         {
-            public TaskCompletionSource<bool> Source { get; set; }
+            public TaskCompletionSource<bool>? Source { get; set; }
 
             // ReSharper disable UnusedParameter.Local
             public void HandleEvent(object sender, EventArgs e)

@@ -33,24 +33,28 @@ namespace SimpleSocketIoClient
 
         #region Properties
 
-        public EngineIoClient EngineIoClient { get; private set; } = new EngineIoClient("socket.io");
+        public EngineIoClient? EngineIoClient { get; private set; }
 
-        public IWebProxy Proxy {
-            get => EngineIoClient.Proxy;
-            set => EngineIoClient.Proxy = value;
+        public IWebProxy? Proxy
+        {
+            get => EngineIoClient?.Proxy;
+            set
+            {
+                EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+                EngineIoClient.Proxy = value;
+            }
         }
 
-        private Dictionary<string, List<(Action<object, string> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
+        private Dictionary<string, List<(Action<object?, string> Action, Type Type)>>? Actions { get; } = new Dictionary<string, List<(Action<object?, string> Action, Type Type)>>();
 
         #endregion
 
         #region Events
 
-        public event EventHandler<EventArgs> Connected;
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Disconnected;
-        public event EventHandler<DataEventArgs<string>> AfterEvent;
-
-        public event EventHandler<DataEventArgs<Exception>> AfterException;
+        public event EventHandler<EventArgs>? Connected;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
+        public event EventHandler<DataEventArgs<string>>? AfterEvent;
+        public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
         private void OnConnected()
         {
@@ -78,6 +82,7 @@ namespace SimpleSocketIoClient
 
         public SocketIoClient()
         {
+            EngineIoClient = new EngineIoClient("socket.io");
             EngineIoClient.AfterMessage += EngineIoClient_AfterMessage;
             EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
             EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Value);
@@ -119,10 +124,19 @@ namespace SimpleSocketIoClient
                         {
                             OnAfterEvent(value);
 
+                            if (Actions == null)
+                            {
+                                break;
+                            }
                             try
                             {
                                 var name = value.Extract("[\"", "\"");
-                                var text = value.Extract(",").TrimEnd(']');
+                                var text = value.Extract(",")?.TrimEnd(']');
+
+                                if (name == null || text == null)
+                                {
+                                    break;
+                                }
 
                                 if (Actions.TryGetValue(name, out var actions))
                                 {
@@ -161,6 +175,8 @@ namespace SimpleSocketIoClient
 
         public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
+            EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+
             return await this.WaitEventAsync(async token =>
             {
                 await EngineIoClient.OpenAsync(uri, token);
@@ -181,6 +197,8 @@ namespace SimpleSocketIoClient
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
+            EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+
             await EngineIoClient.SendMessageAsync(DisconnectPrefix, cancellationToken);
 
             await EngineIoClient.CloseAsync(cancellationToken);
@@ -188,6 +206,8 @@ namespace SimpleSocketIoClient
 
         public async Task SendEventAsync(string message, CancellationToken cancellationToken = default)
         {
+            EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+
             await EngineIoClient.SendMessageAsync($"{EventPrefix}{message}", cancellationToken);
         }
 
@@ -213,17 +233,22 @@ namespace SimpleSocketIoClient
             await Emit(Message, message, cancellationToken);
         }
 
-        public void On<T>(string name, Action<T, string> action)
+        public void On<T>(string name, Action<T?, string> action) where T : class
         {
-            if (!Actions.ContainsKey(name))
+            if (Actions == null)
             {
-                Actions[name] = new List<(Action<object, string> Action, Type Type)>();
+                return;
             }
 
-            Actions[name].Add(((obj, text) => action?.Invoke((T)obj, text), typeof(T)));
+            if (!Actions.ContainsKey(name))
+            {
+                Actions[name] = new List<(Action<object?, string> Action, Type Type)>();
+            }
+
+            Actions[name].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
         }
 
-        public void On<T>(string name, Action<T> action)
+        public void On<T>(string name, Action<T?> action) where T : class
         {
             On<T>(name, (obj, text) => action?.Invoke(obj));
         }

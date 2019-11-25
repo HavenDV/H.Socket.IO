@@ -18,28 +18,32 @@ namespace SimpleSocketIoClient
     {
         #region Properties
 
-        public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
-        public Uri LastConnectUri { get; private set; }
-        public bool IsConnected => Socket.State == WebSocketState.Open;
+        public ClientWebSocket? Socket { get; private set; } = new ClientWebSocket();
+        public Uri? LastConnectUri { get; private set; }
+        public bool IsConnected => Socket?.State == WebSocketState.Open;
 
-        public IWebProxy Proxy { 
-            get => Socket.Options.Proxy; 
-            set => Socket.Options.Proxy = value;
+        public IWebProxy? Proxy
+        {
+            get => Socket?.Options?.Proxy;
+            set {
+                Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+                Socket.Options.Proxy = value;
+            }
         }
 
-        private Task ReceiveTask { get; set; }
-        private CancellationTokenSource CancellationTokenSource { get; set; } = new CancellationTokenSource();
+        private Task? ReceiveTask { get; set; }
+        private CancellationTokenSource? CancellationTokenSource { get; set; }
 
         #endregion
 
         #region Events
 
-        public event EventHandler<EventArgs> Connected;
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>> Disconnected;
+        public event EventHandler<EventArgs>? Connected;
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
 
-        public event EventHandler<DataEventArgs<string>> AfterText;
-        public event EventHandler<DataEventArgs<byte[]>> AfterBinary;
-        public event EventHandler<DataEventArgs<Exception>> AfterException;
+        public event EventHandler<DataEventArgs<string>>? AfterText;
+        public event EventHandler<DataEventArgs<byte[]>>? AfterBinary;
+        public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
         private void OnConnected()
         {
@@ -70,13 +74,14 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
-        public async Task ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
+        public async Task ConnectAsync(Uri? uri, CancellationToken cancellationToken = default)
         {
             if (IsConnected)
             {
                 return;
             }
 
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
             if (Socket.State != WebSocketState.None)
             {
                 Socket?.Dispose();
@@ -91,6 +96,9 @@ namespace SimpleSocketIoClient
                 ReceiveTask.IsCompleted)
             {
                 ReceiveTask?.Dispose();
+                CancellationTokenSource?.Dispose();
+
+                CancellationTokenSource = new CancellationTokenSource();
                 ReceiveTask = Task.Run(async () => await ReceiveAsync(CancellationTokenSource.Token), CancellationTokenSource.Token);
             }
 
@@ -111,6 +119,7 @@ namespace SimpleSocketIoClient
 
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
             if (!IsConnected)
             {
                 return;
@@ -129,6 +138,12 @@ namespace SimpleSocketIoClient
 
         public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)
         {
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (!IsConnected)
+            {
+                return;
+            }
+
             var bytes = Encoding.UTF8.GetBytes(message);
 
             await Socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
@@ -181,7 +196,7 @@ namespace SimpleSocketIoClient
         {
             try
             {
-                while (Socket.State == WebSocketState.Open)
+                while (Socket?.State == WebSocketState.Open)
                 {
                     var buffer = new byte[1024];
 
@@ -197,7 +212,7 @@ namespace SimpleSocketIoClient
                         {
                             result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken);
                         }
-                        catch (WebSocketException exception)
+                        catch (WebSocketException exception) when (LastConnectUri != null)
                         {
                             OnAfterException(exception);
 

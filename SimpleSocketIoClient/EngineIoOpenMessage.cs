@@ -6,10 +6,10 @@ namespace SimpleSocketIoClient
     public class EngineIoOpenMessage
     {
         [JsonProperty("sid")]
-        public string Sid { get; set; }
+        public string? Sid { get; set; }
 
         [JsonProperty("upgrades")]
-        public IReadOnlyList<string> Upgrades { get; set; }
+        public IReadOnlyList<string>? Upgrades { get; set; }
 
         [JsonProperty("pingInterval")]
         public long PingInterval { get; set; }

@@ -13,10 +13,10 @@ namespace SimpleSocketIoClient
 #if NETSTANDARD2_1
         IAsyncDisposable 
 #else
-        IDisposable 
+        IDisposable
 #endif
     {
-#region Constants
+        #region Constants
 
         public const string ConnectPrefix = "0";
         public const string DisconnectPrefix = "1";
@@ -28,9 +28,9 @@ namespace SimpleSocketIoClient
 
         public const string Message = "message";
 
-#endregion
+        #endregion
 
-#region Properties
+        #region Properties
 
         public EngineIoClient EngineIoClient { get; private set; } = new EngineIoClient("socket.io");
 
@@ -41,9 +41,9 @@ namespace SimpleSocketIoClient
 
         private Dictionary<string, List<(Action<object, string> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
 
-#endregion
+        #endregion
 
-#region Events
+        #region Events
 
         public event EventHandler<EventArgs> Connected;
         public event EventHandler<EventArgs> Disconnected;
@@ -71,9 +71,9 @@ namespace SimpleSocketIoClient
             AfterException?.Invoke(this, new DataEventArgs<Exception>(value));
         }
 
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
 
         public SocketIoClient()
         {
@@ -81,9 +81,9 @@ namespace SimpleSocketIoClient
             EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
         }
 
-#endregion
+        #endregion
 
-#region Event Handlers
+        #region Event Handlers
 
         private void EngineIoClient_AfterMessage(object sender, DataEventArgs<string> args)
         {
@@ -114,37 +114,37 @@ namespace SimpleSocketIoClient
                         break;
 
                     case EventPrefix:
-                    {
-                        OnAfterEvent(value);
-
-                        try
                         {
-                            var name = value.Extract("[\"", "\"");
-                            var text = value.Extract(",").TrimEnd(']');
+                            OnAfterEvent(value);
 
-                            if (Actions.TryGetValue(name, out var actions))
+                            try
                             {
-                                foreach (var (action, type) in actions)
-                                {
-                                    try
-                                    {
-                                        var obj = JsonConvert.DeserializeObject(text, type);
+                                var name = value.Extract("[\"", "\"");
+                                var text = value.Extract(",").TrimEnd(']');
 
-                                        action?.Invoke(obj, text);
-                                    }
-                                    catch (Exception exception)
+                                if (Actions.TryGetValue(name, out var actions))
+                                {
+                                    foreach (var (action, type) in actions)
                                     {
-                                        OnAfterException(exception);
+                                        try
+                                        {
+                                            var obj = JsonConvert.DeserializeObject(text, type);
+
+                                            action?.Invoke(obj, text);
+                                        }
+                                        catch (Exception exception)
+                                        {
+                                            OnAfterException(exception);
+                                        }
                                     }
                                 }
                             }
+                            catch (Exception exception)
+                            {
+                                OnAfterException(exception);
+                            }
+                            break;
                         }
-                        catch (Exception exception)
-                        {
-                            OnAfterException(exception);
-                        }
-                        break;
-                    }
                 }
             }
             catch (Exception exception)
@@ -153,9 +153,9 @@ namespace SimpleSocketIoClient
             }
         }
 
-#endregion
+        #endregion
 
-#region Public methods
+        #region Public methods
 
         public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds = 10, CancellationToken cancellationToken = default)
         {
@@ -266,6 +266,6 @@ namespace SimpleSocketIoClient
         }
 #endif
 
-#endregion
+        #endregion
     }
 }

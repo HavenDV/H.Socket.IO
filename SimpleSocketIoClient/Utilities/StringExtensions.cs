@@ -2,8 +2,21 @@
 
 namespace SimpleSocketIoClient.Utilities
 {
+    /// <summary>
+    /// Extensions that work with <see langword="string"/>
+    /// </summary>
     public static class StringExtensions
     {
+        /// <summary>
+        /// Retrieves the string between the starting fragment and the ending.
+        /// The first available fragment is retrieved.
+        /// Returns <see langword="null"/> if nothing is found.
+        /// If <paramref name="end"/> is not specified, the end is the end of the string.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <returns></returns>
         public static string? Extract(this string text, string start, string? end = null)
         {
             text = text ?? throw new ArgumentNullException(nameof(text));

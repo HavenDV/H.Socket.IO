@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace SimpleSocketIoClient.Utilities
 {
+    /// <summary>
+    /// Extensions that work with <see langword="event"/>
+    /// </summary>
     public static class EventExtensions
     {
         private class WaitObject
@@ -18,6 +21,14 @@ namespace SimpleSocketIoClient.Utilities
             }
         }
 
+        /// <summary>
+        /// Asynchronously expects <see langword="event"/>'s until they occur or until canceled
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="func"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="eventNames"></param>
+        /// <returns></returns>
         public static async Task<bool[]> WaitEventsAsync(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
         {
             var sources = eventNames.Select(i => new TaskCompletionSource<bool>()).ToList();
@@ -74,6 +85,14 @@ namespace SimpleSocketIoClient.Utilities
             }
         }
 
+        /// <summary>
+        /// Asynchronously expects <see langword="event"/> until they occur or until canceled
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="func"></param>
+        /// <param name="eventName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public static async Task<bool> WaitEventAsync(this object value, Func<CancellationToken, Task> func, string eventName, CancellationToken cancellationToken = default)
         {
             var results = await value.WaitEventsAsync(func, cancellationToken, eventName);

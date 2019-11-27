@@ -10,6 +10,9 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
+    /// <summary>
+    /// Socket.IO Client.
+    /// </summary>
     public sealed class SocketIoClient :
 #if NETSTANDARD2_1
         IAsyncDisposable
@@ -19,22 +22,28 @@ namespace SimpleSocketIoClient
     {
         #region Constants
 
-        public const string ConnectPrefix = "0";
-        public const string DisconnectPrefix = "1";
-        public const string EventPrefix = "2";
-        public const string AckPrefix = "3";
-        public const string ErrorPrefix = "4";
-        public const string BinaryEventPrefix = "5";
-        public const string BinaryAckPrefix = "6";
+        private const string ConnectPrefix = "0";
+        private const string DisconnectPrefix = "1";
+        private const string EventPrefix = "2";
+        //private const string AckPrefix = "3";
+        //private const string ErrorPrefix = "4";
+        //private const string BinaryEventPrefix = "5";
+        //private const string BinaryAckPrefix = "6";
 
-        public const string Message = "message";
+        private const string Message = "message";
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Internal Engine.IO Client.
+        /// </summary>
         public EngineIoClient? EngineIoClient { get; private set; }
 
+        /// <summary>
+        /// Using proxy.
+        /// </summary>
         public IWebProxy? Proxy
         {
             get => EngineIoClient?.Proxy;
@@ -51,9 +60,24 @@ namespace SimpleSocketIoClient
 
         #region Events
 
+        /// <summary>
+        /// Occurs after a successful connection.
+        /// </summary>
         public event EventHandler<EventArgs>? Connected;
+
+        /// <summary>
+        /// Occurs after a disconnection.
+        /// </summary>
         public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
+
+        /// <summary>
+        /// Occurs after new event.
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterEvent;
+
+        /// <summary>
+        /// Occurs after new exception.
+        /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
         private void OnConnected()
@@ -80,6 +104,9 @@ namespace SimpleSocketIoClient
 
         #region Constructors
 
+        /// <summary>
+        /// Creates Engine.IO client internally.
+        /// </summary>
         public SocketIoClient()
         {
             EngineIoClient = new EngineIoClient("socket.io");
@@ -173,6 +200,12 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
+        /// <summary>
+        /// It connects to the server and asynchronously waits for a connection message.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
@@ -183,6 +216,12 @@ namespace SimpleSocketIoClient
             }, nameof(Connected), cancellationToken);
         }
 
+        /// <summary>
+        /// It connects to the server and asynchronously waits for a connection message with the selected timeout.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout)
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
@@ -190,11 +229,22 @@ namespace SimpleSocketIoClient
             return await ConnectAsync(uri, cancellationSource.Token);
         }
 
+        /// <summary>
+        /// It connects to the server and asynchronously waits for a connection message with the selected timeout.
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeoutInSeconds"></param>
+        /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds)
         {
             return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
+        /// <summary>
+        /// Sends a disconnect message and closes the connection.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
@@ -204,6 +254,12 @@ namespace SimpleSocketIoClient
             await EngineIoClient.CloseAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// Sends a new raw message.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task SendEventAsync(string message, CancellationToken cancellationToken = default)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
@@ -211,11 +267,25 @@ namespace SimpleSocketIoClient
             await EngineIoClient.SendMessageAsync($"{EventPrefix}{message}", cancellationToken);
         }
 
+        /// <summary>
+        /// Sends a new event with the specified name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task Emit(string name, string message, CancellationToken cancellationToken = default)
         {
             await SendEventAsync($"[\"{name}\",{message}]", cancellationToken);
         }
 
+        /// <summary>
+        /// Sends a new event where name is the name of the event and the object is serialized in json.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task Emit(string name, object value, CancellationToken cancellationToken = default)
         {
             var message = JsonConvert.SerializeObject(value);
@@ -223,16 +293,34 @@ namespace SimpleSocketIoClient
             await Emit(name, message, cancellationToken);
         }
 
+        /// <summary>
+        /// Sends a new message event where the object is serialized in json
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task EmitMessage(object value, CancellationToken cancellationToken = default)
         {
             await Emit(Message, value, cancellationToken);
         }
 
+        /// <summary>
+        /// Sends a new message event.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task EmitMessage(string message, CancellationToken cancellationToken = default)
         {
             await Emit(Message, message, cancellationToken);
         }
 
+        /// <summary>
+        /// Performs an action after receiving a specific event. The first parameter is a json deserialized object, the second is raw text.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
         public void On<T>(string name, Action<T?, string> action) where T : class
         {
             if (Actions == null)
@@ -248,22 +336,42 @@ namespace SimpleSocketIoClient
             Actions[name].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
         }
 
+        /// <summary>
+        /// Performs an action after receiving a specific event. The parameter is a json deserialized object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
         public void On<T>(string name, Action<T?> action) where T : class
         {
             On<T>(name, (obj, text) => action?.Invoke(obj));
         }
 
+        /// <summary>
+        /// Performs an action after receiving a specific event. The parameter is a raw text.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
         public void On(string name, Action<string> action)
         {
             On<object>(name, (obj, text) => action?.Invoke(text));
         }
 
+        /// <summary>
+        /// Performs an action after receiving a specific event.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="action"></param>
         public void On(string name, Action action)
         {
             On<object>(name, (obj, text) => action?.Invoke());
         }
 
 #if NETSTANDARD2_1
+        /// <summary>
+        /// Asynchronously disposes an object.
+        /// </summary>
+        /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
             if (EngineIoClient != null)
@@ -273,6 +381,9 @@ namespace SimpleSocketIoClient
             }
         }
 #else
+        /// <summary>
+        /// Disposes an object.
+        /// </summary>
         public void Dispose()
         {
             EngineIoClient?.Dispose();

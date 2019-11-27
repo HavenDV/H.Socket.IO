@@ -3,11 +3,14 @@ using System.Threading.Tasks;
 
 namespace SimpleSocketIoClient.Utilities
 {
+    /// <summary>
+    /// Extensions that work with <see cref="Task"/>
+    /// </summary>
     public static class TaskExtensions
     {
         /// <summary>
         /// Attempts to dispose of a Task, but will not propagate the exception.  
-        /// Returns <value>false</value> instead if the Task could not be disposed.
+        /// Returns <see langword="true"/> instead if the Task could not be disposed.
         /// </summary>
         /// <param name="source"></param>
         /// <param name="shouldMarkExceptionsHandled"></param>

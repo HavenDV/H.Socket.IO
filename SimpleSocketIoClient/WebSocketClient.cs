@@ -9,6 +9,9 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class WebSocketClient :
 #if NETSTANDARD2_1
         IAsyncDisposable 
@@ -18,10 +21,24 @@ namespace SimpleSocketIoClient
     {
         #region Properties
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ClientWebSocket? Socket { get; private set; } = new ClientWebSocket();
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Uri? LastConnectUri { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public bool IsConnected => Socket?.State == WebSocketState.Open;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IWebProxy? Proxy
         {
             get => Socket?.Options?.Proxy;
@@ -38,11 +55,29 @@ namespace SimpleSocketIoClient
 
         #region Events
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<EventArgs>? Connected;
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterText;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<byte[]>>? AfterBinary;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
         private void OnConnected()
@@ -74,6 +109,12 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task ConnectAsync(Uri? uri, CancellationToken cancellationToken = default)
         {
             if (IsConnected)
@@ -105,6 +146,12 @@ namespace SimpleSocketIoClient
             OnConnected();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task ConnectAsync(Uri uri, TimeSpan timeout)
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
@@ -112,11 +159,22 @@ namespace SimpleSocketIoClient
             await ConnectAsync(uri, cancellationSource.Token);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeoutInSeconds"></param>
+        /// <returns></returns>
         public async Task ConnectAsync(Uri uri, int timeoutInSeconds)
         {
             await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
             Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
@@ -136,6 +194,12 @@ namespace SimpleSocketIoClient
             }, nameof(Disconnected), cancellationToken);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)
         {
             Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
@@ -150,6 +214,10 @@ namespace SimpleSocketIoClient
         }
 
 #if NETSTANDARD2_1
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
             if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
@@ -169,6 +237,9 @@ namespace SimpleSocketIoClient
             Socket = null;
         }
 #else
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)

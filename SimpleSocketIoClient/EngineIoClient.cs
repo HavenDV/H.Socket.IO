@@ -10,6 +10,9 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
 {
+    /// <summary>
+    /// Engine.IO Client
+    /// </summary>
     public sealed class EngineIoClient :
 #if NETSTANDARD2_1
         IAsyncDisposable 
@@ -19,22 +22,28 @@ namespace SimpleSocketIoClient
     {
         #region Constants
 
-        public const string OpenPrefix = "0";
-        public const string ClosePrefix = "1";
-        public const string PingPrefix = "2";
-        public const string PongPrefix = "3";
-        public const string MessagePrefix = "4";
-        public const string UpgradePrefix = "5";
-        public const string NoopPrefix = "6";
+        private const string OpenPrefix = "0";
+        private const string ClosePrefix = "1";
+        private const string PingPrefix = "2";
+        private const string PongPrefix = "3";
+        private const string MessagePrefix = "4";
+        private const string UpgradePrefix = "5";
+        private const string NoopPrefix = "6";
 
-        public const string PingMessage = "ping";
+        private const string PingMessage = "ping";
 
         #endregion
 
         #region Properties
 
+        /// <summary>
+        /// Internal WebSocket Client
+        /// </summary>
         public WebSocketClient? WebSocketClient { get; private set; }
 
+        /// <summary>
+        /// Proxy
+        /// </summary>
         public IWebProxy? Proxy
         {
             get => WebSocketClient?.Proxy;
@@ -45,8 +54,18 @@ namespace SimpleSocketIoClient
             }
         }
 
+#pragma warning disable 1574
+        /// <summary>
+        /// This property contains OpenMessage after successful <seealso cref="OpenAsync(Uri, CancellationToken)"/>
+        /// </summary>
+#pragma warning restore 1574
         public EngineIoOpenMessage? OpenMessage { get; private set; }
 
+#pragma warning disable 1574
+        /// <summary>
+        /// This property is true after successful <seealso cref="OpenAsync(Uri, CancellationToken)"/>
+        /// </summary>
+#pragma warning restore 1574
         public bool IsOpened { get; set; }
 
         private string? Framework { get; }
@@ -57,22 +76,65 @@ namespace SimpleSocketIoClient
 
         #region Events
 
-        public event EventHandler<DataEventArgs<EngineIoOpenMessage>>? Opened;
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<EngineIoOpenMessage?>>? Opened;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Closed;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterPing;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterPong;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterMessage;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? Upgraded;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<string>>? AfterNoop;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
-        private void OnOpened(EngineIoOpenMessage value)
+        private void OnOpened(EngineIoOpenMessage? value)
         {
-            Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage>(value));
+            if (Timer == null)
+            {
+                return;
+            }
+
+            IsOpened = true;
+
+            Timer.Interval = value?.PingInterval ?? 25000;
+            Timer.Start();
+
+            Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage?>(value));
         }
 
         private void OnClosed((string Reason, WebSocketCloseStatus? Status) value)
         {
+            IsOpened = false;
+
             Closed?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
         }
 
@@ -110,6 +172,10 @@ namespace SimpleSocketIoClient
 
         #region Constructors
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="framework"></param>
         public EngineIoClient(string framework = "engine.io")
         {
             Framework = framework ?? throw new ArgumentNullException(nameof(framework));
@@ -206,9 +272,17 @@ namespace SimpleSocketIoClient
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<bool> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
+            Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
+
             if (WebSocketClient.IsConnected)
             {
                 return true;
@@ -225,21 +299,18 @@ namespace SimpleSocketIoClient
             };
             var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
-            if (!await this.WaitEventAsync(async token =>
+            return await this.WaitEventAsync(async token =>
             {
                 await WebSocketClient.ConnectAsync(socketIoUri, token);
-            }, nameof(Opened), cancellationToken))
-            {
-                return false;
-            }
-
-            Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
-            Timer.Interval = OpenMessage?.PingInterval ?? 25000;
-            Timer.Start();
-
-            return true;
+            }, nameof(Opened), cancellationToken);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public async Task<bool> OpenAsync(Uri uri, TimeSpan timeout)
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
@@ -247,11 +318,22 @@ namespace SimpleSocketIoClient
             return await OpenAsync(uri, cancellationSource.Token);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeoutInSeconds"></param>
+        /// <returns></returns>
         public async Task<bool> OpenAsync(Uri uri, int timeoutInSeconds)
         {
             return await OpenAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task CloseAsync(CancellationToken cancellationToken = default)
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
@@ -264,6 +346,12 @@ namespace SimpleSocketIoClient
             await WebSocketClient.DisconnectAsync(cancellationToken);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task SendMessageAsync(string message, CancellationToken cancellationToken = default)
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
@@ -272,6 +360,10 @@ namespace SimpleSocketIoClient
         }
 
 #if NETSTANDARD2_1
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
             if (WebSocketClient != null)
@@ -284,6 +376,9 @@ namespace SimpleSocketIoClient
             Timer = null;
         }
 #else
+        /// <summary>
+        /// 
+        /// </summary>
         public void Dispose()
         {
             WebSocketClient?.Dispose();

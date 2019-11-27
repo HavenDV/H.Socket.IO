@@ -316,7 +316,7 @@ namespace SimpleSocketIoClient
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. The first parameter is a json deserialized object, the second is raw text.
+        /// Performs an action after receiving a specific event. <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object, <paramref name="action"/>.<see langword="string"/> is raw text.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
@@ -337,7 +337,7 @@ namespace SimpleSocketIoClient
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. The parameter is a json deserialized object.
+        /// Performs an action after receiving a specific event. <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
@@ -348,7 +348,7 @@ namespace SimpleSocketIoClient
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. The parameter is a raw text.
+        /// Performs an action after receiving a specific event. <paramref name="action"/>.<see langword="string"/> is a raw text.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="action"></param>

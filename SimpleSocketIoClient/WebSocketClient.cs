@@ -63,7 +63,7 @@ namespace SimpleSocketIoClient
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
+        public event EventHandler<WebSocketCloseEventArgs>? Disconnected;
         
         /// <summary>
         /// 
@@ -85,9 +85,9 @@ namespace SimpleSocketIoClient
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnDisconnected((string Reason, WebSocketCloseStatus? Status) value)
+        private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
         {
-            Disconnected?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
+            Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
         private void OnAfterText(string value)
@@ -189,7 +189,7 @@ namespace SimpleSocketIoClient
 
                 if (Socket.State == WebSocketState.Aborted)
                 {
-                    OnDisconnected((Socket.CloseStatusDescription, Socket.CloseStatus));
+                    OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
                 }
             }, nameof(Disconnected), cancellationToken);
         }
@@ -294,7 +294,7 @@ namespace SimpleSocketIoClient
 
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            OnDisconnected((result.CloseStatusDescription, result.CloseStatus));
+                            OnDisconnected(result.CloseStatusDescription, result.CloseStatus);
                             return;
                         }
 
@@ -327,6 +327,8 @@ namespace SimpleSocketIoClient
             {
                 OnAfterException(exception);
             }
+
+            OnDisconnected(Socket?.CloseStatusDescription, Socket?.CloseStatus);
         }
 
         #endregion

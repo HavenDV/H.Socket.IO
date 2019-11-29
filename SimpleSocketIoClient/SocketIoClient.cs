@@ -67,7 +67,7 @@ namespace SimpleSocketIoClient
         /// <summary>
         /// Occurs after a disconnection.
         /// </summary>
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Disconnected;
+        public event EventHandler<WebSocketCloseEventArgs>? Disconnected;
 
         /// <summary>
         /// Occurs after new event.
@@ -89,9 +89,9 @@ namespace SimpleSocketIoClient
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnDisconnected((string Reason, WebSocketCloseStatus? Status) value)
+        private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
         {
-            Disconnected?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
+            Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
         private void OnAfterEvent(string value)
@@ -121,7 +121,7 @@ namespace SimpleSocketIoClient
             EngineIoClient = new EngineIoClient("socket.io");
             EngineIoClient.AfterMessage += EngineIoClient_AfterMessage;
             EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
-            EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Value);
+            EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Reason, args.Status);
         }
 
         #endregion
@@ -153,7 +153,7 @@ namespace SimpleSocketIoClient
                         break;
 
                     case DisconnectPrefix:
-                        OnDisconnected(("Received disconnect message from server", null));
+                        OnDisconnected("Received disconnect message from server", null);
                         break;
 
                     case EventPrefix:

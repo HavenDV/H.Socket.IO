@@ -22,7 +22,7 @@ namespace SimpleSocketIoClient.Tests
             client.AfterMessage += (sender, args) => Console.WriteLine($"AfterMessage: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
-            client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
+            client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] {nameof(client.Opened), nameof(client.Closed)};
             var results = await client.WaitEventsAsync(async cancellationToken =>

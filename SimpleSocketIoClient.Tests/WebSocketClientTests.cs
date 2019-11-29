@@ -24,7 +24,7 @@ namespace SimpleSocketIoClient.Tests
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
             client.Connected += (sender, args) => Console.WriteLine("Connected");
-            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
+            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
             var results = await client.WaitEventsAsync(async cancellationToken =>

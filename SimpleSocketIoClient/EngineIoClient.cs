@@ -84,7 +84,7 @@ namespace SimpleSocketIoClient
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>>? Closed;
+        public event EventHandler<WebSocketCloseEventArgs>? Closed;
 
         /// <summary>
         /// 
@@ -131,11 +131,11 @@ namespace SimpleSocketIoClient
             Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage?>(value));
         }
 
-        private void OnClosed((string Reason, WebSocketCloseStatus? Status) value)
+        private void OnClosed(string? reason, WebSocketCloseStatus? status)
         {
             IsOpened = false;
 
-            Closed?.Invoke(this, new DataEventArgs<(string Reason, WebSocketCloseStatus? Status)>(value));
+            Closed?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
         private void OnAfterPing(string value)
@@ -186,7 +186,7 @@ namespace SimpleSocketIoClient
             WebSocketClient = new WebSocketClient();
             WebSocketClient.AfterText += WebSocket_AfterText;
             WebSocketClient.AfterException += (sender, args) => OnAfterException(args.Value);
-            WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Value);
+            WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Reason, args.Status);
         }
 
         #endregion
@@ -238,7 +238,7 @@ namespace SimpleSocketIoClient
 
                     case ClosePrefix:
                         IsOpened = false;
-                        OnClosed(("Received close message from server", null));
+                        OnClosed("Received close message from server", null);
                         break;
 
                     case PingPrefix:

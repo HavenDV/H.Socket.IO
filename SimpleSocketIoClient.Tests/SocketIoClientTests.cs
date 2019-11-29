@@ -29,7 +29,7 @@ namespace SimpleSocketIoClient.Tests
 #endif
 
             client.Connected += (sender, args) => Console.WriteLine("Connected");
-            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
+            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
             client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
             client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");

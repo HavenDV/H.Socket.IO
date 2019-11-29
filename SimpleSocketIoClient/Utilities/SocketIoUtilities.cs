@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SimpleSocketIoClient.Utilities
@@ -21,9 +22,30 @@ namespace SimpleSocketIoClient.Utilities
                 throw new ArgumentException("text must begin with \'[\' and end with \']\'");
             }
 
+            text = text.Trim('[', ']');
+
+            var indexes = new List<int>();
+            var countOfObjects = 0;
+            for (var i = 0; i < text.Length; i++)
+            {
+                switch (text[i])
+                {
+                    case '{':
+                        countOfObjects++;
+                        break;
+
+                    case '}':
+                        countOfObjects--;
+                        break;
+
+                    case ',' when countOfObjects == 0:
+                        indexes.Add(i);
+                        break;
+                }
+            }
+
             return text
-                .Trim('[', ']')
-                .Split(',')
+                .SplitByIndexes(indexes.ToArray())
                 .Select(value => value.Trim('\"'))
                 .ToArray();
         }

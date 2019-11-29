@@ -20,6 +20,10 @@ namespace SimpleSocketIoClient.Tests
             CollectionAssert.AreEqual(
                 new[] { "message", "{}" },
                 "[\"message\",{}]".GetEventValues());
+
+            CollectionAssert.AreEqual(
+                new[] { "new message", "{\"username\":\"1\",\"message\":\"1\"}" },
+                "[\"new message\",{\"username\":\"1\",\"message\":\"1\"}]".GetEventValues());
         }
     }
 }

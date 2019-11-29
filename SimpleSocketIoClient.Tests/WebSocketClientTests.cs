@@ -63,6 +63,10 @@ namespace SimpleSocketIoClient.Tests
                 Assert.IsFalse(client.IsConnected, "client.IsConnected");
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine($"WebSocket State: {client.Socket.State}");
+            Console.WriteLine($"WebSocket CloseStatus: {client.Socket.CloseStatus}");
+            Console.WriteLine($"WebSocket CloseStatusDescription: {client.Socket.CloseStatusDescription}");
+
             foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
             {
                 Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");

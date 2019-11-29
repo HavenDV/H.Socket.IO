@@ -83,6 +83,10 @@ namespace SimpleSocketIoClient.Tests
                 await client.DisconnectAsync(cancellationToken);
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine($"WebSocket State: {client.EngineIoClient.WebSocketClient.Socket.State}");
+            Console.WriteLine($"WebSocket CloseStatus: {client.EngineIoClient.WebSocketClient.Socket.CloseStatus}");
+            Console.WriteLine($"WebSocket CloseStatusDescription: {client.EngineIoClient.WebSocketClient.Socket.CloseStatusDescription}");
+
             foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
             {
                 Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");

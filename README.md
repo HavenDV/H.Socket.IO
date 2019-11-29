@@ -47,18 +47,18 @@ public async Task ConnectToChatNowShTest()
     });
     client.On<ChatMessage>("typing", message =>
     {
-        Console.WriteLine($"User typing: {message.Username}.");
+        Console.WriteLine($"User typing: {message.Username}");
     });
     client.On<ChatMessage>("stop typing", message =>
     {
-        Console.WriteLine($"User stop typing: {message.Username}.");
+        Console.WriteLine($"User stop typing: {message.Username}");
     });
     client.On<ChatMessage>("new message", message =>
     {
         Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
     });
 	
-    await client.ConnectAsync(new Uri("ws://socket-io-chat.now.sh/"));
+    await client.ConnectAsync(new Uri("wss://socket-io-chat.now.sh/"));
 
     await client.Emit("add user", "C# SimpleSocketIoClient Test User");
 

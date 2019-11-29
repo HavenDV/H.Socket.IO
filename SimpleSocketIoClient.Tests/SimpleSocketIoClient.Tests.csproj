@@ -6,9 +6,14 @@
         <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;net461;net47;</TargetFrameworks>
       </PropertyGroup>
     </When>
-    <When Condition="'$(OS)' != 'Windows_NT'">
+    <When Condition="'$(OS)' != 'Windows_NT' AND '$(DOTNET_VERSION)' == '3'">
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.0;</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(OS)' != 'Windows_NT' AND '$(DOTNET_VERSION)' != '3'">
+      <PropertyGroup>
+        <TargetFrameworks>netcoreapp2.0;</TargetFrameworks>
       </PropertyGroup>
     </When>
   </Choose>

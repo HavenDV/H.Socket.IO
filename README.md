@@ -11,16 +11,73 @@ Install-Package SimpleSocketIoClient
 ### Usage
 
 ```cs
-using var client = new SocketIoClient();
 
-client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
-client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
+public class ChatMessage
+{
+    public string Username { get; set; }
+    public string Message { get; set; }
+    public long NumUsers { get; set; }
+}
 
-await client.ConnectAsync(new Uri("https://socket-io-chat.now.sh/"));
+public async Task ConnectToChatNowShTest()
+{
+#if NETCOREAPP3_0
+    await using var client = new SocketIoClient();
+#else
+    using var client = new SocketIoClient();
+#endif
 
-await Task.Delay(TimeSpan.FromSeconds(5));
+    client.Connected += (sender, args) => Console.WriteLine("Connected");
+    client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Value.Reason}, Status: {args.Value.Status:G}");
+    client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
+    client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: {args.Value}");
+    client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
-await client.DisconnectAsync();
+    client.On<ChatMessage>("login", message =>
+    {
+        Console.WriteLine($"You are logged in. Total number of users: {message.NumUsers}");
+    });
+    client.On<ChatMessage>("user joined", message =>
+    {
+        Console.WriteLine($"User joined: {message.Username}. Total number of users: {message.NumUsers}");
+    });
+    client.On<ChatMessage>("user left", message =>
+    {
+        Console.WriteLine($"User left: {message.Username}. Total number of users: {message.NumUsers}");
+    });
+    client.On<ChatMessage>("typing", message =>
+    {
+        Console.WriteLine($"User typing: {message.Username}.");
+    });
+    client.On<ChatMessage>("stop typing", message =>
+    {
+        Console.WriteLine($"User stop typing: {message.Username}.");
+    });
+    client.On<ChatMessage>("new message", message =>
+    {
+        Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
+    });
+	
+    await client.ConnectAsync(new Uri("ws://socket-io-chat.now.sh/"));
+
+    await client.Emit("add user", "C# SimpleSocketIoClient Test User");
+
+    await Task.Delay(TimeSpan.FromMilliseconds(200));
+
+    await client.Emit("typing");
+
+    await Task.Delay(TimeSpan.FromMilliseconds(200));
+
+    await client.Emit("new message", "hello");
+
+    await Task.Delay(TimeSpan.FromMilliseconds(200));
+
+    await client.Emit("stop typing");
+
+    await Task.Delay(TimeSpan.FromSeconds(2));
+
+    await client.DisconnectAsync();
+}
 ```
 
 ### Branches

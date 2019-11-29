@@ -4,7 +4,11 @@ on: [push]
 
 jobs:
   build:
-    runs-on: [windows-latest]
+    strategy:
+        matrix:
+            os: [ubuntu-latest, ubuntu-16.04, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
 
     steps:
     - name: Getting context
@@ -16,6 +20,7 @@ jobs:
       uses: actions/checkout@v1
       
     - name: Getting Nuget cache
+      if: runner.os == 'Windows'
       uses: actions/cache@v1
       with:
         path: ~/.nuget/packages
@@ -32,7 +37,8 @@ jobs:
       run: dotnet build --configuration Release
       
     - name: Run tests
-      run: dotnet test
+      run: dotnet test --configuration Release
       
     - name: Try Publish(if the version has changed)
+      if: runner.os == 'Windows'
       run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

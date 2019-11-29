@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        dotnet: [ '2.2.103', '3.0.100', '3.1.100-preview3-014645' ]
+        dotnet: [ '3.0.100', '3.1.100-preview3-014645' ]
         os: [ubuntu-latest, ubuntu-16.04, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
@@ -35,18 +35,13 @@ jobs:
       with:
         dotnet-version: ${{ matrix.dotnet }}
     
-    - name: Build and run tests with dotnet(Windows)
-      if: runner.os == 'Windows'
-      run: dotnet test --configuration Release
+    - name: Build
+      run: dotnet build --configuration Release
     
-    - name: Build and run tests with dotnet 2(No Windows)
-      if: matrix.dotnet == '2.2.103'
-      run: dotnet test --configuration Release /p:DOTNET_VERSION=2
-    
-    - name: Build and run tests with dotnet 3(No Windows)
-      if: matrix.dotnet != '2.2.103'
+    - name: Run tests
       run: dotnet test --configuration Release
       
     - name: Try Publish(if the version has changed)
-      if: runner.os == 'Windows'
+      if: runner.os == 'Windows' &&
+          matrix.dotnet == '3.0.100'
       run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

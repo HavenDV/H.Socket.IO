@@ -1,7 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Choose>
+    <When Condition="'$(OS)' == 'Windows_NT'">
+      <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(OS)' != 'Windows_NT' AND '$(DOTNET_VERSION)' == '2'">
+      <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(OS)' != 'Windows_NT' AND '$(DOTNET_VERSION)' != '2'">
+      <PropertyGroup>
+        <TargetFrameworks>netstandard2.1;</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+  </Choose>
+
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0</TargetFrameworks>
     <LangVersion>8</LangVersion>
     <Authors>havendv</Authors>
     <Company>havendv</Company>

@@ -1,4 +1,10 @@
-## [SimpleSocketIoClient](https://github.com/HavenDV/SimpleSocketIoClient/) [![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/SimpleSocketIoClient/search?l=C%23&o=desc&s=&type=Code) [![License](https://img.shields.io/github/license/HavenDV/SimpleSocketIoClient.svg?label=License&maxAge=86400)](LICENSE.md) [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
+## [SimpleSocketIoClient](https://github.com/HavenDV/SimpleSocketIoClient/) 
+
+[![NuGet](https://img.shields.io/nuget/v/SimpleSocketIoClient.svg?style=flat-square)](https://www.nuget.org/packages/SimpleSocketIoClient/)
+[![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/SimpleSocketIoClient/search?l=C%23&o=desc&s=&type=Code) 
+[![License](https://img.shields.io/github/license/HavenDV/SimpleSocketIoClient.svg?label=License&maxAge=86400)](LICENSE.md) 
+[![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
+[![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22)
 
 This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0**
 
@@ -79,13 +85,6 @@ public async Task ConnectToChatNowShTest()
     await client.DisconnectAsync();
 }
 ```
-
-### Branches
-
-|   master(stable)  |
-|-------------------|
-| Github Actions CI |
-| [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22) |
 
 ### Used documentation
 

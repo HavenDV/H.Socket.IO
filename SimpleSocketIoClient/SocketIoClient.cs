@@ -30,8 +30,6 @@ namespace SimpleSocketIoClient
         //private const string BinaryEventPrefix = "5";
         //private const string BinaryAckPrefix = "6";
 
-        private const string Message = "message";
-
         #endregion
 
         #region Properties
@@ -76,6 +74,11 @@ namespace SimpleSocketIoClient
         public event EventHandler<DataEventArgs<string>>? AfterEvent;
 
         /// <summary>
+        /// Occurs after new unhandled event(not captured by any On).
+        /// </summary>
+        public event EventHandler<DataEventArgs<string>>? AfterUnhandledEvent;
+
+        /// <summary>
         /// Occurs after new exception.
         /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
@@ -93,6 +96,11 @@ namespace SimpleSocketIoClient
         private void OnAfterEvent(string value)
         {
             AfterEvent?.Invoke(this, new DataEventArgs<string>(value));
+        }
+
+        private void OnAfterUnhandledEvent(string value)
+        {
+            AfterUnhandledEvent?.Invoke(this, new DataEventArgs<string>(value));
         }
 
         private void OnAfterException(Exception value)
@@ -181,6 +189,10 @@ namespace SimpleSocketIoClient
                                         }
                                     }
                                 }
+                                else
+                                {
+                                    OnAfterUnhandledEvent(value);
+                                }
                             }
                             catch (Exception exception)
                             {
@@ -194,6 +206,15 @@ namespace SimpleSocketIoClient
             {
                 OnAfterException(exception);
             }
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private async Task EmitInternal(CancellationToken cancellationToken = default, params string[] messages)
+        {
+            await SendEventAsync($"[{string.Join(",", messages)}]", cancellationToken);
         }
 
         #endregion
@@ -268,6 +289,17 @@ namespace SimpleSocketIoClient
         }
 
         /// <summary>
+        /// Sends a new event where name is the name of the event.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task Emit(string name, CancellationToken cancellationToken = default)
+        {
+            await EmitInternal(cancellationToken, $"\"{name}\"");
+        }
+
+        /// <summary>
         /// Sends a new event with the specified name.
         /// </summary>
         /// <param name="name"></param>
@@ -276,7 +308,7 @@ namespace SimpleSocketIoClient
         /// <returns></returns>
         public async Task Emit(string name, string message, CancellationToken cancellationToken = default)
         {
-            await SendEventAsync($"[\"{name}\",{message}]", cancellationToken);
+            await EmitInternal(cancellationToken, $"\"{name}\"", $"\"{message}\"");
         }
 
         /// <summary>
@@ -288,31 +320,9 @@ namespace SimpleSocketIoClient
         /// <returns></returns>
         public async Task Emit(string name, object value, CancellationToken cancellationToken = default)
         {
-            var message = JsonConvert.SerializeObject(value);
+            var json = JsonConvert.SerializeObject(value);
 
-            await Emit(name, message, cancellationToken);
-        }
-
-        /// <summary>
-        /// Sends a new message event where the object is serialized in json
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task EmitMessage(object value, CancellationToken cancellationToken = default)
-        {
-            await Emit(Message, value, cancellationToken);
-        }
-
-        /// <summary>
-        /// Sends a new message event.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task EmitMessage(string message, CancellationToken cancellationToken = default)
-        {
-            await Emit(Message, message, cancellationToken);
+            await EmitInternal(cancellationToken, $"\"{name}\"", json);
         }
 
         /// <summary>

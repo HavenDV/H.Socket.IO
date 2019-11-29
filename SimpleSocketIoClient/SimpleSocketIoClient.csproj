@@ -19,13 +19,11 @@
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.9</Version>
+    <Version>0.9.9.1</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added AfterUnhandledEvent event.
-Added Emit(name) method.
-Fixed Emit bugs.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed On when second argument == null</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2019 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
@@ -34,7 +32,6 @@ Fixed Emit bugs.</PackageReleaseNotes>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <AssemblyVersion>0.9.8.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

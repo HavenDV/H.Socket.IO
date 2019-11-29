@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -52,7 +53,7 @@ namespace SimpleSocketIoClient
             }
         }
 
-        private Dictionary<string, List<(Action<object?, string> Action, Type Type)>>? Actions { get; } = new Dictionary<string, List<(Action<object?, string> Action, Type Type)>>();
+        private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>? Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
 
         #endregion
 
@@ -165,10 +166,11 @@ namespace SimpleSocketIoClient
                             }
                             try
                             {
-                                var name = value.Extract("[\"", "\"");
-                                var text = value.Extract(",")?.TrimEnd(']');
+                                var values = value.GetEventValues();
+                                var name = values.ElementAtOrDefault(0);
+                                var text = values.ElementAtOrDefault(1);
 
-                                if (name == null || text == null)
+                                if (name == null)
                                 {
                                     break;
                                 }
@@ -179,7 +181,9 @@ namespace SimpleSocketIoClient
                                     {
                                         try
                                         {
-                                            var obj = JsonConvert.DeserializeObject(text, type);
+                                            var obj = text == null
+                                                ? null
+                                                : JsonConvert.DeserializeObject(text, type);
 
                                             action?.Invoke(obj, text);
                                         }
@@ -331,7 +335,7 @@ namespace SimpleSocketIoClient
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On<T>(string name, Action<T?, string> action) where T : class
+        public void On<T>(string name, Action<T?, string?> action) where T : class
         {
             if (Actions == null)
             {
@@ -340,7 +344,7 @@ namespace SimpleSocketIoClient
 
             if (!Actions.ContainsKey(name))
             {
-                Actions[name] = new List<(Action<object?, string> Action, Type Type)>();
+                Actions[name] = new List<(Action<object?, string?> Action, Type Type)>();
             }
 
             Actions[name].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
@@ -362,7 +366,7 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On(string name, Action<string> action)
+        public void On(string name, Action<string?> action)
         {
             On<object>(name, (obj, text) => action?.Invoke(text));
         }

@@ -19,11 +19,11 @@
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.9.9.2</Version>
+    <Version>0.9.9.3</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed On when second argument == null</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed EventExtensions.WaitEventsAsync canceled results</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2019 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

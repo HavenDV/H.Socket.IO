@@ -74,7 +74,7 @@ namespace SimpleSocketIoClient.Utilities
             }
             catch (TaskCanceledException)
             {
-                return sources.Select(i => false).ToArray();
+                return sources.Select(i => i.Task.IsCompleted && !i.Task.IsCanceled && i.Task.Result).ToArray();
             }
             finally
             {

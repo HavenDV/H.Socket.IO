@@ -11,9 +11,10 @@ namespace SimpleSocketIoClient.Tests
     {
         private class TestClass
         {
-            public event EventHandler TestEvent;
+            public event EventHandler TestEvent1;
+            public event EventHandler TestEvent2;
 
-            public void OnTestEvent() => TestEvent?.Invoke(this, EventArgs.Empty);
+            public void OnTestEvent1() => TestEvent1?.Invoke(this, EventArgs.Empty);
         }
 
         [TestMethod]
@@ -26,10 +27,28 @@ namespace SimpleSocketIoClient.Tests
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
 
-                testObject.OnTestEvent();
-            }, nameof(TestClass.TestEvent), cancellationTokenSource.Token);
+                testObject.OnTestEvent1();
+            }, nameof(TestClass.TestEvent1), cancellationTokenSource.Token);
 
             Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public async Task WaitEventsAsyncTest()
+        {
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+            var testObject = new TestClass();
+
+            var eventNames = new[] { nameof(TestClass.TestEvent1), nameof(TestClass.TestEvent2) };
+            var results = await testObject.WaitEventsAsync(async cancellationToken =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
+
+                testObject.OnTestEvent1();
+            }, cancellationTokenSource.Token, eventNames);
+
+            Assert.IsTrue(results[0]);
+            Assert.IsFalse(results[1]);
         }
     }
 }

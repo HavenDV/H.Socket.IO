@@ -1,11 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SimpleSocketIoClient.Utilities;
 
-namespace SimpleSocketIoClient.Tests
+namespace SimpleSocketIoClient.IntegrationTests
 {
     [TestClass]
     public class EngineIoClientTests

@@ -23,70 +23,42 @@ namespace SimpleSocketIoClient.Utilities
         }
 
         /// <summary>
-        /// Asynchronously expects <see langword="event"/>'s until they occur or until canceled
+        /// Asynchronously expects <see langword="event"/> until they occur or until canceled
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="func"></param>
+        /// <param name="eventName"></param>
         /// <param name="cancellationToken"></param>
-        /// <param name="eventNames"></param>
         /// <returns></returns>
-        public static async Task<Dictionary<string, bool>> WaitEventsAsync(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
+        public static async Task<bool> WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)
         {
-            var sources = eventNames.ToDictionary(
-                i => i, 
-                i => new TaskCompletionSource<bool>());
+            var taskCompletionSource = new TaskCompletionSource<bool>();
             using var cancellationSource = new CancellationTokenSource();
-            
-            cancellationSource.Token.Register(() =>
+
+            cancellationSource.Token.Register(() => taskCompletionSource.TrySetCanceled());
+            cancellationToken.Register(() => taskCompletionSource.TrySetCanceled());
+
+            var waitObject = new WaitObject
             {
-                foreach (var source in sources.Values)
-                {
-                    source?.TrySetCanceled();
-                }
-            }, false);
-            cancellationToken.Register(() =>
-            {
-                foreach (var source in sources.Values)
-                {
-                    source?.TrySetCanceled();
-                }
-            }, false);
-            
-            var objects = sources.Select(pair => new WaitObject
-            {
-                Source = pair.Value,
-            }).ToList();
-            var method = typeof(WaitObject).GetMethod(nameof(WaitObject.HandleEvent)) ?? throw new Exception("Method not found");
-            var eventInfos = eventNames
-                .Select(eventName => value.GetType().GetEvent(eventName))
-                .ToList();
-            var delegates = eventInfos
-                .Select((eventInfo, i) => Delegate.CreateDelegate(eventInfo.EventHandlerType, objects[i], method, true))
-                .ToList();
+                Source = taskCompletionSource,
+            };
+            var method = typeof(WaitObject).GetMethod(nameof(WaitObject.HandleEvent)) ?? throw new InvalidOperationException("Method not found");
+            var eventInfo = value.GetType().GetEvent(eventName);
+            var delegateObject = Delegate.CreateDelegate(eventInfo.EventHandlerType, waitObject, method, true);
 
             try
             {
-                for (var i = 0; i < eventInfos.Count; i++)
-                {
-                    eventInfos[i].AddEventHandler(value, delegates[i]);
-                }
+                eventInfo.AddEventHandler(value, delegateObject);
 
-                await func(cancellationToken);
-
-                await Task.WhenAll(sources.Values.Select(i => i.Task));
+                return await taskCompletionSource.Task;
             }
             catch (TaskCanceledException)
             {
+                return false;
             }
             finally
             {
-                for (var i = 0; i < eventInfos.Count; i++)
-                {
-                    eventInfos[i].RemoveEventHandler(value, delegates[i]);
-                }
+                eventInfo.RemoveEventHandler(value, delegateObject);
             }
-
-            return sources.ToDictionary(i => i.Key, i => i.Value.Task.IsCompleted && !i.Value.Task.IsCanceled && i.Value.Task.Result);
         }
 
         /// <summary>
@@ -99,9 +71,50 @@ namespace SimpleSocketIoClient.Utilities
         /// <returns></returns>
         public static async Task<bool> WaitEventAsync(this object value, Func<CancellationToken, Task> func, string eventName, CancellationToken cancellationToken = default)
         {
-            var results = await value.WaitEventsAsync(func, cancellationToken, eventName);
+            try
+            {
+                var task = value.WaitEventAsync(eventName, cancellationToken);
 
-            return results.TryGetValue(eventName, out var result) && result;
+                await func(cancellationToken);
+
+                return await task;
+            }
+            catch (TaskCanceledException)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Asynchronously expects <see langword="event"/>'s until they occur or until canceled
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="func"></param>
+        /// <param name="cancellationToken"></param>
+        /// <param name="eventNames"></param>
+        /// <returns></returns>
+        public static async Task<Dictionary<string, bool>> WaitEventsAsync(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
+        {
+            var tasks = eventNames
+                .Select(name => value.WaitEventAsync(name, cancellationToken))
+                .ToList();
+
+            try
+            {
+                await func(cancellationToken);
+
+                var results = await Task.WhenAll(tasks);
+
+                return eventNames
+                    .Zip(results, (name, result) => (name, result))
+                    .ToDictionary(i => i.name, i => i.result);
+            }
+            catch (TaskCanceledException)
+            {
+                return eventNames
+                    .Zip(tasks, (name, task) => (name, task))
+                    .ToDictionary(i => i.name, i => i.task.IsCompleted && !i.task.IsCanceled && i.task.Result);
+            }
         }
     }
 }

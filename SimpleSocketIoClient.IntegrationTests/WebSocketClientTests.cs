@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -43,9 +42,14 @@ namespace SimpleSocketIoClient.IntegrationTests
 
                 Assert.IsFalse(client.IsConnected, "client.IsConnected");
             }, cancellationTokenSource.Token, events);
-            foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
+
+            Console.WriteLine($"WebSocket State: {client.Socket.State}");
+            Console.WriteLine($"WebSocket CloseStatus: {client.Socket.CloseStatus}");
+            Console.WriteLine($"WebSocket CloseStatusDescription: {client.Socket.CloseStatusDescription}");
+
+            foreach (var (name, result) in results)
             {
-                Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");
+                Assert.IsTrue(result, $"Client event(\"{name}\") did not happen");
             }
 
             results = await client.WaitEventsAsync(async cancellationToken =>
@@ -67,9 +71,9 @@ namespace SimpleSocketIoClient.IntegrationTests
             Console.WriteLine($"WebSocket CloseStatus: {client.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.Socket.CloseStatusDescription}");
 
-            foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
+            foreach (var (name, result) in results)
             {
-                Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");
+                Assert.IsTrue(result, $"Client event(\"{name}\") did not happen");
             }
         }
     }

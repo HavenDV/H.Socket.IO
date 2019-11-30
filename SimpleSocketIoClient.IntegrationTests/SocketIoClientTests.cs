@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,9 +86,9 @@ namespace SimpleSocketIoClient.IntegrationTests
             Console.WriteLine($"WebSocket CloseStatus: {client.EngineIoClient.WebSocketClient.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.EngineIoClient.WebSocketClient.Socket.CloseStatusDescription}");
 
-            foreach (var (result, eventName) in results.Zip(events, (a, b) => (a, b)))
+            foreach (var (name, result) in results)
             {
-                Assert.IsTrue(result, $"Client event(\"{eventName}\") did not happen");
+                Assert.IsTrue(result, $"Client event(\"{name}\") did not happen");
             }
         }
     }

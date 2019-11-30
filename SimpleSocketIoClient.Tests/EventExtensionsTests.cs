@@ -20,7 +20,7 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task WaitEventAsyncTest()
         {
-            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
             var testObject = new TestClass();
 
             var result = await testObject.WaitEventAsync(async cancellationToken =>
@@ -30,7 +30,7 @@ namespace SimpleSocketIoClient.Tests
                 testObject.OnCommonEvent();
             }, nameof(TestClass.CommonEvent), cancellationTokenSource.Token);
 
-            Assert.IsTrue(result);
+            Assert.IsTrue(result, nameof(TestClass.CommonEvent));
         }
 
         [TestMethod]
@@ -46,8 +46,8 @@ namespace SimpleSocketIoClient.Tests
                 testObject.OnCommonEvent();
             }, cancellationTokenSource.Token, nameof(TestClass.CommonEvent), nameof(TestClass.EventThatWillNeverHappen));
 
-            Assert.IsTrue(results[nameof(TestClass.CommonEvent)]);
-            Assert.IsFalse(results[nameof(TestClass.EventThatWillNeverHappen)]);
+            Assert.IsTrue(results[nameof(TestClass.CommonEvent)], nameof(TestClass.CommonEvent));
+            Assert.IsFalse(results[nameof(TestClass.EventThatWillNeverHappen)], nameof(TestClass.EventThatWillNeverHappen));
         }
     }
 }

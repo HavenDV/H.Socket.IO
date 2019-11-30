@@ -61,27 +61,50 @@ namespace SimpleSocketIoClient.IntegrationTests
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected), nameof(client.AfterEvent) };
             var results = await client.WaitEventsAsync(async cancellationToken =>
             {
+                Console.WriteLine("# Before ConnectAsync");
+
                 await client.ConnectAsync(new Uri("wss://socket-io-chat.now.sh/"), cancellationToken);
+
+                Console.WriteLine("# Before Emit \"add user\"");
 
                 await client.Emit("add user", "C# SimpleSocketIoClient Test User", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+
+                Console.WriteLine("# Before Emit \"typing\"");
 
                 await client.Emit("typing", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+
+                Console.WriteLine("# Before Emit \"new message\"");
 
                 await client.Emit("new message", "hello", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+
+                Console.WriteLine("# Before Emit \"stop typing\"");
 
                 await client.Emit("stop typing", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
+                Console.WriteLine("# Before DisconnectAsync");
+
                 await client.DisconnectAsync(cancellationToken);
+
+                Console.WriteLine("# After DisconnectAsync");
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.EngineIoClient.WebSocketClient.Socket.State}");
             Console.WriteLine($"WebSocket CloseStatus: {client.EngineIoClient.WebSocketClient.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.EngineIoClient.WebSocketClient.Socket.CloseStatusDescription}");

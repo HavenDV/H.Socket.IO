@@ -28,21 +28,32 @@ namespace SimpleSocketIoClient.IntegrationTests
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
             var results = await client.WaitEventsAsync(async cancellationToken =>
             {
-                Assert.IsFalse(client.IsConnected, "client.IsConnected");
+                Console.WriteLine("# Before ConnectAsync");
+
+                Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
 
                 await client.ConnectAsync(new Uri("ws://echo.websocket.org"), cancellationToken);
 
-                Assert.IsTrue(client.IsConnected, "client.IsConnected");
+                Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+
+                Console.WriteLine("# Before SendTextAsync");
 
                 await client.SendTextAsync("Test", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+
+                Console.WriteLine("# Before DisconnectAsync");
 
                 await client.DisconnectAsync(cancellationToken);
 
-                Assert.IsFalse(client.IsConnected, "client.IsConnected");
+                Console.WriteLine("# After DisconnectAsync");
+
+                Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");
             Console.WriteLine($"WebSocket CloseStatus: {client.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.Socket.CloseStatusDescription}");
@@ -54,19 +65,30 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             results = await client.WaitEventsAsync(async cancellationToken =>
             {
+                Console.WriteLine("# Before ConnectAsync");
+
                 await client.ConnectAsync(new Uri("ws://echo.websocket.org"), cancellationToken);
 
-                Assert.IsTrue(client.IsConnected, "client.IsConnected");
+                Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
+
+                Console.WriteLine("# Before SendTextAsync");
 
                 await client.SendTextAsync("Test", cancellationToken);
 
+                Console.WriteLine("# Before Delay");
+
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+
+                Console.WriteLine("# Before DisconnectAsync");
 
                 await client.DisconnectAsync(cancellationToken);
 
-                Assert.IsFalse(client.IsConnected, "client.IsConnected");
+                Console.WriteLine("# After DisconnectAsync");
+
+                Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");
             Console.WriteLine($"WebSocket CloseStatus: {client.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.Socket.CloseStatusDescription}");

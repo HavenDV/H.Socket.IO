@@ -6,11 +6,11 @@
         <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
       </PropertyGroup>
     </When>
-    <When Condition="'$(OS)' != 'Windows_NT'">
+    <Otherwise>
       <PropertyGroup>
         <TargetFrameworks>netstandard2.1;</TargetFrameworks>
       </PropertyGroup>
-    </When>
+    </Otherwise>
   </Choose>
 
   <PropertyGroup>
@@ -18,7 +18,6 @@
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.9.9.4</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</RepositoryUrl>
@@ -29,6 +28,10 @@
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

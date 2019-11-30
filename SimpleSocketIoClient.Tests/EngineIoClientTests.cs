@@ -27,13 +27,22 @@ namespace SimpleSocketIoClient.Tests
             var events = new[] {nameof(client.Opened), nameof(client.Closed)};
             var results = await client.WaitEventsAsync(async cancellationToken =>
             {
+                Console.WriteLine("# Before OpenAsync");
+
                 await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
+
+                Console.WriteLine("# Before Delay");
 
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
+                Console.WriteLine("# Before CloseAsync");
+
                 await client.CloseAsync(cancellationToken);
+
+                Console.WriteLine("# After CloseAsync");
             }, cancellationTokenSource.Token, events);
 
+            Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.WebSocketClient.Socket.State}");
             Console.WriteLine($"WebSocket CloseStatus: {client.WebSocketClient.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.WebSocketClient.Socket.CloseStatusDescription}");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,29 +30,31 @@ namespace SimpleSocketIoClient.Utilities
         /// <param name="cancellationToken"></param>
         /// <param name="eventNames"></param>
         /// <returns></returns>
-        public static async Task<bool[]> WaitEventsAsync(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
+        public static async Task<Dictionary<string, bool>> WaitEventsAsync(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
         {
-            var sources = eventNames.Select(i => new TaskCompletionSource<bool>()).ToList();
+            var sources = eventNames.ToDictionary(
+                i => i, 
+                i => new TaskCompletionSource<bool>());
             using var cancellationSource = new CancellationTokenSource();
             
             cancellationSource.Token.Register(() =>
             {
-                foreach (var source in sources)
+                foreach (var source in sources.Values)
                 {
                     source?.TrySetCanceled();
                 }
             }, false);
             cancellationToken.Register(() =>
             {
-                foreach (var source in sources)
+                foreach (var source in sources.Values)
                 {
                     source?.TrySetCanceled();
                 }
             }, false);
             
-            var objects = sources.Select(source => new WaitObject
+            var objects = sources.Select(pair => new WaitObject
             {
-                Source = source,
+                Source = pair.Value,
             }).ToList();
             var method = typeof(WaitObject).GetMethod(nameof(WaitObject.HandleEvent)) ?? throw new Exception("Method not found");
             var eventInfos = eventNames
@@ -70,11 +73,10 @@ namespace SimpleSocketIoClient.Utilities
 
                 await func(cancellationToken);
 
-                return await Task.WhenAll(sources.Select(i => i.Task));
+                await Task.WhenAll(sources.Values.Select(i => i.Task));
             }
             catch (TaskCanceledException)
             {
-                return sources.Select(i => i.Task.IsCompleted && !i.Task.IsCanceled && i.Task.Result).ToArray();
             }
             finally
             {
@@ -83,6 +85,8 @@ namespace SimpleSocketIoClient.Utilities
                     eventInfos[i].RemoveEventHandler(value, delegates[i]);
                 }
             }
+
+            return sources.ToDictionary(i => i.Key, i => i.Value.Task.IsCompleted && !i.Value.Task.IsCanceled && i.Value.Task.Result);
         }
 
         /// <summary>
@@ -97,7 +101,7 @@ namespace SimpleSocketIoClient.Utilities
         {
             var results = await value.WaitEventsAsync(func, cancellationToken, eventName);
 
-            return results.ElementAtOrDefault(0);
+            return results.TryGetValue(eventName, out var result) && result;
         }
     }
 }

@@ -11,10 +11,10 @@ namespace SimpleSocketIoClient.Tests
     {
         private class TestClass
         {
-            public event EventHandler TestEvent1;
-            public event EventHandler TestEvent2;
+            public event EventHandler CommonEvent;
+            public event EventHandler EventThatWillNeverHappen;
 
-            public void OnTestEvent1() => TestEvent1?.Invoke(this, EventArgs.Empty);
+            public void OnCommonEvent() => CommonEvent?.Invoke(this, EventArgs.Empty);
         }
 
         [TestMethod]
@@ -27,8 +27,8 @@ namespace SimpleSocketIoClient.Tests
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
 
-                testObject.OnTestEvent1();
-            }, nameof(TestClass.TestEvent1), cancellationTokenSource.Token);
+                testObject.OnCommonEvent();
+            }, nameof(TestClass.CommonEvent), cancellationTokenSource.Token);
 
             Assert.IsTrue(result);
         }
@@ -39,16 +39,15 @@ namespace SimpleSocketIoClient.Tests
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
             var testObject = new TestClass();
 
-            var eventNames = new[] { nameof(TestClass.TestEvent1), nameof(TestClass.TestEvent2) };
             var results = await testObject.WaitEventsAsync(async cancellationToken =>
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
 
-                testObject.OnTestEvent1();
-            }, cancellationTokenSource.Token, eventNames);
+                testObject.OnCommonEvent();
+            }, cancellationTokenSource.Token, nameof(TestClass.CommonEvent), nameof(TestClass.EventThatWillNeverHappen));
 
-            Assert.IsTrue(results[0]);
-            Assert.IsFalse(results[1]);
+            Assert.IsTrue(results[nameof(TestClass.CommonEvent)]);
+            Assert.IsFalse(results[nameof(TestClass.EventThatWillNeverHappen)]);
         }
     }
 }

@@ -86,9 +86,9 @@ namespace SimpleSocketIoClient.IntegrationTests
             Console.WriteLine($"WebSocket CloseStatus: {client.EngineIoClient.WebSocketClient.Socket.CloseStatus}");
             Console.WriteLine($"WebSocket CloseStatusDescription: {client.EngineIoClient.WebSocketClient.Socket.CloseStatusDescription}");
 
-            foreach (var (name, result) in results)
+            foreach (var pair in results)
             {
-                Assert.IsTrue(result, $"Client event(\"{name}\") did not happen");
+                Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
         }
     }

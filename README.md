@@ -27,7 +27,7 @@ public class ChatMessage
 
 public async Task ConnectToChatNowShTest()
 {
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1
     await using var client = new SocketIoClient();
 #else
     using var client = new SocketIoClient();

@@ -20,7 +20,7 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task WaitEventAsyncTest()
         {
-            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(1));
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var testObject = new TestClass();
 
             var result = await testObject.WaitEventAsync(async cancellationToken =>
@@ -36,7 +36,7 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public async Task WaitEventsAsyncTest()
         {
-            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(250));
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var testObject = new TestClass();
 
             var results = await testObject.WaitEventsAsync(async cancellationToken =>

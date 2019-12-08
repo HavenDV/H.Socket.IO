@@ -6,7 +6,7 @@ jobs:
   build:
     strategy:
       matrix:
-        dotnet: [ '3.0.100', '3.1.100-preview3-014645' ]
+        dotnet: [ '3.0.100', '3.1.100' ]
         os: [ubuntu-latest, ubuntu-16.04, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
@@ -43,5 +43,5 @@ jobs:
       
     - name: Try Publish(if the version has changed)
       if: runner.os == 'Windows' &&
-          matrix.dotnet == '3.0.100'
+          matrix.dotnet == '3.1.100'
       run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

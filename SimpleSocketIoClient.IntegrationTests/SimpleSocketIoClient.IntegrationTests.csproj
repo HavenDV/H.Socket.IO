@@ -3,12 +3,12 @@
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.0;netcoreapp2.0;net461;net47;</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.0;net47;net461;</TargetFrameworks>
       </PropertyGroup>
     </When>
     <When Condition="'$(OS)' != 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.0;</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;</TargetFrameworks>
       </PropertyGroup>
     </When>
   </Choose>

@@ -13,11 +13,13 @@ namespace SimpleSocketIoClient.IntegrationTests
         public async Task ConnectToChatNowShTest()
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-#if NETCOREAPP3_0
+
+#if NETCOREAPP3_0 || NETCOREAPP3_1
             await using var client = new EngineIoClient("socket.io");
 #else
             using var client = new EngineIoClient("socket.io");
 #endif
+
             client.AfterMessage += (sender, args) => Console.WriteLine($"AfterMessage: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");

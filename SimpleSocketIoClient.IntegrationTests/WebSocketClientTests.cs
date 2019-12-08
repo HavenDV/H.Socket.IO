@@ -13,7 +13,8 @@ namespace SimpleSocketIoClient.IntegrationTests
         public async Task DoubleConnectToWebSocketOrgTest()
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-#if NETCOREAPP3_0
+
+#if NETCOREAPP3_0 || NETCOREAPP3_1
             await using var client = new WebSocketClient();
 #else
             using var client = new WebSocketClient();

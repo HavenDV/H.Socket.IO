@@ -8,7 +8,7 @@
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFrameworks>netcoreapp3.1;</TargetFrameworks>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>

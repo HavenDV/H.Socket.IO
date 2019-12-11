@@ -17,6 +17,9 @@ Install-Package SimpleSocketIoClient
 ### Usage
 
 ```cs
+using System;
+using System.Threading.Tasks;
+using SimpleSocketIoClient;
 
 public class ChatMessage
 {
@@ -86,10 +89,14 @@ public async Task ConnectToChatNowShTest()
 }
 ```
 
+### Live Example
+
+.NET Fiddle - https://dotnetfiddle.net/YUPt3x <br/>
+Http client of the tested Socket.IO server - https://socket-io-chat.now.sh/
+
 ### Used documentation
 
-Socket.IO Protocol - https://github.com/socketio/socket.io-protocol
-
+Socket.IO Protocol - https://github.com/socketio/socket.io-protocol <br/>
 Engine.IO Protocol - https://github.com/socketio/engine.io-protocol
 
 ### Contacts

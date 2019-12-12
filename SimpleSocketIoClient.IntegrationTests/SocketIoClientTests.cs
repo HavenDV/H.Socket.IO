@@ -6,18 +6,19 @@ using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient.IntegrationTests
 {
-    public class ChatMessage
-    {
-        public string Username { get; set; }
-        public string Message { get; set; }
-        public long NumUsers { get; set; }
-    }
-
     [TestClass]
     public class SocketIoClientTests
     {
-        [TestMethod]
-        public async Task ConnectToChatNowShTest()
+        // ReSharper disable once ClassNeverInstantiated.Local
+        // ReSharper disable UnusedAutoPropertyAccessor.Local
+        private class ChatMessage
+        {
+            public string Username { get; set; }
+            public string Message { get; set; }
+            public long NumUsers { get; set; }
+        }
+
+        private static async Task ConnectToChatNowShBaseTest(string url)
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
@@ -63,7 +64,7 @@ namespace SimpleSocketIoClient.IntegrationTests
             {
                 Console.WriteLine("# Before ConnectAsync");
 
-                await client.ConnectAsync(new Uri("wss://socket-io-chat.now.sh/"), cancellationToken);
+                await client.ConnectAsync(new Uri(url), cancellationToken);
 
                 Console.WriteLine("# Before Emit \"add user\"");
 
@@ -113,6 +114,18 @@ namespace SimpleSocketIoClient.IntegrationTests
             {
                 Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
+        }
+
+        [TestMethod]
+        public async Task ConnectToChatNowShTest()
+        {
+            await ConnectToChatNowShBaseTest("wss://socket-io-chat.now.sh/");
+        }
+
+        [TestMethod]
+        public async Task ConnectToLocalChatServerTest()
+        {
+            await ConnectToChatNowShBaseTest("ws://localhost:1465/");
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.WebSockets;
 
-namespace SimpleSocketIoClient.WebSocket
+namespace SimpleSocketIoClient.EventsArgs
 {
     /// <summary>
     /// Arguments used in <see cref="WebSocket"/> close event

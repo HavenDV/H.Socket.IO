@@ -1,4 +1,5 @@
 using System;
+using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -9,8 +10,7 @@ namespace SimpleSocketIoClient.IntegrationTests
     [TestClass]
     public class EngineIoClientTests
     {
-        [TestMethod]
-        public async Task ConnectToChatNowShTest()
+        private static async Task ConnectToChatBaseTest(string url)
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
@@ -30,7 +30,7 @@ namespace SimpleSocketIoClient.IntegrationTests
             {
                 Console.WriteLine("# Before OpenAsync");
 
-                await client.OpenAsync(new Uri("https://socket-io-chat.now.sh/"), 10);
+                await client.OpenAsync(new Uri(url), 10);
 
                 Console.WriteLine("# Before Delay");
 
@@ -51,6 +51,25 @@ namespace SimpleSocketIoClient.IntegrationTests
             foreach (var pair in results)
             {
                 Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+            }
+        }
+
+        [TestMethod]
+        public async Task ConnectToChatNowShTest()
+        {
+            await ConnectToChatBaseTest("wss://socket-io-chat.now.sh/");
+        }
+
+        [TestMethod]
+        public async Task ConnectToLocalChatServerTest()
+        {
+            try
+            {
+                await ConnectToChatBaseTest("ws://localhost:1465/");
+            }
+            catch (WebSocketException exception)
+            {
+                Console.WriteLine(exception);
             }
         }
     }

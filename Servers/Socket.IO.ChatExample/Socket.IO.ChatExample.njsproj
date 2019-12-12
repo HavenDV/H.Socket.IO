@@ -28,6 +28,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="custom-namespaces.js">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="rooms-test.js" />
     <Content Include="index.js" />
     <Content Include="package.json" />

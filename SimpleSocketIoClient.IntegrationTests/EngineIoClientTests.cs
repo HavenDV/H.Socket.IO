@@ -3,6 +3,7 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SimpleSocketIoClient.EngineIO;
 using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient.IntegrationTests

@@ -7,6 +7,8 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using SimpleSocketIoClient.WebSocket;
+using SimpleSocketIoClient.EngineIO;
 using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient

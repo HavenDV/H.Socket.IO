@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SimpleSocketIoClient.Utilities;
 
-namespace SimpleSocketIoClient
+namespace SimpleSocketIoClient.WebSocket
 {
     /// <summary>
     /// 

@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 using System.Timers;
 using Newtonsoft.Json;
 using SimpleSocketIoClient.Utilities;
+using SimpleSocketIoClient.WebSocket;
 
-namespace SimpleSocketIoClient
+namespace SimpleSocketIoClient.EngineIO
 {
     /// <summary>
     /// Engine.IO Client

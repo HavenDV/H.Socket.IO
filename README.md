@@ -10,8 +10,7 @@ This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provi
 <br/>
 Implemented features:
 - Namespaces
- <br/>
- 
+
 **Note: This is an alpha version. Some features may not be available. Please see examples or tests.**
 
 ### Nuget

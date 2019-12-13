@@ -7,8 +7,8 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using SimpleSocketIoClient.WebSocket;
 using SimpleSocketIoClient.EngineIO;
+using SimpleSocketIoClient.EventsArgs;
 using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient
@@ -55,6 +55,11 @@ namespace SimpleSocketIoClient
             }
         }
 
+        /// <summary>
+        /// Optional property which is used when sending a message
+        /// </summary>
+        public string? DefaultNamespace { get; set; }
+
         private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>? Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
 
         #endregion
@@ -62,9 +67,9 @@ namespace SimpleSocketIoClient
         #region Events
 
         /// <summary>
-        /// Occurs after a successful connection.
+        /// Occurs after a successful connection to each namespace
         /// </summary>
-        public event EventHandler<EventArgs>? Connected;
+        public event EventHandler<SocketIoEventEventArgs>? Connected;
 
         /// <summary>
         /// Occurs after a disconnection.
@@ -74,21 +79,21 @@ namespace SimpleSocketIoClient
         /// <summary>
         /// Occurs after new event.
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterEvent;
+        public event EventHandler<SocketIoEventEventArgs>? AfterEvent;
 
         /// <summary>
         /// Occurs after new unhandled event(not captured by any On).
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterUnhandledEvent;
+        public event EventHandler<SocketIoEventEventArgs>? AfterUnhandledEvent;
 
         /// <summary>
         /// Occurs after new exception.
         /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
 
-        private void OnConnected()
+        private void OnConnected(string value)
         {
-            Connected?.Invoke(this, EventArgs.Empty);
+            Connected?.Invoke(this, new SocketIoEventEventArgs(string.Empty, value));
         }
 
         private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
@@ -96,14 +101,14 @@ namespace SimpleSocketIoClient
             Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
-        private void OnAfterEvent(string value)
+        private void OnAfterEvent(string value, string @namespace)
         {
-            AfterEvent?.Invoke(this, new DataEventArgs<string>(value));
+            AfterEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace));
         }
 
-        private void OnAfterUnhandledEvent(string value)
+        private void OnAfterUnhandledEvent(string value, string @namespace)
         {
-            AfterUnhandledEvent?.Invoke(this, new DataEventArgs<string>(value));
+            AfterUnhandledEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace));
         }
 
         private void OnAfterException(Exception value)
@@ -146,12 +151,24 @@ namespace SimpleSocketIoClient
                 }
 
                 var prefix = args.Value.Substring(0, 1);
+                var @namespace = "/";
                 var value = args.Value.Substring(1);
+
+                if (args.Value.ElementAtOrDefault(1) == '/')
+                {
+                    var index = args.Value.IndexOf(',');
+                    @namespace = index >= 0
+                        ? args.Value.Substring(1, index - 1)
+                        : args.Value.Substring(1);
+                    value = index >= 0
+                        ? args.Value.Substring(index + 1)
+                        : string.Empty;
+                }
 
                 switch (prefix)
                 {
                     case ConnectPrefix:
-                        OnConnected();
+                        OnConnected(@namespace);
                         break;
 
                     case DisconnectPrefix:
@@ -160,7 +177,7 @@ namespace SimpleSocketIoClient
 
                     case EventPrefix:
                         {
-                            OnAfterEvent(value);
+                            OnAfterEvent(value, @namespace);
 
                             if (Actions == null)
                             {
@@ -177,7 +194,7 @@ namespace SimpleSocketIoClient
                                     break;
                                 }
 
-                                if (Actions.TryGetValue(name, out var actions))
+                                if (Actions.TryGetValue($"{name}{@namespace}", out var actions))
                                 {
                                     foreach (var (action, type) in actions)
                                     {
@@ -197,7 +214,7 @@ namespace SimpleSocketIoClient
                                 }
                                 else
                                 {
-                                    OnAfterUnhandledEvent(value);
+                                    OnAfterUnhandledEvent(value, @namespace);
                                 }
                             }
                             catch (Exception exception)
@@ -218,10 +235,6 @@ namespace SimpleSocketIoClient
 
         #region Private methods
 
-        private async Task EmitInternal(CancellationToken cancellationToken = default, params string[] messages)
-        {
-            await SendEventAsync($"[{string.Join(",", messages)}]", cancellationToken);
-        }
 
         #endregion
 
@@ -232,15 +245,66 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="namespaces"></param>
         /// <returns></returns>
-        public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default)
+        public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default, params string[] namespaces)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            return await this.WaitEventAsync(async token =>
+            if (!EngineIoClient.IsOpened && !await this.WaitEventAsync(async token =>
             {
                 await EngineIoClient.OpenAsync(uri, token);
+            }, nameof(Connected), cancellationToken))
+            {
+                return false;
+            }
+
+            return await ConnectToNamespacesAsync(cancellationToken, DefaultNamespace != null
+                ? namespaces.Concat(new []{ DefaultNamespace }).Distinct().ToArray()
+                : namespaces);
+        }
+
+        /// <summary>
+        /// It connects to selected namespaces and asynchronously waits for a connection message.
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <param name="namespaces"></param>
+        /// <returns></returns>
+        public async Task<bool> ConnectToNamespacesAsync(CancellationToken cancellationToken = default, params string[] namespaces)
+        {
+            EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+
+            if (!EngineIoClient.IsOpened)
+            {
+                return false;
+            }
+
+            if (!namespaces.Any())
+            {
+                return true;
+            }
+
+            return await this.WaitEventAsync(async token =>
+            {
+                foreach (var @namespace in namespaces)
+                {
+                    await EngineIoClient.SendMessageAsync($"0/{@namespace?.TrimStart('/')}", token);
+                }
             }, nameof(Connected), cancellationToken);
+        }
+
+        /// <summary>
+        /// It connects to selected namespaces and asynchronously waits for a connection message.
+        /// </summary>
+        /// <param name="customNamespace"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<bool> ConnectToNamespaceAsync(string customNamespace, CancellationToken cancellationToken = default)
+        {
+            customNamespace = customNamespace ?? throw new ArgumentNullException(nameof(customNamespace));
+            EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
+
+            return await ConnectToNamespacesAsync(cancellationToken, customNamespace);
         }
 
         /// <summary>
@@ -248,12 +312,13 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeout"></param>
+        /// <param name="namespaces"></param>
         /// <returns></returns>
-        public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout)
+        public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout, params string[] namespaces)
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
 
-            return await ConnectAsync(uri, cancellationSource.Token);
+            return await ConnectAsync(uri, cancellationSource.Token, namespaces);
         }
 
         /// <summary>
@@ -261,10 +326,11 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeoutInSeconds"></param>
+        /// <param name="namespaces"></param>
         /// <returns></returns>
-        public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds)
+        public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds, params string[] namespaces)
         {
-            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
+            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds), namespaces);
         }
 
         /// <summary>
@@ -285,50 +351,42 @@ namespace SimpleSocketIoClient
         /// Sends a new raw message.
         /// </summary>
         /// <param name="message"></param>
+        /// <param name="customNamespace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task SendEventAsync(string message, CancellationToken cancellationToken = default)
+        public async Task SendEventAsync(string message, string? customNamespace = null, CancellationToken cancellationToken = default)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            await EngineIoClient.SendMessageAsync($"{EventPrefix}{message}", cancellationToken);
+            customNamespace ??= DefaultNamespace;
+            var namespaceBody = customNamespace == null ? string.Empty : $"/{customNamespace.TrimStart('/')}";
+            namespaceBody += !string.IsNullOrWhiteSpace(namespaceBody) && !string.IsNullOrWhiteSpace(message)
+                ? ","
+                : "";
+
+            await EngineIoClient.SendMessageAsync($"{EventPrefix}{namespaceBody}{message}", cancellationToken);
         }
 
         /// <summary>
-        /// Sends a new event where name is the name of the event.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task Emit(string name, CancellationToken cancellationToken = default)
-        {
-            await EmitInternal(cancellationToken, $"\"{name}\"");
-        }
-
-        /// <summary>
-        /// Sends a new event with the specified name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="message"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task Emit(string name, string message, CancellationToken cancellationToken = default)
-        {
-            await EmitInternal(cancellationToken, $"\"{name}\"", $"\"{message}\"");
-        }
-
-        /// <summary>
-        /// Sends a new event where name is the name of the event and the object is serialized in json.
+        /// Sends a new event where name is the name of the event <br/>
+        /// the object can be <see langword="string"/> - so it will be send as simple message <br/>
+        /// any other will be serialized to json.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
+        /// <param name="customNamespace"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task Emit(string name, object value, CancellationToken cancellationToken = default)
+        public async Task Emit(string name, object? value = null, string? customNamespace = null, CancellationToken cancellationToken = default)
         {
-            var json = JsonConvert.SerializeObject(value);
+            var messages = value switch
+            {
+                null           => new[] {$"\"{name}\""},
+                string message => new[] {$"\"{name}\"", $"\"{message}\""},
+                _              => new[] {$"\"{name}\"", JsonConvert.SerializeObject(value)},
+            };
 
-            await EmitInternal(cancellationToken, $"\"{name}\"", json);
+            await SendEventAsync($"[{string.Join(",", messages)}]", customNamespace, cancellationToken);
         }
 
         /// <summary>
@@ -337,19 +395,21 @@ namespace SimpleSocketIoClient
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On<T>(string name, Action<T?, string?> action) where T : class
+        /// <param name="customNamespace"></param>
+        public void On<T>(string name, Action<T?, string?> action, string? customNamespace = null) where T : class
         {
             if (Actions == null)
             {
                 return;
             }
 
-            if (!Actions.ContainsKey(name))
+            var key = $"{name}{customNamespace ?? "/"}";
+            if (!Actions.ContainsKey(key))
             {
-                Actions[name] = new List<(Action<object?, string?> Action, Type Type)>();
+                Actions[key] = new List<(Action<object?, string?> Action, Type Type)>();
             }
 
-            Actions[name].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
+            Actions[key].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
         }
 
         /// <summary>
@@ -358,9 +418,10 @@ namespace SimpleSocketIoClient
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On<T>(string name, Action<T?> action) where T : class
+        /// <param name="customNamespace"></param>
+        public void On<T>(string name, Action<T?> action, string? customNamespace = null) where T : class
         {
-            On<T>(name, (obj, text) => action?.Invoke(obj));
+            On<T>(name, (obj, text) => action?.Invoke(obj), customNamespace);
         }
 
         /// <summary>
@@ -368,9 +429,10 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On(string name, Action<string?> action)
+        /// <param name="customNamespace"></param>
+        public void On(string name, Action<string?> action, string? customNamespace = null)
         {
-            On<object>(name, (obj, text) => action?.Invoke(text));
+            On<object>(name, (obj, text) => action?.Invoke(text), customNamespace);
         }
 
         /// <summary>
@@ -378,9 +440,10 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="name"></param>
         /// <param name="action"></param>
-        public void On(string name, Action action)
+        /// <param name="customNamespace"></param>
+        public void On(string name, Action action, string? customNamespace = null)
         {
-            On<object>(name, (obj, text) => action?.Invoke());
+            On<object>(name, (obj, text) => action?.Invoke(), customNamespace);
         }
 
 #if NETSTANDARD2_1

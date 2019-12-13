@@ -6,7 +6,12 @@
 [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
 [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22)
 
-This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0**
+This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0** <br/>
+Includes EngineIoClient and WebSocketClient <br/>
+Implemented features:
+- Namespaces
+ <br/>
+Note: This is an alpha version. Some features may not be available. Please see examples or tests.
 
 ### Nuget
 
@@ -36,10 +41,10 @@ public async Task ConnectToChatNowShTest()
     using var client = new SocketIoClient();
 #endif
 
-    client.Connected += (sender, args) => Console.WriteLine("Connected");
+    client.Connected += (sender, args) => Console.WriteLine($"Connected: {args.Namespace}");
     client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-    client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: {args.Value}");
-    client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: {args.Value}");
+    client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: Namespace: {args.Namespace}, Value: {args.Value}");
+    client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
     client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
     client.On<ChatMessage>("login", message =>

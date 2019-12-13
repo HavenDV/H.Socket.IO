@@ -7,11 +7,11 @@
 [![Build Status](https://github.com/HavenDV/SimpleSocketIoClient/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/SimpleSocketIoClient/actions?query=workflow%3A%22.NET+Core%22)
 
 This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0** <br/>
-Includes EngineIoClient and WebSocketClient <br/>
+<br/>
 Implemented features:
 - Namespaces
  <br/>
-Note: This is an alpha version. Some features may not be available. Please see examples or tests.
+**Note: This is an alpha version. Some features may not be available. Please see examples or tests.**
 
 ### Nuget
 

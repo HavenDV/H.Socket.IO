@@ -14,7 +14,7 @@ namespace SimpleSocketIoClient.Utilities
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static string[] GetEventValues(this string text)
+        public static string[] GetJsonArrayValues(this string text)
         {
             text = text ?? throw new ArgumentNullException(nameof(text));
             if (!text.StartsWith("[") || !text.EndsWith("]"))

@@ -23,17 +23,6 @@ namespace SimpleSocketIoClient
         IDisposable
 #endif
     {
-        #region Constants
-
-        private const string ConnectPrefix = "0";
-        private const string DisconnectPrefix = "1";
-        private const string EventPrefix = "2";
-        //private const string AckPrefix = "3";
-        //private const string ErrorPrefix = "4";
-        //private const string BinaryEventPrefix = "5";
-        //private const string BinaryAckPrefix = "6";
-
-        #endregion
 
         #region Properties
 
@@ -150,34 +139,20 @@ namespace SimpleSocketIoClient
                     return;
                 }
 
-                var prefix = args.Value.Substring(0, 1);
-                var @namespace = "/";
-                var value = args.Value.Substring(1);
-
-                if (args.Value.ElementAtOrDefault(1) == '/')
+                var packet = SocketIoPacket.Decode(args.Value);
+                switch (packet.Prefix)
                 {
-                    var index = args.Value.IndexOf(',');
-                    @namespace = index >= 0
-                        ? args.Value.Substring(1, index - 1)
-                        : args.Value.Substring(1);
-                    value = index >= 0
-                        ? args.Value.Substring(index + 1)
-                        : string.Empty;
-                }
-
-                switch (prefix)
-                {
-                    case ConnectPrefix:
-                        OnConnected(@namespace);
+                    case SocketIoPacket.ConnectPrefix:
+                        OnConnected(packet.Namespace);
                         break;
 
-                    case DisconnectPrefix:
+                    case SocketIoPacket.DisconnectPrefix:
                         OnDisconnected("Received disconnect message from server", null);
                         break;
 
-                    case EventPrefix:
+                    case SocketIoPacket.EventPrefix:
                         {
-                            OnAfterEvent(value, @namespace);
+                            OnAfterEvent(packet.Value, packet.Namespace);
 
                             if (Actions == null)
                             {
@@ -185,7 +160,7 @@ namespace SimpleSocketIoClient
                             }
                             try
                             {
-                                var values = value.GetEventValues();
+                                var values = packet.Value.GetJsonArrayValues();
                                 var name = values.ElementAtOrDefault(0);
                                 var text = values.ElementAtOrDefault(1);
 
@@ -194,7 +169,7 @@ namespace SimpleSocketIoClient
                                     break;
                                 }
 
-                                if (Actions.TryGetValue($"{name}{@namespace}", out var actions))
+                                if (Actions.TryGetValue($"{name}{packet.Namespace}", out var actions))
                                 {
                                     foreach (var (action, type) in actions)
                                     {
@@ -214,7 +189,7 @@ namespace SimpleSocketIoClient
                                 }
                                 else
                                 {
-                                    OnAfterUnhandledEvent(value, @namespace);
+                                    OnAfterUnhandledEvent(packet.Value, packet.Namespace);
                                 }
                             }
                             catch (Exception exception)
@@ -288,7 +263,9 @@ namespace SimpleSocketIoClient
             {
                 foreach (var @namespace in namespaces)
                 {
-                    await EngineIoClient.SendMessageAsync($"0/{@namespace?.TrimStart('/')}", token);
+                    var packet = new SocketIoPacket(SocketIoPacket.ConnectPrefix, @namespace: @namespace);
+
+                    await EngineIoClient.SendMessageAsync(packet.Encode(), token);
                 }
             }, nameof(Connected), cancellationToken);
         }
@@ -342,7 +319,18 @@ namespace SimpleSocketIoClient
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            await EngineIoClient.SendMessageAsync(DisconnectPrefix, cancellationToken);
+            if (DefaultNamespace != null)
+            {
+                var packet = new SocketIoPacket(SocketIoPacket.DisconnectPrefix, @namespace: DefaultNamespace);
+
+                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
+            }
+
+            {
+                var packet = new SocketIoPacket(SocketIoPacket.DisconnectPrefix);
+
+                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
+            }
 
             await EngineIoClient.CloseAsync(cancellationToken);
         }
@@ -358,13 +346,9 @@ namespace SimpleSocketIoClient
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            customNamespace ??= DefaultNamespace;
-            var namespaceBody = customNamespace == null ? string.Empty : $"/{customNamespace.TrimStart('/')}";
-            namespaceBody += !string.IsNullOrWhiteSpace(namespaceBody) && !string.IsNullOrWhiteSpace(message)
-                ? ","
-                : "";
+            var packet = new SocketIoPacket(SocketIoPacket.EventPrefix, message, customNamespace ?? DefaultNamespace);
 
-            await EngineIoClient.SendMessageAsync($"{EventPrefix}{namespaceBody}{message}", cancellationToken);
+            await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
         }
 
         /// <summary>

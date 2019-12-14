@@ -11,19 +11,19 @@ namespace SimpleSocketIoClient.Tests
         {
             CollectionAssert.AreEqual(
                 new [] { "message", "value" }, 
-                "[\"message\",\"value\"]".GetEventValues());
+                "[\"message\",\"value\"]".GetJsonArrayValues());
 
             CollectionAssert.AreEqual(
                 new[] { "message" },
-                "[\"message\"]".GetEventValues());
+                "[\"message\"]".GetJsonArrayValues());
 
             CollectionAssert.AreEqual(
                 new[] { "message", "{}" },
-                "[\"message\",{}]".GetEventValues());
+                "[\"message\",{}]".GetJsonArrayValues());
 
             CollectionAssert.AreEqual(
                 new[] { "new message", "{\"username\":\"1\",\"message\":\"1\"}" },
-                "[\"new message\",{\"username\":\"1\",\"message\":\"1\"}]".GetEventValues());
+                "[\"new message\",{\"username\":\"1\",\"message\":\"1\"}]".GetJsonArrayValues());
         }
     }
 }

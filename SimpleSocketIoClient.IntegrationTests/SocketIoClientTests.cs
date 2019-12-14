@@ -57,6 +57,24 @@ namespace SimpleSocketIoClient.IntegrationTests
             }
         }
 
+        public static void EnableDebug(SocketIoClient client)
+        {
+            client.EngineIoClient.Opened += (sender, args) => Console.WriteLine("EngineIoClient.Opened");
+            client.EngineIoClient.Closed += (sender, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.EngineIoClient.Upgraded += (sender, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
+            client.EngineIoClient.AfterException += (sender, args) => Console.WriteLine($"EngineIoClient.AfterException: {args.Value}");
+            client.EngineIoClient.AfterMessage += (sender, args) => Console.WriteLine($"EngineIoClient.AfterMessage: {args.Value}");
+            client.EngineIoClient.AfterNoop += (sender, args) => Console.WriteLine($"EngineIoClient.AfterNoop: {args.Value}");
+            client.EngineIoClient.AfterPing += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPing: {args.Value}");
+            client.EngineIoClient.AfterPong += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPong: {args.Value}");
+
+            client.EngineIoClient.WebSocketClient.Connected += (sender, args) => Console.WriteLine("WebSocketClient.Connected");
+            client.EngineIoClient.WebSocketClient.Disconnected += (sender, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.EngineIoClient.WebSocketClient.AfterText += (sender, args) => Console.WriteLine($"WebSocketClient.AfterText: {args.Value}");
+            client.EngineIoClient.WebSocketClient.AfterException += (sender, args) => Console.WriteLine($"WebSocketClient.AfterException: {args.Value}");
+            client.EngineIoClient.WebSocketClient.AfterBinary += (sender, args) => Console.WriteLine($"WebSocketClient.AfterBinary: {args.Value.Length}");
+        }
+
         // ReSharper disable once ClassNeverInstantiated.Local
         // ReSharper disable UnusedAutoPropertyAccessor.Local
         private class ChatMessage
@@ -136,6 +154,8 @@ namespace SimpleSocketIoClient.IntegrationTests
         {
             await BaseLocalTest(async (client, cancellationToken) =>
             {
+                EnableDebug(client);
+
                 client.DefaultNamespace = "my";
 
                 await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
@@ -154,6 +174,8 @@ namespace SimpleSocketIoClient.IntegrationTests
         {
             await BaseLocalTest(async (client, cancellationToken) =>
             {
+                EnableDebug(client);
+
                 await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
 
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
@@ -170,20 +192,7 @@ namespace SimpleSocketIoClient.IntegrationTests
         {
             await BaseLocalTest(async (client, cancellationToken) =>
             {
-                client.EngineIoClient.Opened += (sender, args) => Console.WriteLine("EngineIoClient.Opened");
-                client.EngineIoClient.Closed += (sender, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
-                client.EngineIoClient.Upgraded += (sender, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
-                client.EngineIoClient.AfterException += (sender, args) => Console.WriteLine($"EngineIoClient.AfterException: {args.Value}");
-                client.EngineIoClient.AfterMessage += (sender, args) => Console.WriteLine($"EngineIoClient.AfterMessage: {args.Value}");
-                client.EngineIoClient.AfterNoop += (sender, args) => Console.WriteLine($"EngineIoClient.AfterNoop: {args.Value}");
-                client.EngineIoClient.AfterPing += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPing: {args.Value}");
-                client.EngineIoClient.AfterPong += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPong: {args.Value}");
-
-                client.EngineIoClient.WebSocketClient.Connected += (sender, args) => Console.WriteLine("WebSocketClient.Connected");
-                client.EngineIoClient.WebSocketClient.Disconnected += (sender, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-                client.EngineIoClient.WebSocketClient.AfterText += (sender, args) => Console.WriteLine($"WebSocketClient.AfterText: {args.Value}");
-                client.EngineIoClient.WebSocketClient.AfterException += (sender, args) => Console.WriteLine($"WebSocketClient.AfterException: {args.Value}");
-                client.EngineIoClient.WebSocketClient.AfterBinary += (sender, args) => Console.WriteLine($"WebSocketClient.AfterBinary: {args.Value.Length}");
+                EnableDebug(client);
 
                 await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
 

@@ -24,14 +24,6 @@ namespace SimpleSocketIoClient.EngineIO
     {
         #region Constants
 
-        private const string OpenPrefix = "0";
-        private const string ClosePrefix = "1";
-        private const string PingPrefix = "2";
-        private const string PongPrefix = "3";
-        private const string MessagePrefix = "4";
-        private const string UpgradePrefix = "5";
-        private const string NoopPrefix = "6";
-
         private const string PingMessage = "ping";
 
         #endregion
@@ -204,7 +196,7 @@ namespace SimpleSocketIoClient.EngineIO
                 // Reconnect if required
                 await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri);
 
-                await WebSocketClient.SendTextAsync($"{PingPrefix}{PingMessage}");
+                await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode());
 
                 OnAfterPing(PingMessage);
             }
@@ -227,40 +219,38 @@ namespace SimpleSocketIoClient.EngineIO
                     throw new InvalidDataException("Empty or null Engine.IO string");
                 }
 
-                var prefix = text.Substring(0, 1);
-                var value = text.Substring(1);
-
-                switch (prefix)
+                var packet = EngineIoPacket.Decode(text);
+                switch (packet.Prefix)
                 {
-                    case OpenPrefix:
-                        OpenMessage = JsonConvert.DeserializeObject<EngineIoOpenMessage>(value);
+                    case EngineIoPacket.OpenPrefix:
+                        OpenMessage = JsonConvert.DeserializeObject<EngineIoOpenMessage>(packet.Value);
                         IsOpened = true;
                         OnOpened(OpenMessage);
                         break;
 
-                    case ClosePrefix:
+                    case EngineIoPacket.ClosePrefix:
                         IsOpened = false;
                         OnClosed("Received close message from server", null);
                         break;
 
-                    case PingPrefix:
-                        OnAfterPing(value);
+                    case EngineIoPacket.PingPrefix:
+                        OnAfterPing(packet.Value);
                         break;
 
-                    case PongPrefix:
-                        OnAfterPong(value);
+                    case EngineIoPacket.PongPrefix:
+                        OnAfterPong(packet.Value);
                         break;
 
-                    case MessagePrefix:
-                        OnAfterMessage(value);
+                    case EngineIoPacket.MessagePrefix:
+                        OnAfterMessage(packet.Value);
                         break;
 
-                    case UpgradePrefix:
-                        OnUpgraded(value);
+                    case EngineIoPacket.UpgradePrefix:
+                        OnUpgraded(packet.Value);
                         break;
 
-                    case NoopPrefix:
-                        OnAfterNoop(value);
+                    case EngineIoPacket.NoopPrefix:
+                        OnAfterNoop(packet.Value);
                         break;
                 }
             }
@@ -343,7 +333,7 @@ namespace SimpleSocketIoClient.EngineIO
 
             Timer.Stop();
 
-            await WebSocketClient.SendTextAsync(ClosePrefix, cancellationToken);
+            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.ClosePrefix).Encode(), cancellationToken);
 
             await WebSocketClient.DisconnectAsync(cancellationToken);
         }
@@ -358,7 +348,7 @@ namespace SimpleSocketIoClient.EngineIO
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
 
-            await WebSocketClient.SendTextAsync($"{MessagePrefix}{message}", cancellationToken);
+            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.MessagePrefix, message).Encode(), cancellationToken);
         }
 
 #if NETSTANDARD2_1

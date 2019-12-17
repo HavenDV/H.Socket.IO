@@ -22,11 +22,11 @@ Implemented features:
 - Namespaces
 
 Note: This is an alpha version. Some features may not be available. Please see examples or tests.</Description>
-    <Version>0.10.0.0</Version>
+    <Version>0.11.0.0</Version>
     <PackageProjectUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/SimpleSocketIoClient.git</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added Socket.IO namespaces support</PackageReleaseNotes>
+    <PackageReleaseNotes>Added IAsyncDisposable for all target frameworks</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2019 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

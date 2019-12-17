@@ -51,7 +51,7 @@ namespace SimpleSocketIoClient.Utilities
             {
                 eventInfo.AddEventHandler(value, delegateObject);
 
-                return await taskCompletionSource.Task;
+                return await taskCompletionSource.Task.ConfigureAwait(false);
             }
             catch (TaskCanceledException)
             {
@@ -77,9 +77,9 @@ namespace SimpleSocketIoClient.Utilities
             {
                 var task = value.WaitEventAsync(eventName, cancellationToken);
 
-                await func(cancellationToken);
+                await func(cancellationToken).ConfigureAwait(false);
 
-                return await task;
+                return await task.ConfigureAwait(false);
             }
             catch (TaskCanceledException)
             {
@@ -103,9 +103,9 @@ namespace SimpleSocketIoClient.Utilities
 
             try
             {
-                await func(cancellationToken);
+                await func(cancellationToken).ConfigureAwait(false);
 
-                var results = await Task.WhenAll(tasks);
+                var results = await Task.WhenAll(tasks).ConfigureAwait(false);
 
                 return eventNames
                     .Zip(results, (name, result) => (name, result))

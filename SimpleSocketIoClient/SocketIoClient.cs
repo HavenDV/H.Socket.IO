@@ -222,15 +222,15 @@ namespace SimpleSocketIoClient
 
             if (!EngineIoClient.IsOpened && !await this.WaitEventAsync(async token =>
             {
-                await EngineIoClient.OpenAsync(uri, token);
-            }, nameof(Connected), cancellationToken))
+                await EngineIoClient.OpenAsync(uri, token).ConfigureAwait(false);
+            }, nameof(Connected), cancellationToken).ConfigureAwait(false))
             {
                 return false;
             }
 
             return await ConnectToNamespacesAsync(cancellationToken, DefaultNamespace != null
                 ? namespaces.Concat(new []{ DefaultNamespace }).Distinct().ToArray()
-                : namespaces);
+                : namespaces).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -259,9 +259,9 @@ namespace SimpleSocketIoClient
                 {
                     var packet = new SocketIoPacket(SocketIoPacket.ConnectPrefix, @namespace: @namespace);
 
-                    await EngineIoClient.SendMessageAsync(packet.Encode(), token);
+                    await EngineIoClient.SendMessageAsync(packet.Encode(), token).ConfigureAwait(false);
                 }
-            }, nameof(Connected), cancellationToken);
+            }, nameof(Connected), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace SimpleSocketIoClient
             customNamespace = customNamespace ?? throw new ArgumentNullException(nameof(customNamespace));
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            return await ConnectToNamespacesAsync(cancellationToken, customNamespace);
+            return await ConnectToNamespacesAsync(cancellationToken, customNamespace).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace SimpleSocketIoClient
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
 
-            return await ConnectAsync(uri, cancellationSource.Token, namespaces);
+            return await ConnectAsync(uri, cancellationSource.Token, namespaces).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace SimpleSocketIoClient
         /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds, params string[] namespaces)
         {
-            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds), namespaces);
+            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds), namespaces).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -317,16 +317,16 @@ namespace SimpleSocketIoClient
             {
                 var packet = new SocketIoPacket(SocketIoPacket.DisconnectPrefix, @namespace: DefaultNamespace);
 
-                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
+                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken).ConfigureAwait(false);
             }
 
             {
                 var packet = new SocketIoPacket(SocketIoPacket.DisconnectPrefix);
 
-                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
+                await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken).ConfigureAwait(false);
             }
 
-            await EngineIoClient.CloseAsync(cancellationToken);
+            await EngineIoClient.CloseAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -342,7 +342,7 @@ namespace SimpleSocketIoClient
 
             var packet = new SocketIoPacket(SocketIoPacket.EventPrefix, message, customNamespace ?? DefaultNamespace);
 
-            await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken);
+            await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -364,7 +364,7 @@ namespace SimpleSocketIoClient
                 _              => new[] {$"\"{name}\"", JsonConvert.SerializeObject(value)},
             };
 
-            await SendEventAsync($"[{string.Join(",", messages)}]", customNamespace, cancellationToken);
+            await SendEventAsync($"[{string.Join(",", messages)}]", customNamespace, cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace SimpleSocketIoClient
         {
             if (EngineIoClient != null)
             {
-                await EngineIoClient.DisposeAsync();
+                await EngineIoClient.DisposeAsync().ConfigureAwait(false);
                 EngineIoClient = null;
             }
         }

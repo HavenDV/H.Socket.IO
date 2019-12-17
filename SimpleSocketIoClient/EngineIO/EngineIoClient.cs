@@ -189,9 +189,9 @@ namespace SimpleSocketIoClient.EngineIO
             try
             {
                 // Reconnect if required
-                await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri);
+                await WebSocketClient.ConnectAsync(WebSocketClient.LastConnectUri).ConfigureAwait(false);
 
-                await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode());
+                await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode()).ConfigureAwait(false);
 
                 OnAfterPing(PingMessage);
             }
@@ -288,8 +288,8 @@ namespace SimpleSocketIoClient.EngineIO
 
             return await this.WaitEventAsync(async token =>
             {
-                await WebSocketClient.ConnectAsync(socketIoUri, token);
-            }, nameof(Opened), cancellationToken);
+                await WebSocketClient.ConnectAsync(socketIoUri, token).ConfigureAwait(false);
+            }, nameof(Opened), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace SimpleSocketIoClient.EngineIO
         {
             using var cancellationSource = new CancellationTokenSource(timeout);
 
-            return await OpenAsync(uri, cancellationSource.Token);
+            return await OpenAsync(uri, cancellationSource.Token).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace SimpleSocketIoClient.EngineIO
         /// <returns></returns>
         public async Task<bool> OpenAsync(Uri uri, int timeoutInSeconds)
         {
-            return await OpenAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds));
+            return await OpenAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds)).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -328,9 +328,9 @@ namespace SimpleSocketIoClient.EngineIO
 
             Timer.Stop();
 
-            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.ClosePrefix).Encode(), cancellationToken);
+            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.ClosePrefix).Encode(), cancellationToken).ConfigureAwait(false);
 
-            await WebSocketClient.DisconnectAsync(cancellationToken);
+            await WebSocketClient.DisconnectAsync(cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -343,7 +343,7 @@ namespace SimpleSocketIoClient.EngineIO
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
 
-            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.MessagePrefix, message).Encode(), cancellationToken);
+            await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.MessagePrefix, message).Encode(), cancellationToken).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -354,7 +354,7 @@ namespace SimpleSocketIoClient.EngineIO
         {
             if (WebSocketClient != null)
             {
-                await WebSocketClient.DisposeAsync();
+                await WebSocketClient.DisposeAsync().ConfigureAwait(false);
                 WebSocketClient = null;
             }
 

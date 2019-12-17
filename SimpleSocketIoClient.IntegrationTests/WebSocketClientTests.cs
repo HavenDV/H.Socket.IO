@@ -15,11 +15,7 @@ namespace SimpleSocketIoClient.IntegrationTests
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-#if NETSTANDARD2_1 || NETCOREAPP3_0 || NETCOREAPP3_1
             await using var client = new WebSocketClient();
-#else
-            using var client = new WebSocketClient();
-#endif
 
             client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");

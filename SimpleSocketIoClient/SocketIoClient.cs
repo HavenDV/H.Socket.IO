@@ -16,14 +16,8 @@ namespace SimpleSocketIoClient
     /// <summary>
     /// Socket.IO Client.
     /// </summary>
-    public sealed class SocketIoClient :
-#if NETSTANDARD2_1
-        IAsyncDisposable
-#else
-        IDisposable
-#endif
+    public sealed class SocketIoClient : IAsyncDisposable
     {
-
         #region Properties
 
         /// <summary>
@@ -430,7 +424,6 @@ namespace SimpleSocketIoClient
             On<object>(name, (obj, text) => action?.Invoke(), customNamespace);
         }
 
-#if NETSTANDARD2_1
         /// <summary>
         /// Asynchronously disposes an object.
         /// </summary>
@@ -443,16 +436,6 @@ namespace SimpleSocketIoClient
                 EngineIoClient = null;
             }
         }
-#else
-        /// <summary>
-        /// Disposes an object.
-        /// </summary>
-        public void Dispose()
-        {
-            EngineIoClient?.Dispose();
-            EngineIoClient = null;
-        }
-#endif
 
         #endregion
     }

@@ -15,12 +15,7 @@ namespace SimpleSocketIoClient.EngineIO
     /// <summary>
     /// Engine.IO Client
     /// </summary>
-    public sealed class EngineIoClient :
-#if NETSTANDARD2_1
-        IAsyncDisposable 
-#else
-        IDisposable
-#endif
+    public sealed class EngineIoClient : IAsyncDisposable
     {
         #region Constants
 
@@ -351,7 +346,6 @@ namespace SimpleSocketIoClient.EngineIO
             await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.MessagePrefix, message).Encode(), cancellationToken);
         }
 
-#if NETSTANDARD2_1
         /// <summary>
         /// 
         /// </summary>
@@ -367,20 +361,6 @@ namespace SimpleSocketIoClient.EngineIO
             Timer?.Dispose();
             Timer = null;
         }
-#else
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            WebSocketClient?.Dispose();
-            WebSocketClient = null;
-
-            Timer?.Dispose();
-            Timer = null;
-        }
-#endif
-
 
         #endregion
     }

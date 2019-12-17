@@ -13,12 +13,7 @@ namespace SimpleSocketIoClient.WebSocket
     /// <summary>
     /// 
     /// </summary>
-    public sealed class WebSocketClient :
-#if NETSTANDARD2_1
-        IAsyncDisposable 
-#else
-        IDisposable
-#endif
+    public sealed class WebSocketClient : IAsyncDisposable
     {
         #region Properties
 
@@ -214,7 +209,6 @@ namespace SimpleSocketIoClient.WebSocket
             await Socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken);
         }
 
-#if NETSTANDARD2_1
         /// <summary>
         /// 
         /// </summary>
@@ -237,28 +231,6 @@ namespace SimpleSocketIoClient.WebSocket
             Socket?.Dispose();
             Socket = null;
         }
-#else
-        /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-            if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
-            {
-                CancellationTokenSource.Cancel();
-            }
-
-            CancellationTokenSource?.Dispose();
-            CancellationTokenSource = null;
-
-            ReceiveTask?.TryDispose();
-            ReceiveTask = null;
-
-            Socket?.Dispose();
-            Socket = null;
-        }
-#endif
-
 
         #endregion
 

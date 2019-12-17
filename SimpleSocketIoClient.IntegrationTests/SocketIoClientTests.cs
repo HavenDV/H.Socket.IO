@@ -17,11 +17,7 @@ namespace SimpleSocketIoClient.IntegrationTests
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-#if NETSTANDARD2_1 || NETCOREAPP3_0 || NETCOREAPP3_1
             await using var client = new SocketIoClient();
-#else
-            using var client = new SocketIoClient();
-#endif
 
             client.Connected += (sender, args) => Console.WriteLine($"Connected: {args.Namespace}");
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");

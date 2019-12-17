@@ -50,11 +50,12 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public void Test()
         {
-            BaseTest("42[\"login\",{\"numUsers\":5}]", new EngineIoPacket(EngineIoPacket.MessagePrefix, "2[\"login\",{\"numUsers\":5}]"));
-            BaseTest("42/my,[\"message\",{\"message\":\"hello\"}]", new EngineIoPacket(EngineIoPacket.MessagePrefix, "2/my,[\"message\",{\"message\":\"hello\"}]"));
-            BaseTest("40", new EngineIoPacket(EngineIoPacket.MessagePrefix, "0"));
             BaseTest("0{\"sid\":\"lvRP3AYFhuQr-7iVB5T9\",\"upgrades\":[],\"pingInterval\":25000,\"pingTimeout\":60000}", new EngineIoPacket(EngineIoPacket.OpenPrefix, "{\"sid\":\"lvRP3AYFhuQr-7iVB5T9\",\"upgrades\":[],\"pingInterval\":25000,\"pingTimeout\":60000}"));
             BaseTest("1", new EngineIoPacket(EngineIoPacket.ClosePrefix));
+            BaseTest("40", new EngineIoPacket(EngineIoPacket.MessagePrefix, "0"));
+            BaseTest("42[\"login\",{\"numUsers\":5}]", new EngineIoPacket(EngineIoPacket.MessagePrefix, "2[\"login\",{\"numUsers\":5}]"));
+            BaseTest("42/my,[\"message\",{\"message\":\"hello\"}]", new EngineIoPacket(EngineIoPacket.MessagePrefix, "2/my,[\"message\",{\"message\":\"hello\"}]"));
+            BaseTest("44\"Authentication error\"", new EngineIoPacket(EngineIoPacket.MessagePrefix, "4\"Authentication error\""));
         }
     }
 }

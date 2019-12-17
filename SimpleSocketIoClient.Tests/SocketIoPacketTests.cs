@@ -50,11 +50,12 @@ namespace SimpleSocketIoClient.Tests
         [TestMethod]
         public void Test()
         {
+            BaseTest("0", new SocketIoPacket(SocketIoPacket.ConnectPrefix));
+            BaseTest("0/my", new SocketIoPacket(SocketIoPacket.ConnectPrefix, @namespace: "/my"));
+            BaseTest("1", new SocketIoPacket(SocketIoPacket.DisconnectPrefix));
             BaseTest("2[\"login\",{\"numUsers\":5}]", new SocketIoPacket(SocketIoPacket.EventPrefix, "[\"login\",{\"numUsers\":5}]", "/"));
             BaseTest("2/my,[\"message\",{\"message\":\"hello\"}]", new SocketIoPacket(SocketIoPacket.EventPrefix, "[\"message\",{\"message\":\"hello\"}]", "/my"));
-            BaseTest("0/my", new SocketIoPacket(SocketIoPacket.ConnectPrefix, @namespace: "/my"));
-            BaseTest("0", new SocketIoPacket(SocketIoPacket.ConnectPrefix));
-            BaseTest("1", new SocketIoPacket(SocketIoPacket.DisconnectPrefix));
+            BaseTest("4\"Authentication error\"", new SocketIoPacket(SocketIoPacket.ErrorPrefix, "\"Authentication error\""));
         }
     }
 }

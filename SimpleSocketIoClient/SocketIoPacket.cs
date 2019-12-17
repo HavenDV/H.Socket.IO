@@ -11,7 +11,7 @@ namespace SimpleSocketIoClient
         public const string DisconnectPrefix = "1";
         public const string EventPrefix = "2";
         //public const string AckPrefix = "3";
-        //public const string ErrorPrefix = "4";
+        public const string ErrorPrefix = "4";
         //public const string BinaryEventPrefix = "5";
         //public const string BinaryAckPrefix = "6";
 

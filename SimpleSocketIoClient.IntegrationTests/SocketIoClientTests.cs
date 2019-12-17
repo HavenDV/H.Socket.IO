@@ -24,9 +24,10 @@ namespace SimpleSocketIoClient.IntegrationTests
             client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
             client.AfterHandledEvent += (sender, args) => Console.WriteLine($"AfterHandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
             client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.AfterError += (sender, args) => Console.WriteLine($"AfterError: Namespace: {args.Namespace}, Value: {args.Value}");
             client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
-            var results = await client.WaitEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync(async cancellationToken =>
             {
                 await func(client, cancellationToken);
             }, cancellationTokenSource.Token, new [] { nameof(client.Connected), nameof(client.Disconnected) }.Concat(additionalEvents).ToArray());
@@ -38,7 +39,7 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             foreach (var pair in results)
             {
-                Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+                Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
         }
 
@@ -129,6 +130,12 @@ namespace SimpleSocketIoClient.IntegrationTests
         public async Task ConnectToChatNowShTest()
         {
             await ConnectToChatBaseTest("wss://socket-io-chat.now.sh/");
+        }
+
+        [TestMethod]
+        public async Task Test()
+        {
+            await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await ConnectToChatBaseTest("ws://test.ubetia.net:3005/"));
         }
 
         [TestMethod]

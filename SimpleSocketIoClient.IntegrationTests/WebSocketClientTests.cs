@@ -24,7 +24,7 @@ namespace SimpleSocketIoClient.IntegrationTests
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
-            var results = await client.WaitEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync(async cancellationToken =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 
@@ -58,10 +58,10 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             foreach (var pair in results)
             {
-                Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+                Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
 
-            results = await client.WaitEventsAsync(async cancellationToken =>
+            results = await client.WaitAllEventsAsync(async cancellationToken =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 
@@ -93,7 +93,7 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             foreach (var pair in results)
             {
-                Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+                Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
         }
     }

@@ -289,7 +289,7 @@ namespace SimpleSocketIoClient.EngineIO
             return await this.WaitEventAsync(async token =>
             {
                 await WebSocketClient.ConnectAsync(socketIoUri, token).ConfigureAwait(false);
-            }, nameof(Opened), cancellationToken).ConfigureAwait(false);
+            }, nameof(Opened), cancellationToken).ConfigureAwait(false) != null;
         }
 
         /// <summary>

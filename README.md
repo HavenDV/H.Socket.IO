@@ -42,6 +42,7 @@ public async Task ConnectToChatNowShTest()
     client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
     client.AfterHandledEvent += (sender, args) => Console.WriteLine($"AfterHandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
     client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
+    client.AfterError += (sender, args) => Console.WriteLine($"AfterError: Namespace: {args.Namespace}, Value: {args.Value}");
     client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
 
     client.On<ChatMessage>("login", message =>

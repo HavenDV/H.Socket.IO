@@ -22,8 +22,7 @@ namespace SimpleSocketIoClient.IntegrationTests
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
-            var events = new[] {nameof(client.Opened), nameof(client.Closed)};
-            var results = await client.WaitEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync(async cancellationToken =>
             {
                 Console.WriteLine("# Before OpenAsync");
 
@@ -38,7 +37,7 @@ namespace SimpleSocketIoClient.IntegrationTests
                 await client.CloseAsync(cancellationToken);
 
                 Console.WriteLine("# After CloseAsync");
-            }, cancellationTokenSource.Token, events);
+            }, cancellationTokenSource.Token, nameof(client.Opened), nameof(client.Closed));
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.WebSocketClient.Socket.State}");
@@ -47,7 +46,7 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             foreach (var pair in results)
             {
-                Assert.IsTrue(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+                Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
         }
 

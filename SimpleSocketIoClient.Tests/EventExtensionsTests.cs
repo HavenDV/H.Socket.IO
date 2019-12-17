@@ -30,25 +30,41 @@ namespace SimpleSocketIoClient.Tests
                 testObject.OnCommonEvent();
             }, nameof(TestClass.CommonEvent), cancellationTokenSource.Token);
 
-            Assert.IsTrue(result, nameof(TestClass.CommonEvent));
+            Assert.IsNotNull(result, nameof(TestClass.CommonEvent));
         }
 
         [TestMethod]
-        public async Task WaitEventsAsyncTest()
+        public async Task WaitAllEventsAsyncTest()
         {
             using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var testObject = new TestClass();
 
-            var results = await testObject.WaitEventsAsync(async cancellationToken =>
+            var results = await testObject.WaitAllEventsAsync(async cancellationToken =>
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
 
                 testObject.OnCommonEvent();
             }, cancellationTokenSource.Token, nameof(TestClass.CommonEvent), nameof(TestClass.EventThatWillNeverHappen));
 
-            Assert.IsTrue(results[nameof(TestClass.CommonEvent)], nameof(TestClass.CommonEvent));
-            // ReSharper disable once HeuristicUnreachableCode
-            Assert.IsFalse(results[nameof(TestClass.EventThatWillNeverHappen)], nameof(TestClass.EventThatWillNeverHappen));
+            Assert.IsNotNull(results[nameof(TestClass.CommonEvent)], nameof(TestClass.CommonEvent));
+            Assert.IsNull(results[nameof(TestClass.EventThatWillNeverHappen)], nameof(TestClass.EventThatWillNeverHappen));
+        }
+
+        [TestMethod]
+        public async Task WaitAnyEventAsyncTest()
+        {
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            var testObject = new TestClass();
+
+            var results = await testObject.WaitAnyEventAsync(async cancellationToken =>
+            {
+                await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken);
+
+                testObject.OnCommonEvent();
+            }, cancellationTokenSource.Token, nameof(TestClass.CommonEvent), nameof(TestClass.EventThatWillNeverHappen));
+
+            Assert.IsNotNull(results[nameof(TestClass.CommonEvent)], nameof(TestClass.CommonEvent));
+            Assert.IsNull(results[nameof(TestClass.EventThatWillNeverHappen)], nameof(TestClass.EventThatWillNeverHappen));
         }
     }
 }

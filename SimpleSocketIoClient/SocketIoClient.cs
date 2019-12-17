@@ -73,6 +73,11 @@ namespace SimpleSocketIoClient
         public event EventHandler<SocketIoEventEventArgs>? AfterUnhandledEvent;
 
         /// <summary>
+        /// Occurs after new error.
+        /// </summary>
+        public event EventHandler<SocketIoErrorEventArgs>? AfterError;
+
+        /// <summary>
         /// Occurs after new exception.
         /// </summary>
         public event EventHandler<DataEventArgs<Exception>>? AfterException;
@@ -99,6 +104,11 @@ namespace SimpleSocketIoClient
             {
                 AfterUnhandledEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace, false));
             }
+        }
+
+        private void OnAfterError(string value, string @namespace)
+        {
+            AfterError?.Invoke(this, new SocketIoErrorEventArgs(value, @namespace));
         }
 
         private void OnAfterException(Exception value)
@@ -197,6 +207,10 @@ namespace SimpleSocketIoClient
                             OnAfterEvent(packet.Value, packet.Namespace, isHandled);
                         }
                         break;
+
+                    case SocketIoPacket.ErrorPrefix:
+                        OnAfterError(packet.Value.Trim('\"'), packet.Namespace);
+                        break;
                 }
             }
             catch (Exception exception)
@@ -220,17 +234,28 @@ namespace SimpleSocketIoClient
         /// <param name="uri"></param>
         /// <param name="cancellationToken"></param>
         /// <param name="namespaces"></param>
+        /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
+        /// <exception cref="ObjectDisposedException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default, params string[] namespaces)
         {
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
-            if (!EngineIoClient.IsOpened && !await this.WaitEventAsync(async token =>
+            if (!EngineIoClient.IsOpened)
             {
-                await EngineIoClient.OpenAsync(uri, token).ConfigureAwait(false);
-            }, nameof(Connected), cancellationToken).ConfigureAwait(false))
-            {
-                return false;
+                var results = await this.WaitAnyEventAsync(async token =>
+                {
+                    await EngineIoClient.OpenAsync(uri, token).ConfigureAwait(false);
+                }, cancellationToken, nameof(Connected), nameof(AfterError)).ConfigureAwait(false);
+
+                if (results[nameof(AfterError)] is SocketIoErrorEventArgs error)
+                {
+                    throw new InvalidOperationException($"Socket.IO returns error: {error.Value}");
+                }
+                if (results[nameof(Connected)] == null)
+                {
+                    return false;
+                }
             }
 
             return await ConnectToNamespacesAsync(cancellationToken, DefaultNamespace != null
@@ -243,6 +268,7 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <param name="namespaces"></param>
+        /// <exception cref="ObjectDisposedException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectToNamespacesAsync(CancellationToken cancellationToken = default, params string[] namespaces)
         {
@@ -266,7 +292,7 @@ namespace SimpleSocketIoClient
 
                     await EngineIoClient.SendMessageAsync(packet.Encode(), token).ConfigureAwait(false);
                 }
-            }, nameof(Connected), cancellationToken).ConfigureAwait(false);
+            }, nameof(Connected), cancellationToken).ConfigureAwait(false) != null;
         }
 
         /// <summary>
@@ -274,6 +300,8 @@ namespace SimpleSocketIoClient
         /// </summary>
         /// <param name="customNamespace"></param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ObjectDisposedException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectToNamespaceAsync(string customNamespace, CancellationToken cancellationToken = default)
         {
@@ -313,6 +341,7 @@ namespace SimpleSocketIoClient
         /// Sends a disconnect message and closes the connection.
         /// </summary>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="ObjectDisposedException"></exception>
         /// <returns></returns>
         public async Task DisconnectAsync(CancellationToken cancellationToken = default)
         {
@@ -340,6 +369,7 @@ namespace SimpleSocketIoClient
         /// <param name="message"></param>
         /// <param name="customNamespace"></param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="ObjectDisposedException"></exception>
         /// <returns></returns>
         public async Task SendEventAsync(string message, string? customNamespace = null, CancellationToken cancellationToken = default)
         {

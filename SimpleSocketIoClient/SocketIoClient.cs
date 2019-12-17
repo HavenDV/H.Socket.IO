@@ -124,11 +124,11 @@ namespace SimpleSocketIoClient
 
         #region Event Handlers
 
-        private void EngineIoClient_AfterMessage(object sender, DataEventArgs<string> args)
+        private void EngineIoClient_AfterMessage(object? sender, DataEventArgs<string>? args)
         {
             try
             {
-                if (args.Value == null)
+                if (args?.Value == null)
                 {
                     throw new InvalidDataException("Engine.IO message is null");
                 }

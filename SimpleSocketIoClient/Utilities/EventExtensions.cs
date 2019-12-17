@@ -42,8 +42,10 @@ namespace SimpleSocketIoClient.Utilities
                 Source = taskCompletionSource,
             };
             var method = typeof(WaitObject).GetMethod(nameof(WaitObject.HandleEvent)) ?? throw new InvalidOperationException("Method not found");
-            var eventInfo = value.GetType().GetEvent(eventName);
-            var delegateObject = Delegate.CreateDelegate(eventInfo.EventHandlerType, waitObject, method, true);
+            var eventInfo = value.GetType().GetEvent(eventName) ?? throw new InvalidOperationException("Event info not found");
+            // ReSharper disable once ConstantNullCoalescingCondition
+            var eventHandlerType = eventInfo.EventHandlerType ?? throw new InvalidOperationException("Event Handler Type not found");
+            var delegateObject = Delegate.CreateDelegate(eventHandlerType, waitObject, method, true);
 
             try
             {

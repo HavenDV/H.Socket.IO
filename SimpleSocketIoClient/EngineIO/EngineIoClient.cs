@@ -209,14 +209,14 @@ namespace SimpleSocketIoClient.EngineIO
             }
         }
 
-        private void WebSocket_AfterText(object sender, DataEventArgs<string> args)
+        private void WebSocket_AfterText(object? sender, DataEventArgs<string>? args)
         {
             try
             {
-                var text = args.Value;
+                var text = args?.Value ?? throw new InvalidDataException("Null Engine.IO string");
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    throw new InvalidDataException("Empty or null Engine.IO string");
+                    throw new InvalidDataException("Empty Engine.IO string");
                 }
 
                 var packet = EngineIoPacket.Decode(text);

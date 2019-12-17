@@ -1,32 +1,38 @@
 ﻿using System;
-using System.Net.WebSockets;
 
 namespace SimpleSocketIoClient.EventsArgs
 {
     /// <summary>
-    /// Arguments used in <see cref="WebSocket"/> close event
+    /// Arguments used in <see cref="SocketIoClient.AfterEvent"/> event
     /// </summary>
-    public class WebSocketCloseEventArgs : EventArgs
+    public class SocketIoEventEventArgs : EventArgs
     {
         /// <summary>
-        /// Reason of disconnect
+        /// Value
         /// </summary>
-        public string? Reason { get; set; }
+        public string Value { get; set; }
 
         /// <summary>
-        /// Status of WebSocket
+        /// Namespace
         /// </summary>
-        public WebSocketCloseStatus? Status { get; set; }
+        public string Namespace { get; set; }
+
+        /// <summary>
+        /// IsHandled
+        /// </summary>
+        public bool IsHandled { get; set; }
 
         /// <summary>
         /// Base constructor
         /// </summary>
-        /// <param name="reason"></param>
-        /// <param name="status"></param>
-        public WebSocketCloseEventArgs(string? reason, WebSocketCloseStatus? status)
+        /// <param name="value"></param>
+        /// <param name="namespace"></param>
+        /// <param name="isHandled"></param>
+        public SocketIoEventEventArgs(string value, string @namespace, bool isHandled)
         {
-            Reason = reason;
-            Status = status;
+            Value = value;
+            Namespace = @namespace;
+            IsHandled = isHandled;
         }
     }
 }

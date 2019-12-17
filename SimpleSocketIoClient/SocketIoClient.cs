@@ -28,11 +28,9 @@ namespace SimpleSocketIoClient
         /// <summary>
         /// Using proxy.
         /// </summary>
-        public IWebProxy? Proxy
-        {
+        public IWebProxy? Proxy {
             get => EngineIoClient?.Proxy;
-            set
-            {
+            set {
                 EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
                 EngineIoClient.Proxy = value;
             }
@@ -65,6 +63,11 @@ namespace SimpleSocketIoClient
         public event EventHandler<SocketIoEventEventArgs>? AfterEvent;
 
         /// <summary>
+        /// Occurs after new handled event(captured by any On).
+        /// </summary>
+        public event EventHandler<SocketIoEventEventArgs>? AfterHandledEvent;
+
+        /// <summary>
         /// Occurs after new unhandled event(not captured by any On).
         /// </summary>
         public event EventHandler<SocketIoEventEventArgs>? AfterUnhandledEvent;
@@ -76,7 +79,7 @@ namespace SimpleSocketIoClient
 
         private void OnConnected(string value)
         {
-            Connected?.Invoke(this, new SocketIoEventEventArgs(string.Empty, value));
+            Connected?.Invoke(this, new SocketIoEventEventArgs(string.Empty, value, false));
         }
 
         private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
@@ -84,14 +87,18 @@ namespace SimpleSocketIoClient
             Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
-        private void OnAfterEvent(string value, string @namespace)
+        private void OnAfterEvent(string value, string @namespace, bool isHandled)
         {
-            AfterEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace));
-        }
+            AfterEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace, isHandled));
 
-        private void OnAfterUnhandledEvent(string value, string @namespace)
-        {
-            AfterUnhandledEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace));
+            if (isHandled)
+            {
+                AfterHandledEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace, true));
+            }
+            else
+            {
+                AfterUnhandledEvent?.Invoke(this, new SocketIoEventEventArgs(value, @namespace, false));
+            }
         }
 
         private void OnAfterException(Exception value)
@@ -145,53 +152,51 @@ namespace SimpleSocketIoClient
                         break;
 
                     case SocketIoPacket.EventPrefix:
+                        var isHandled = false;
+                        try
                         {
-                            OnAfterEvent(packet.Value, packet.Namespace);
-
-                            if (Actions == null)
+                            if (Actions == null ||
+                                string.IsNullOrWhiteSpace(packet.Value))
                             {
                                 break;
                             }
-                            try
+
+                            var values = packet.Value.GetJsonArrayValues();
+                            var name = values.ElementAtOrDefault(0);
+                            var text = values.ElementAtOrDefault(1);
+
+                            if (!Actions.TryGetValue($"{name}{packet.Namespace}", out var actions))
                             {
-                                var values = packet.Value.GetJsonArrayValues();
-                                var name = values.ElementAtOrDefault(0);
-                                var text = values.ElementAtOrDefault(1);
+                                break;
+                            }
 
-                                if (name == null)
+                            foreach (var (action, type) in actions)
+                            {
+                                isHandled = true;
+
+                                try
                                 {
-                                    break;
+                                    var obj = text == null
+                                        ? null
+                                        : JsonConvert.DeserializeObject(text, type);
+
+                                    action?.Invoke(obj, text);
                                 }
-
-                                if (Actions.TryGetValue($"{name}{packet.Namespace}", out var actions))
+                                catch (Exception exception)
                                 {
-                                    foreach (var (action, type) in actions)
-                                    {
-                                        try
-                                        {
-                                            var obj = text == null
-                                                ? null
-                                                : JsonConvert.DeserializeObject(text, type);
-
-                                            action?.Invoke(obj, text);
-                                        }
-                                        catch (Exception exception)
-                                        {
-                                            OnAfterException(exception);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    OnAfterUnhandledEvent(packet.Value, packet.Namespace);
+                                    OnAfterException(exception);
                                 }
                             }
-                            catch (Exception exception)
-                            {
-                                OnAfterException(exception);
-                            }
-                            break;
                         }
+                        catch (Exception exception)
+                        {
+                            OnAfterException(exception);
+                        }
+                        finally
+                        {
+                            OnAfterEvent(packet.Value, packet.Namespace, isHandled);
+                        }
+                        break;
                 }
             }
             catch (Exception exception)
@@ -229,7 +234,7 @@ namespace SimpleSocketIoClient
             }
 
             return await ConnectToNamespacesAsync(cancellationToken, DefaultNamespace != null
-                ? namespaces.Concat(new []{ DefaultNamespace }).Distinct().ToArray()
+                ? namespaces.Concat(new[] { DefaultNamespace }).Distinct().ToArray()
                 : namespaces).ConfigureAwait(false);
         }
 
@@ -359,9 +364,9 @@ namespace SimpleSocketIoClient
         {
             var messages = value switch
             {
-                null           => new[] {$"\"{name}\""},
-                string message => new[] {$"\"{name}\"", $"\"{message}\""},
-                _              => new[] {$"\"{name}\"", JsonConvert.SerializeObject(value)},
+                null           => new[] { $"\"{name}\"" },
+                string message => new[] { $"\"{name}\"", $"\"{message}\"" },
+                _              => new[] { $"\"{name}\"", JsonConvert.SerializeObject(value) },
             };
 
             await SendEventAsync($"[{string.Join(",", messages)}]", customNamespace, cancellationToken).ConfigureAwait(false);

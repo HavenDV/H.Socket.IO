@@ -18,14 +18,21 @@ namespace SimpleSocketIoClient.EventsArgs
         public string Namespace { get; set; }
 
         /// <summary>
+        /// IsHandled
+        /// </summary>
+        public bool IsHandled { get; set; }
+
+        /// <summary>
         /// Base constructor
         /// </summary>
         /// <param name="value"></param>
         /// <param name="namespace"></param>
-        public SocketIoEventEventArgs(string value, string @namespace)
+        /// <param name="isHandled"></param>
+        public SocketIoEventEventArgs(string value, string @namespace, bool isHandled)
         {
             Value = value;
             Namespace = @namespace;
+            IsHandled = isHandled;
         }
     }
 }

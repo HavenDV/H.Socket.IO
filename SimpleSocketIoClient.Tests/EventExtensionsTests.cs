@@ -47,6 +47,7 @@ namespace SimpleSocketIoClient.Tests
             }, cancellationTokenSource.Token, nameof(TestClass.CommonEvent), nameof(TestClass.EventThatWillNeverHappen));
 
             Assert.IsTrue(results[nameof(TestClass.CommonEvent)], nameof(TestClass.CommonEvent));
+            // ReSharper disable once HeuristicUnreachableCode
             Assert.IsFalse(results[nameof(TestClass.EventThatWillNeverHappen)], nameof(TestClass.EventThatWillNeverHappen));
         }
     }

@@ -53,7 +53,7 @@ namespace SimpleSocketIoClient.Utilities
 
                 return await taskCompletionSource.Task.ConfigureAwait(false);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 return null;
             }
@@ -81,7 +81,7 @@ namespace SimpleSocketIoClient.Utilities
 
                 return await task.ConfigureAwait(false);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 return null;
             }
@@ -107,7 +107,7 @@ namespace SimpleSocketIoClient.Utilities
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
             }
 
@@ -136,7 +136,7 @@ namespace SimpleSocketIoClient.Utilities
 
                 await Task.WhenAny(tasks).ConfigureAwait(false);
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
             }
 

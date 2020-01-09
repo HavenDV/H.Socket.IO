@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace H.SocketIO.Utilities
+namespace H.Socket.IO.Utilities
 {
     /// <summary>
     /// Utilities for <see cref="SocketIoClient"/>

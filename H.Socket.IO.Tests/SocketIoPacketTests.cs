@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.SocketIO.Tests
+namespace H.Socket.IO.Tests
 {
     [TestClass]
     public class SocketIoPacketTests

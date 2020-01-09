@@ -6,14 +6,14 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using H.EngineIO;
-using H.SocketIO.EventsArgs;
-using H.SocketIO.Utilities;
+using H.Engine.IO;
+using H.Socket.IO.EventsArgs;
+using H.Socket.IO.Utilities;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
 
-namespace H.SocketIO
+namespace H.Socket.IO
 {
     /// <summary>
     /// Socket.IO Client.

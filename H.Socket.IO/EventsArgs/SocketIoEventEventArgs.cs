@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace H.SocketIO.EventsArgs
+namespace H.Socket.IO.EventsArgs
 {
     /// <summary>
     /// Arguments used in <see cref="SocketIoClient.AfterEvent"/> event

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace H.EngineIO
+namespace H.Engine.IO
 {
     public class EngineIoPacket
     {

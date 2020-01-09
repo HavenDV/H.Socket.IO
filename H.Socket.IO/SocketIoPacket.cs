@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace H.SocketIO
+namespace H.Socket.IO
 {
     internal class SocketIoPacket
     {

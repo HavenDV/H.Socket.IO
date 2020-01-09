@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.SocketIO", "H.SocketIO\H.SocketIO.csproj", "{9B592C68-3C75-4907-8672-60236F8714CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Socket.IO", "H.Socket.IO\H.Socket.IO.csproj", "{9B592C68-3C75-4907-8672-60236F8714CD}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.SocketIO.Tests", "H.SocketIO.Tests\H.SocketIO.Tests.csproj", "{D8C53574-42BB-43AB-A5CA-D4860A15C94D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Socket.IO.Tests", "H.Socket.IO.Tests\H.Socket.IO.Tests.csproj", "{D8C53574-42BB-43AB-A5CA-D4860A15C94D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{82093184-8701-4DBE-B42B-8291CABACCA1}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,11 +16,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.SocketIO.IntegrationTests", "H.SocketIO.IntegrationTests\H.SocketIO.IntegrationTests.csproj", "{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Socket.IO.IntegrationTests", "H.Socket.IO.IntegrationTests\H.Socket.IO.IntegrationTests.csproj", "{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.WebSockets", "H.WebSockets\H.WebSockets.csproj", "{E91F3623-0C13-4CF6-A154-13622A8B8F99}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.EngineIO", "H.EngineIO\H.EngineIO.csproj", "{20FF7182-3433-4362-93E1-8A346E3C4CD1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Engine.IO", "H.Engine.IO\H.Engine.IO.csproj", "{20FF7182-3433-4362-93E1-8A346E3C4CD1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -10,7 +10,7 @@ using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
 
-namespace H.EngineIO
+namespace H.Engine.IO
 {
     /// <summary>
     /// Engine.IO Client

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using H.WebSockets.Utilities;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.SocketIO.Tests
+namespace H.Socket.IO.Tests
 {
     [TestClass]
     public class EventExtensionsTests

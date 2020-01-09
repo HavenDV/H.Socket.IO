@@ -1,7 +1,7 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using H.EngineIO;
+﻿using H.Engine.IO;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.SocketIO.Tests
+namespace H.Socket.IO.Tests
 {
     [TestClass]
     public class EngineIoPacketTests

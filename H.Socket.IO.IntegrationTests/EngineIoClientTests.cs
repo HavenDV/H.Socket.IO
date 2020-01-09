@@ -2,11 +2,11 @@ using System;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using H.EngineIO;
+using H.Engine.IO;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.SocketIO.IntegrationTests
+namespace H.Socket.IO.IntegrationTests
 {
     [TestClass]
     public class EngineIoClientTests

@@ -23,11 +23,12 @@ Implemented features:
 - Namespaces
 
 Note: This is an alpha version. Some features may not be available. Please see examples or tests.</Description>
-    <Version>0.13.0.0</Version>
+    <Version>0.14.0</Version>
     <PackageProjectUrl>https://github.com/HavenDV/H.SocketIO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.SocketIO</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added AfterError event</PackageReleaseNotes>
+    <PackageReleaseNotes>Changed event names
+Renamed package to "H.Socket.IO"</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

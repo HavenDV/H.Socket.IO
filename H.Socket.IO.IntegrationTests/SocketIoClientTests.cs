@@ -21,11 +21,11 @@ namespace H.Socket.IO.IntegrationTests
 
             client.Connected += (sender, args) => Console.WriteLine($"Connected: {args.Namespace}");
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.AfterEvent += (sender, args) => Console.WriteLine($"AfterEvent: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
-            client.AfterHandledEvent += (sender, args) => Console.WriteLine($"AfterHandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.AfterUnhandledEvent += (sender, args) => Console.WriteLine($"AfterUnhandledEvent: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.AfterError += (sender, args) => Console.WriteLine($"AfterError: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
+            client.EventReceived += (sender, args) => Console.WriteLine($"EventReceived: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
+            client.HandledEventReceived += (sender, args) => Console.WriteLine($"HandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.UnhandledEventReceived += (sender, args) => Console.WriteLine($"UnhandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.ErrorReceived += (sender, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
 
             var results = await client.WaitAllEventsAsync(async cancellationToken =>
             {
@@ -124,7 +124,7 @@ namespace H.Socket.IO.IntegrationTests
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
                 await client.DisconnectAsync(cancellationToken);
-            }, nameof(SocketIoClient.AfterEvent));
+            }, nameof(SocketIoClient.EventReceived));
         }
 
         [TestMethod]
@@ -170,7 +170,7 @@ namespace H.Socket.IO.IntegrationTests
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
                 await client.DisconnectAsync(cancellationToken);
-            }, nameof(SocketIoClient.AfterEvent), nameof(SocketIoClient.AfterUnhandledEvent));
+            }, nameof(SocketIoClient.EventReceived), nameof(SocketIoClient.UnhandledEventReceived));
         }
 
         [TestMethod]
@@ -188,7 +188,7 @@ namespace H.Socket.IO.IntegrationTests
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
                 await client.DisconnectAsync(cancellationToken);
-            }, nameof(SocketIoClient.AfterEvent), nameof(SocketIoClient.AfterUnhandledEvent));
+            }, nameof(SocketIoClient.EventReceived), nameof(SocketIoClient.UnhandledEventReceived));
         }
 
         [TestMethod]

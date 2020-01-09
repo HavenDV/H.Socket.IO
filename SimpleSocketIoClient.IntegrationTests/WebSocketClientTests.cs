@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using H.WebSockets;
+using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleSocketIoClient.Utilities;
-using SimpleSocketIoClient.WebSocket;
 
 namespace SimpleSocketIoClient.IntegrationTests
 {
@@ -17,9 +17,9 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             await using var client = new WebSocketClient();
 
-            client.AfterText += (sender, args) => Console.WriteLine($"AfterText: {args.Value}");
-            client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
-            client.AfterBinary += (sender, args) => Console.WriteLine($"AfterBinary: {args.Value?.Length}");
+            client.TextMessageReceived += (sender, args) => Console.WriteLine($"TextMessageReceived: {args.Value}");
+            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
+            client.BinaryMessageReceived += (sender, args) => Console.WriteLine($"BinaryMessageReceived: {args.Value?.Count}");
             client.Connected += (sender, args) => Console.WriteLine("Connected");
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 

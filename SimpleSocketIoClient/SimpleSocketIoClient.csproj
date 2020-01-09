@@ -50,4 +50,8 @@ Note: This is an alpha version. Some features may not be available. Please see e
     </AssemblyAttribute>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\H.WebSockets\H.WebSockets.csproj" />
+  </ItemGroup>
+
 </Project>

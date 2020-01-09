@@ -3,8 +3,8 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleSocketIoClient.Utilities;
 
 namespace SimpleSocketIoClient.IntegrationTests
 {
@@ -68,9 +68,9 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             client.EngineIoClient.WebSocketClient.Connected += (sender, args) => Console.WriteLine("WebSocketClient.Connected");
             client.EngineIoClient.WebSocketClient.Disconnected += (sender, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.EngineIoClient.WebSocketClient.AfterText += (sender, args) => Console.WriteLine($"WebSocketClient.AfterText: {args.Value}");
-            client.EngineIoClient.WebSocketClient.AfterException += (sender, args) => Console.WriteLine($"WebSocketClient.AfterException: {args.Value}");
-            client.EngineIoClient.WebSocketClient.AfterBinary += (sender, args) => Console.WriteLine($"WebSocketClient.AfterBinary: {args.Value.Length}");
+            client.EngineIoClient.WebSocketClient.TextMessageReceived += (sender, args) => Console.WriteLine($"WebSocketClient.TextMessageReceived: {args.Value}");
+            client.EngineIoClient.WebSocketClient.ExceptionOccurred += (sender, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Value}");
+            client.EngineIoClient.WebSocketClient.BinaryMessageReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BinaryMessageReceived: {args.Value.Count}");
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

@@ -5,10 +5,10 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using H.WebSockets;
+using H.WebSockets.Args;
+using H.WebSockets.Utilities;
 using Newtonsoft.Json;
-using SimpleSocketIoClient.EventsArgs;
-using SimpleSocketIoClient.Utilities;
-using SimpleSocketIoClient.WebSocket;
 
 namespace SimpleSocketIoClient.EngineIO
 {
@@ -173,8 +173,8 @@ namespace SimpleSocketIoClient.EngineIO
             Timer.Elapsed += Timer_Elapsed;
 
             WebSocketClient = new WebSocketClient();
-            WebSocketClient.AfterText += WebSocket_AfterText;
-            WebSocketClient.AfterException += (sender, args) => OnAfterException(args.Value);
+            WebSocketClient.TextMessageReceived += WebSocket_AfterText;
+            WebSocketClient.ExceptionOccurred += (sender, args) => OnAfterException(args.Value);
             WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Reason, args.Status);
         }
 

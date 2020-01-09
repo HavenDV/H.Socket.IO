@@ -6,6 +6,8 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using H.WebSockets.Args;
+using H.WebSockets.Utilities;
 using Newtonsoft.Json;
 using SimpleSocketIoClient.EngineIO;
 using SimpleSocketIoClient.EventsArgs;

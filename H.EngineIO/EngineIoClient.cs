@@ -78,17 +78,22 @@ namespace H.EngineIO
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterPing;
+        public event EventHandler<DataEventArgs<string>>? PingSent;
 
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterPong;
+        public event EventHandler<DataEventArgs<string>>? PingReceived;
 
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterMessage;
+        public event EventHandler<DataEventArgs<string>>? PongReceived;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<string>>? MessageReceived;
 
         /// <summary>
         /// 
@@ -98,12 +103,12 @@ namespace H.EngineIO
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? AfterNoop;
+        public event EventHandler<DataEventArgs<string>>? NoopReceived;
 
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<Exception>>? AfterException;
+        public event EventHandler<DataEventArgs<Exception>>? ExceptionOccurred;
 
         private void OnOpened(EngineIoOpenMessage? value)
         {
@@ -127,19 +132,24 @@ namespace H.EngineIO
             Closed?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
-        private void OnAfterPing(string value)
+        private void OnPingSent(string value)
         {
-            AfterPing?.Invoke(this, new DataEventArgs<string>(value));
+            PingSent?.Invoke(this, new DataEventArgs<string>(value));
         }
 
-        private void OnAfterPong(string value)
+        private void OnPingReceived(string value)
         {
-            AfterPong?.Invoke(this, new DataEventArgs<string>(value));
+            PingReceived?.Invoke(this, new DataEventArgs<string>(value));
         }
 
-        private void OnAfterMessage(string value)
+        private void OnPongReceived(string value)
         {
-            AfterMessage?.Invoke(this, new DataEventArgs<string>(value));
+            PongReceived?.Invoke(this, new DataEventArgs<string>(value));
+        }
+
+        private void OnMessageReceived(string value)
+        {
+            MessageReceived?.Invoke(this, new DataEventArgs<string>(value));
         }
 
         private void OnUpgraded(string value)
@@ -147,14 +157,14 @@ namespace H.EngineIO
             Upgraded?.Invoke(this, new DataEventArgs<string>(value));
         }
 
-        private void OnAfterNoop(string value)
+        private void OnNoopReceived(string value)
         {
-            AfterNoop?.Invoke(this, new DataEventArgs<string>(value));
+            NoopReceived?.Invoke(this, new DataEventArgs<string>(value));
         }
 
-        private void OnAfterException(Exception value)
+        private void OnExceptionOccurred(Exception value)
         {
-            AfterException?.Invoke(this, new DataEventArgs<Exception>(value));
+            ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
         }
 
         #endregion
@@ -173,8 +183,8 @@ namespace H.EngineIO
             Timer.Elapsed += Timer_Elapsed;
 
             WebSocketClient = new WebSocketClient();
-            WebSocketClient.TextMessageReceived += WebSocket_AfterText;
-            WebSocketClient.ExceptionOccurred += (sender, args) => OnAfterException(args.Value);
+            WebSocketClient.TextReceived += WebSocketClient_OnTextReceived;
+            WebSocketClient.ExceptionOccurred += (sender, args) => OnExceptionOccurred(args.Value);
             WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Reason, args.Status);
         }
 
@@ -193,18 +203,18 @@ namespace H.EngineIO
 
                 await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode()).ConfigureAwait(false);
 
-                OnAfterPing(PingMessage);
+                OnPingSent(PingMessage);
             }
             catch (OperationCanceledException)
             {
             }
             catch (Exception exception)
             {
-                OnAfterException(exception);
+                OnExceptionOccurred(exception);
             }
         }
 
-        private void WebSocket_AfterText(object? sender, DataEventArgs<string>? args)
+        private void WebSocketClient_OnTextReceived(object? sender, DataEventArgs<string>? args)
         {
             try
             {
@@ -229,15 +239,15 @@ namespace H.EngineIO
                         break;
 
                     case EngineIoPacket.PingPrefix:
-                        OnAfterPing(packet.Value);
+                        OnPingReceived(packet.Value);
                         break;
 
                     case EngineIoPacket.PongPrefix:
-                        OnAfterPong(packet.Value);
+                        OnPongReceived(packet.Value);
                         break;
 
                     case EngineIoPacket.MessagePrefix:
-                        OnAfterMessage(packet.Value);
+                        OnMessageReceived(packet.Value);
                         break;
 
                     case EngineIoPacket.UpgradePrefix:
@@ -245,13 +255,13 @@ namespace H.EngineIO
                         break;
 
                     case EngineIoPacket.NoopPrefix:
-                        OnAfterNoop(packet.Value);
+                        OnNoopReceived(packet.Value);
                         break;
                 }
             }
             catch (Exception exception)
             {
-                OnAfterException(exception);
+                OnExceptionOccurred(exception);
             }
         }
 

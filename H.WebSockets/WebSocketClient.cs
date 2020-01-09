@@ -64,12 +64,12 @@ namespace H.WebSockets
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<string>>? TextMessageReceived;
+        public event EventHandler<DataEventArgs<string>>? TextReceived;
 
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<DataEventArgs<IReadOnlyCollection<byte>>>? BinaryMessageReceived;
+        public event EventHandler<DataEventArgs<IReadOnlyCollection<byte>>>? BytesReceived;
 
         /// <summary>
         /// 
@@ -86,14 +86,14 @@ namespace H.WebSockets
             Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
 
-        private void OnTextMessageReceived(string value)
+        private void OnTextReceived(string value)
         {
-            TextMessageReceived?.Invoke(this, new DataEventArgs<string>(value));
+            TextReceived?.Invoke(this, new DataEventArgs<string>(value));
         }
 
-        private void OnBinaryMessageReceived(IReadOnlyCollection<byte> value)
+        private void OnBytesReceived(IReadOnlyCollection<byte> value)
         {
-            BinaryMessageReceived?.Invoke(this, new DataEventArgs<IReadOnlyCollection<byte>>(value));
+            BytesReceived?.Invoke(this, new DataEventArgs<IReadOnlyCollection<byte>>(value));
         }
 
         private void OnExceptionOccurred(Exception value)
@@ -213,6 +213,23 @@ namespace H.WebSockets
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task SendBytesAsync(byte[] bytes, CancellationToken cancellationToken = default)
+        {
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            await Socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Binary, true, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
@@ -277,12 +294,12 @@ namespace H.WebSockets
                         {
                             using var reader = new StreamReader(stream, Encoding.UTF8);
                             var message = reader.ReadToEnd();
-                            OnTextMessageReceived(message);
+                            OnTextReceived(message);
                             break;
                         }
 
                         case WebSocketMessageType.Binary:
-                            OnBinaryMessageReceived(stream.ToArray());
+                            OnBytesReceived(stream.ToArray());
                             break;
                     }
 

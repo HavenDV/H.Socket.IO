@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleSocketIoClient.IntegrationTests", "SimpleSocketIoClient.IntegrationTests\SimpleSocketIoClient.IntegrationTests.csproj", "{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.WebSockets", "H.WebSockets\H.WebSockets.csproj", "{E91F3623-0C13-4CF6-A154-13622A8B8F99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4FA3F702-22E4-4D6C-8392-EB82C4FEF21D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E91F3623-0C13-4CF6-A154-13622A8B8F99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E91F3623-0C13-4CF6-A154-13622A8B8F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E91F3623-0C13-4CF6-A154-13622A8B8F99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E91F3623-0C13-4CF6-A154-13622A8B8F99}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

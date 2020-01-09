@@ -1,0 +1,310 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using H.WebSockets.Args;
+using H.WebSockets.Utilities;
+
+namespace H.WebSockets
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    public sealed class WebSocketClient : IAsyncDisposable
+    {
+        #region Properties
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ClientWebSocket? Socket { get; private set; } = new ClientWebSocket();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Uri? LastConnectUri { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsConnected => Socket?.State == WebSocketState.Open;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public IWebProxy? Proxy
+        {
+            get => Socket?.Options?.Proxy;
+            set {
+                Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+                Socket.Options.Proxy = value;
+            }
+        }
+
+        private Task? ReceiveTask { get; set; }
+        private CancellationTokenSource? CancellationTokenSource { get; set; }
+
+        #endregion
+
+        #region Events
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<EventArgs>? Connected;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<WebSocketCloseEventArgs>? Disconnected;
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<string>>? TextMessageReceived;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<IReadOnlyCollection<byte>>>? BinaryMessageReceived;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public event EventHandler<DataEventArgs<Exception>>? ExceptionOccurred;
+
+        private void OnConnected()
+        {
+            Connected?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
+        {
+            Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
+        }
+
+        private void OnTextMessageReceived(string value)
+        {
+            TextMessageReceived?.Invoke(this, new DataEventArgs<string>(value));
+        }
+
+        private void OnBinaryMessageReceived(IReadOnlyCollection<byte> value)
+        {
+            BinaryMessageReceived?.Invoke(this, new DataEventArgs<IReadOnlyCollection<byte>>(value));
+        }
+
+        private void OnExceptionOccurred(Exception value)
+        {
+            ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
+        }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task ConnectAsync(Uri? uri, CancellationToken cancellationToken = default)
+        {
+            if (IsConnected)
+            {
+                return;
+            }
+
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (Socket.State != WebSocketState.None)
+            {
+                Socket?.Dispose();
+                Socket = new ClientWebSocket();
+            }
+
+            LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
+
+            await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
+
+            if (ReceiveTask == null ||
+                ReceiveTask.IsCompleted)
+            {
+                ReceiveTask?.Dispose();
+                CancellationTokenSource?.Dispose();
+
+                CancellationTokenSource = new CancellationTokenSource();
+                ReceiveTask = Task.Run(async () => await ReceiveAsync(CancellationTokenSource.Token).ConfigureAwait(false), CancellationTokenSource.Token);
+            }
+
+            OnConnected();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public async Task ConnectAsync(Uri uri, TimeSpan timeout)
+        {
+            using var cancellationSource = new CancellationTokenSource(timeout);
+
+            await ConnectAsync(uri, cancellationSource.Token).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="timeoutInSeconds"></param>
+        /// <returns></returns>
+        public async Task ConnectAsync(Uri uri, int timeoutInSeconds)
+        {
+            await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds)).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task DisconnectAsync(CancellationToken cancellationToken = default)
+        {
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (!IsConnected)
+            {
+                return;
+            }
+            
+            await this.WaitEventAsync(async token =>
+            {
+                await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", token).ConfigureAwait(false);
+
+                if (Socket.State == WebSocketState.Aborted)
+                {
+                    OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
+                }
+            }, nameof(Disconnected), cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task SendTextAsync(string message, CancellationToken cancellationToken = default)
+        {
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (!IsConnected)
+            {
+                return;
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(message);
+
+            await Socket.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, cancellationToken).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async ValueTask DisposeAsync()
+        {
+            if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
+            {
+                CancellationTokenSource.Cancel();
+
+                await ReceiveTask.ConfigureAwait(false);
+            }
+
+            CancellationTokenSource?.Dispose();
+            CancellationTokenSource = null;
+
+            ReceiveTask?.Dispose();
+            ReceiveTask = null;
+
+            Socket?.Dispose();
+            Socket = null;
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private async Task ReceiveAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                while (Socket?.State == WebSocketState.Open)
+                {
+                    var buffer = new byte[1024];
+
+                    WebSocketReceiveResult result;
+#if NETSTANDARD2_1
+                    await using var stream = new MemoryStream();
+#else
+                    using var stream = new MemoryStream();
+#endif
+                    do
+                    {
+                        try
+                        {
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (WebSocketException exception) when (LastConnectUri != null)
+                        {
+                            OnExceptionOccurred(exception);
+
+                            await ConnectAsync(LastConnectUri, cancellationToken).ConfigureAwait(false);
+
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
+                        }
+
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            OnDisconnected(result.CloseStatusDescription, result.CloseStatus);
+                            return;
+                        }
+
+                        stream.Write(buffer, 0, result.Count);
+                    } while (!result.EndOfMessage);
+
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    switch (result.MessageType)
+                    {
+                        case WebSocketMessageType.Text:
+                        {
+                            using var reader = new StreamReader(stream, Encoding.UTF8);
+                            var message = reader.ReadToEnd();
+                            OnTextMessageReceived(message);
+                            break;
+                        }
+
+                        case WebSocketMessageType.Binary:
+                            OnBinaryMessageReceived(stream.ToArray());
+                            break;
+                    }
+
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception exception)
+            {
+                OnExceptionOccurred(exception);
+            }
+
+            OnDisconnected(Socket?.CloseStatusDescription, Socket?.CloseStatus);
+        }
+
+        #endregion
+    }
+}

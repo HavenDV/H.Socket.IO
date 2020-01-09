@@ -41,7 +41,17 @@ jobs:
     - name: Run tests
       run: dotnet test --configuration Release --nologo
       
-    - name: Try Publish(if the version has changed)
+    - name: Try Publish(if the version has changed) H.WebSockets
       if: runner.os == 'Windows' &&
           matrix.dotnet == '3.1.100'
-      run: dotnet nuget push SimpleSocketIoClient\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      run: dotnet nuget push H.WebSockets\bin\Release\H.WebSockets.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      
+    - name: Try Publish(if the version has changed) H.Engine.IO
+      if: runner.os == 'Windows' &&
+          matrix.dotnet == '3.1.100'
+      run: dotnet nuget push H.Engine.IO\bin\Release\H.Engine.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      
+    - name: Try Publish(if the version has changed) H.Socket.IO
+      if: runner.os == 'Windows' &&
+          matrix.dotnet == '3.1.100'
+      run: dotnet nuget push H.Socket.IO\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

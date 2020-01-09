@@ -45,8 +45,7 @@ namespace H.WebSockets
             }
         }
 
-        private Task? ReceiveTask { get; set; }
-        private CancellationTokenSource? CancellationTokenSource { get; set; }
+        private TaskWorker? ReceiveWorker { get; set; }
 
         #endregion
 
@@ -130,14 +129,15 @@ namespace H.WebSockets
 
             await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
 
-            if (ReceiveTask == null ||
-                ReceiveTask.IsCompleted)
+            if (ReceiveWorker == null ||
+                ReceiveWorker.Task.IsCompleted)
             {
-                ReceiveTask?.Dispose();
-                CancellationTokenSource?.Dispose();
+                if (ReceiveWorker != null)
+                {
+                    await ReceiveWorker.DisposeAsync();
+                }
 
-                CancellationTokenSource = new CancellationTokenSource();
-                ReceiveTask = Task.Run(async () => await ReceiveAsync(CancellationTokenSource.Token).ConfigureAwait(false), CancellationTokenSource.Token);
+                ReceiveWorker = new TaskWorker(async token => await ReceiveAsync(token).ConfigureAwait(false), OnExceptionOccurred);
             }
 
             OnConnected();
@@ -216,18 +216,12 @@ namespace H.WebSockets
         /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
-            if (ReceiveTask != null && CancellationTokenSource != null && Socket != null)
+            if (ReceiveWorker != null)
             {
-                CancellationTokenSource.Cancel();
+                await ReceiveWorker.DisposeAsync().ConfigureAwait(false);
 
-                await ReceiveTask.ConfigureAwait(false);
+                ReceiveWorker = null;
             }
-
-            CancellationTokenSource?.Dispose();
-            CancellationTokenSource = null;
-
-            ReceiveTask?.Dispose();
-            ReceiveTask = null;
 
             Socket?.Dispose();
             Socket = null;

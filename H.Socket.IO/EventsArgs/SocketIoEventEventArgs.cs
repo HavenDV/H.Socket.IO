@@ -3,7 +3,7 @@
 namespace H.Socket.IO.EventsArgs
 {
     /// <summary>
-    /// Arguments used in <see cref="SocketIoClient.AfterEvent"/> event
+    /// Arguments used in <see cref="SocketIoClient.EventReceived"/> event
     /// </summary>
     public class SocketIoEventEventArgs : EventArgs
     {

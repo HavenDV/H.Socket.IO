@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using H.WebSockets.Utilities;
 
-namespace SimpleSocketIoClient.Tests
+namespace H.SocketIO.Tests
 {
     [TestClass]
     public class EventExtensionsTests

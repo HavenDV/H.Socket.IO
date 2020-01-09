@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleSocketIoClient.Utilities;
+using H.SocketIO.Utilities;
 
-namespace SimpleSocketIoClient.Tests
+namespace H.SocketIO.Tests
 {
     [TestClass]
     public class StringExtensionsTests

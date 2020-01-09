@@ -5,7 +5,7 @@ using H.WebSockets;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SimpleSocketIoClient.IntegrationTests
+namespace H.SocketIO.IntegrationTests
 {
     [TestClass]
     public class WebSocketClientTests

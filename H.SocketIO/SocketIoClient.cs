@@ -7,13 +7,13 @@ using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using H.EngineIO;
+using H.SocketIO.EventsArgs;
+using H.SocketIO.Utilities;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
-using SimpleSocketIoClient.EventsArgs;
-using SimpleSocketIoClient.Utilities;
 
-namespace SimpleSocketIoClient
+namespace H.SocketIO
 {
     /// <summary>
     /// Socket.IO Client.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SimpleSocketIoClient.Utilities
+namespace H.SocketIO.Utilities
 {
     /// <summary>
     /// Extensions that work with <see langword="string"/>

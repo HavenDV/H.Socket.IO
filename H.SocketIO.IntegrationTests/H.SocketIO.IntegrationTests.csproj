@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleSocketIoClient\SimpleSocketIoClient.csproj" />
+    <ProjectReference Include="..\H.SocketIO\H.SocketIO.csproj" />
   </ItemGroup>
 
 </Project>

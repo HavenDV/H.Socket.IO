@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace SimpleSocketIoClient.EventsArgs
+namespace H.SocketIO.EventsArgs
 {
     /// <summary>
-    /// Arguments used in <see cref="SocketIoClient.AfterError"/> event
+    /// Arguments used in <see cref="SocketIoClient.AfterEvent"/> event
     /// </summary>
-    public class SocketIoErrorEventArgs : EventArgs
+    public class SocketIoEventEventArgs : EventArgs
     {
         /// <summary>
         /// Value
@@ -18,14 +18,21 @@ namespace SimpleSocketIoClient.EventsArgs
         public string Namespace { get; set; }
 
         /// <summary>
+        /// IsHandled
+        /// </summary>
+        public bool IsHandled { get; set; }
+
+        /// <summary>
         /// Base constructor
         /// </summary>
         /// <param name="value"></param>
         /// <param name="namespace"></param>
-        public SocketIoErrorEventArgs(string value, string @namespace)
+        /// <param name="isHandled"></param>
+        public SocketIoEventEventArgs(string value, string @namespace, bool isHandled)
         {
             Value = value;
             Namespace = @namespace;
+            IsHandled = isHandled;
         }
     }
 }

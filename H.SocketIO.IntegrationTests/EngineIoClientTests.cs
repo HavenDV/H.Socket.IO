@@ -6,7 +6,7 @@ using H.EngineIO;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SimpleSocketIoClient.IntegrationTests
+namespace H.SocketIO.IntegrationTests
 {
     [TestClass]
     public class EngineIoClientTests

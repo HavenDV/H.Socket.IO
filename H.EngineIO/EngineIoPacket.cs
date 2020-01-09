@@ -2,7 +2,7 @@
 
 namespace H.EngineIO
 {
-    internal class EngineIoPacket
+    public class EngineIoPacket
     {
         #region Constants
 

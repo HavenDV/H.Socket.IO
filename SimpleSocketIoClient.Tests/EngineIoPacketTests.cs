@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleSocketIoClient.EngineIO;
+using H.EngineIO;
 
 namespace SimpleSocketIoClient.Tests
 {

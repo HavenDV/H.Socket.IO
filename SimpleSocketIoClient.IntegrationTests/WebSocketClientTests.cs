@@ -17,9 +17,9 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             await using var client = new WebSocketClient();
 
-            client.TextMessageReceived += (sender, args) => Console.WriteLine($"TextMessageReceived: {args.Value}");
+            client.TextReceived += (sender, args) => Console.WriteLine($"TextReceived: {args.Value}");
             client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
-            client.BinaryMessageReceived += (sender, args) => Console.WriteLine($"BinaryMessageReceived: {args.Value?.Count}");
+            client.BytesReceived += (sender, args) => Console.WriteLine($"BytesReceived: {args.Value?.Count}");
             client.Connected += (sender, args) => Console.WriteLine("Connected");
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 

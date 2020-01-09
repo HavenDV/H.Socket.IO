@@ -60,17 +60,18 @@ namespace SimpleSocketIoClient.IntegrationTests
             client.EngineIoClient.Opened += (sender, args) => Console.WriteLine("EngineIoClient.Opened");
             client.EngineIoClient.Closed += (sender, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
             client.EngineIoClient.Upgraded += (sender, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
-            client.EngineIoClient.AfterException += (sender, args) => Console.WriteLine($"EngineIoClient.AfterException: {args.Value}");
-            client.EngineIoClient.AfterMessage += (sender, args) => Console.WriteLine($"EngineIoClient.AfterMessage: {args.Value}");
-            client.EngineIoClient.AfterNoop += (sender, args) => Console.WriteLine($"EngineIoClient.AfterNoop: {args.Value}");
-            client.EngineIoClient.AfterPing += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPing: {args.Value}");
-            client.EngineIoClient.AfterPong += (sender, args) => Console.WriteLine($"EngineIoClient.AfterPong: {args.Value}");
+            client.EngineIoClient.ExceptionOccurred += (sender, args) => Console.WriteLine($"EngineIoClient.ExceptionOccurred: {args.Value}");
+            client.EngineIoClient.MessageReceived += (sender, args) => Console.WriteLine($"EngineIoClient.MessageReceived: {args.Value}");
+            client.EngineIoClient.NoopReceived += (sender, args) => Console.WriteLine($"EngineIoClient.NoopReceived: {args.Value}");
+            client.EngineIoClient.PingReceived += (sender, args) => Console.WriteLine($"EngineIoClient.PingReceived: {args.Value}");
+            client.EngineIoClient.PongReceived += (sender, args) => Console.WriteLine($"EngineIoClient.PongReceived: {args.Value}");
+            client.EngineIoClient.PingSent += (sender, args) => Console.WriteLine($"EngineIoClient.PingSent: {args.Value}");
 
             client.EngineIoClient.WebSocketClient.Connected += (sender, args) => Console.WriteLine("WebSocketClient.Connected");
             client.EngineIoClient.WebSocketClient.Disconnected += (sender, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.EngineIoClient.WebSocketClient.TextMessageReceived += (sender, args) => Console.WriteLine($"WebSocketClient.TextMessageReceived: {args.Value}");
+            client.EngineIoClient.WebSocketClient.TextReceived += (sender, args) => Console.WriteLine($"WebSocketClient.TextReceived: {args.Value}");
             client.EngineIoClient.WebSocketClient.ExceptionOccurred += (sender, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Value}");
-            client.EngineIoClient.WebSocketClient.BinaryMessageReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BinaryMessageReceived: {args.Value.Count}");
+            client.EngineIoClient.WebSocketClient.BytesReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

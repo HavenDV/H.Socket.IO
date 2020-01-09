@@ -2,9 +2,9 @@ using System;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using H.EngineIO;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using SimpleSocketIoClient.EngineIO;
 
 namespace SimpleSocketIoClient.IntegrationTests
 {
@@ -17,8 +17,8 @@ namespace SimpleSocketIoClient.IntegrationTests
 
             await using var client = new EngineIoClient("socket.io");
 
-            client.AfterMessage += (sender, args) => Console.WriteLine($"AfterMessage: {args.Value}");
-            client.AfterException += (sender, args) => Console.WriteLine($"AfterException: {args.Value}");
+            client.MessageReceived += (sender, args) => Console.WriteLine($"MessageReceived: {args.Value}");
+            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 

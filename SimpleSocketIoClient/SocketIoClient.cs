@@ -6,10 +6,10 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using H.EngineIO;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
-using SimpleSocketIoClient.EngineIO;
 using SimpleSocketIoClient.EventsArgs;
 using SimpleSocketIoClient.Utilities;
 
@@ -128,8 +128,8 @@ namespace SimpleSocketIoClient
         public SocketIoClient()
         {
             EngineIoClient = new EngineIoClient("socket.io");
-            EngineIoClient.AfterMessage += EngineIoClient_AfterMessage;
-            EngineIoClient.AfterException += (sender, args) => OnAfterException(args.Value);
+            EngineIoClient.MessageReceived += EngineIoClient_MessageReceived;
+            EngineIoClient.ExceptionOccurred += (sender, args) => OnAfterException(args.Value);
             EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Reason, args.Status);
         }
 
@@ -137,7 +137,7 @@ namespace SimpleSocketIoClient
 
         #region Event Handlers
 
-        private void EngineIoClient_AfterMessage(object? sender, DataEventArgs<string>? args)
+        private void EngineIoClient_MessageReceived(object? sender, DataEventArgs<string>? args)
         {
             try
             {

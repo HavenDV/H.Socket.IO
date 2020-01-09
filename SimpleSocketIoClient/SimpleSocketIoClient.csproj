@@ -49,7 +49,7 @@ Note: This is an alpha version. Some features may not be available. Please see e
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\H.WebSockets\H.WebSockets.csproj" />
+    <ProjectReference Include="..\H.EngineIO\H.EngineIO.csproj" />
   </ItemGroup>
 
 </Project>

@@ -33,7 +33,6 @@ Renamed package to "H.Socket.IO"</PackageReleaseNotes>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageId>SimpleSocketIoClient</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

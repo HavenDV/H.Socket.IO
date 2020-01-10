@@ -54,4 +54,4 @@ jobs:
     - name: Try Publish(if the version has changed) H.Socket.IO
       if: runner.os == 'Windows' &&
           matrix.dotnet == '3.1.100'
-      run: dotnet nuget push H.Socket.IO\bin\Release\SimpleSocketIoClient.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      run: dotnet nuget push H.Socket.IO\bin\Release\H.Socket.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

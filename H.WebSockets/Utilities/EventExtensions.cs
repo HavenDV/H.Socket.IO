@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace H.WebSockets.Utilities
 {
     /// <summary>
-    /// Extensions that work with <see langword="event"/>
+    /// Extensions that work with <see langword="event"/> <br/>
+    /// <![CDATA[Version: 1.0.0.0]]> <br/>
     /// </summary>
     public static class EventExtensions
     {
@@ -23,7 +24,9 @@ namespace H.WebSockets.Utilities
         }
 
         /// <summary>
-        /// Asynchronously expects <see langword="event"/> until they occur or until canceled
+        /// Asynchronously expects <see langword="event"/> until they occur or until canceled <br/>
+        /// <![CDATA[Version: 1.0.0.0]]> <br/>
+        /// <![CDATA[Dependency: WaitObject]]> <br/>
         /// </summary>
         /// <param name="value"></param>
         /// <param name="eventName"></param>
@@ -33,7 +36,7 @@ namespace H.WebSockets.Utilities
         {
             var taskCompletionSource = new TaskCompletionSource<EventArgs?>();
             using var cancellationSource = new CancellationTokenSource();
-            
+
             cancellationSource.Token.Register(() => taskCompletionSource.TrySetCanceled());
             cancellationToken.Register(() => taskCompletionSource.TrySetCanceled());
 
@@ -64,7 +67,9 @@ namespace H.WebSockets.Utilities
         }
 
         /// <summary>
-        /// Asynchronously expects <see langword="event"/> until they occur or until canceled
+        /// Asynchronously expects <see langword="event"/> until they occur or until canceled <br/>
+        /// <![CDATA[Version: 1.0.0.0]]> <br/>
+        /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
         /// <param name="func"></param>
@@ -88,7 +93,9 @@ namespace H.WebSockets.Utilities
         }
 
         /// <summary>
-        /// Asynchronously expects all <see langword="event"/>'s until they occur or until canceled
+        /// Asynchronously expects all <see langword="event"/>'s until they occur or until canceled <br/>
+        /// <![CDATA[Version: 1.0.0.0]]> <br/>
+        /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
         /// <param name="func"></param>
@@ -117,7 +124,9 @@ namespace H.WebSockets.Utilities
         }
 
         /// <summary>
-        /// Asynchronously expects any <see langword="event"/> until it occurs or until canceled
+        /// Asynchronously expects any <see langword="event"/> until it occurs or until canceled <br/>
+        /// <![CDATA[Version: 1.0.0.0]]> <br/>
+        /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
         /// <param name="func"></param>

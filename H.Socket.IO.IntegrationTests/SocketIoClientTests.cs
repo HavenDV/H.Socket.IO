@@ -27,7 +27,7 @@ namespace H.Socket.IO.IntegrationTests
             client.ErrorReceived += (sender, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
             client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
 
-            var results = await client.WaitAllEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
             {
                 await func(client, cancellationToken);
             }, cancellationTokenSource.Token, new [] { nameof(client.Connected), nameof(client.Disconnected) }.Concat(additionalEvents).ToArray());

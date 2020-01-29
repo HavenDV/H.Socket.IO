@@ -245,7 +245,7 @@ namespace H.Socket.IO
 
             if (!EngineIoClient.IsOpened)
             {
-                var results = await this.WaitAnyEventAsync(async token =>
+                var results = await this.WaitAnyEventAsync<EventArgs>(async token =>
                 {
                     await EngineIoClient.OpenAsync(uri, token).ConfigureAwait(false);
                 }, cancellationToken, nameof(Connected), nameof(ErrorReceived)).ConfigureAwait(false);
@@ -286,7 +286,7 @@ namespace H.Socket.IO
                 return true;
             }
 
-            return await this.WaitEventAsync(async token =>
+            return await this.WaitEventAsync<SocketIoEventEventArgs>(async token =>
             {
                 foreach (var @namespace in namespaces)
                 {

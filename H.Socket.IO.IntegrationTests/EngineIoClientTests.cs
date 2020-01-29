@@ -22,7 +22,7 @@ namespace H.Socket.IO.IntegrationTests
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
-            var results = await client.WaitAllEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
             {
                 Console.WriteLine("# Before OpenAsync");
 

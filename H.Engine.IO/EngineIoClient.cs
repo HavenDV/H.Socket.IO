@@ -296,7 +296,7 @@ namespace H.Engine.IO
             };
             var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
-            return await this.WaitEventAsync(async token =>
+            return await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage>>(async token =>
             {
                 await WebSocketClient.ConnectAsync(socketIoUri, token).ConfigureAwait(false);
             }, nameof(Opened), cancellationToken).ConfigureAwait(false) != null;

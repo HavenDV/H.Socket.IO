@@ -180,7 +180,7 @@ namespace H.WebSockets
                 return;
             }
             
-            await this.WaitEventAsync(async token =>
+            await this.WaitEventAsync<WebSocketCloseEventArgs>(async token =>
             {
                 await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", token).ConfigureAwait(false);
 

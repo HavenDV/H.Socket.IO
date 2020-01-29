@@ -24,7 +24,7 @@ namespace H.Socket.IO.IntegrationTests
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
-            var results = await client.WaitAllEventsAsync(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 
@@ -61,7 +61,7 @@ namespace H.Socket.IO.IntegrationTests
                 Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
 
-            results = await client.WaitAllEventsAsync(async cancellationToken =>
+            results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 

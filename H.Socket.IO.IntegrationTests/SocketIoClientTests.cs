@@ -114,7 +114,7 @@ namespace H.Socket.IO.IntegrationTests
 
                 await client.ConnectAsync(new Uri(url), cancellationToken);
 
-                await client.Emit("add user", "C# SimpleSocketIoClient Test User", cancellationToken: cancellationToken);
+                await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: cancellationToken);
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
                 await client.Emit("typing", cancellationToken: cancellationToken);
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
@@ -202,7 +202,7 @@ namespace H.Socket.IO.IntegrationTests
                 await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
 
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                await client.Emit("add user", "C# SimpleSocketIoClient Test User", cancellationToken: cancellationToken);
+                await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: cancellationToken);
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
                 await client.Emit("typing", cancellationToken: cancellationToken);
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);

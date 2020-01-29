@@ -230,14 +230,15 @@ namespace H.WebSockets
         /// <summary>
         /// Waits for the next text asynchronously <br/>
         /// Returns DataEventArgs if text was received <br/>
-        /// Returns null if no text was received and the method was canceled <br/>
+        /// Throws <see cref="OperationCanceledException"/> if method was canceled <br/>
         /// </summary>
         /// <param name="func"></param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<string>?> WaitTextAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<DataEventArgs<string>> WaitTextAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
         {
-            return await this.WaitEventAsync<DataEventArgs<string>?>(
+            return await this.WaitEventAsync<DataEventArgs<string>>(
                 func ?? (token => Task.CompletedTask), 
                 nameof(TextReceived),
                 cancellationToken);
@@ -246,12 +247,13 @@ namespace H.WebSockets
         /// <summary>
         /// Waits for the next text asynchronously with specified timeout <br/>
         /// Returns DataEventArgs if text was received <br/>
-        /// Returns null if no text was received and the method was canceled <br/>
+        /// Throws <see cref="OperationCanceledException"/> if method was canceled <br/>
         /// </summary>
         /// <param name="timeout"></param>
         /// <param name="func"></param>
+        /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitTextAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        public async Task<DataEventArgs<string>> WaitTextAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 
@@ -261,14 +263,15 @@ namespace H.WebSockets
         /// <summary>
         /// Waits for the next bytes asynchronously <br/>
         /// Returns DataEventArgs if bytes was received <br/>
-        /// Returns null if no bytes was received and the method was canceled <br/>
+        /// Throws <see cref="OperationCanceledException"/> if method was canceled <br/>
         /// </summary>
         /// <param name="func"></param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<IReadOnlyCollection<byte>>?> WaitBytesAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
         {
-            return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>?>(
+            return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>>(
                 func ?? (token => Task.CompletedTask),
                 nameof(BytesReceived),
                 cancellationToken);
@@ -277,12 +280,13 @@ namespace H.WebSockets
         /// <summary>
         /// Waits for the next bytes asynchronously with specified timeout <br/>
         /// Returns DataEventArgs if bytes was received <br/>
-        /// Returns null if no bytes was received and the method was canceled <br/>
+        /// Throws <see cref="OperationCanceledException"/> if method was canceled <br/>
         /// </summary>
         /// <param name="timeout"></param>
         /// <param name="func"></param>
+        /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitBytesAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 

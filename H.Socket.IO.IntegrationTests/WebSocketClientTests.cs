@@ -36,7 +36,12 @@ namespace H.Socket.IO.IntegrationTests
 
                 Console.WriteLine("# Before SendTextAsync");
 
-                await client.SendTextAsync("Test", cancellationToken);
+                var args = await client.WaitTextAsync(async token =>
+                {
+                    await client.SendTextAsync("Test", token);
+                }, cancellationToken);
+
+                Console.WriteLine($"WaitTextAsync: {args.Value}");
 
                 Console.WriteLine("# Before Delay");
 

@@ -383,6 +383,42 @@ namespace H.Socket.IO
         }
 
         /// <summary>
+        /// Waits for the next event or error asynchronously <br/>
+        /// Returns <see cref="SocketIoEventEventArgs"/> if event was received <br/>
+        /// Returns <see cref="SocketIoErrorEventArgs"/> if error was received <br/>
+        /// Returns null if no event was received and the method was canceled <br/>
+        /// </summary>
+        /// <param name="func"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<EventArgs?> WaitEventOrErrorAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        {
+            var dictionary = await this.WaitAnyEventAsync<EventArgs?>(
+                func ?? (token => Task.CompletedTask),
+                cancellationToken,
+                nameof(EventReceived), nameof(ErrorReceived));
+
+            return dictionary[nameof(EventReceived)] 
+                   ?? dictionary[nameof(EventReceived)];
+        }
+
+        /// <summary>
+        /// Waits for the next event or error asynchronously with specified timeout <br/>
+        /// Returns <see cref="SocketIoEventEventArgs"/> if event was received <br/>
+        /// Returns <see cref="SocketIoErrorEventArgs"/> if error was received <br/>
+        /// Returns null if no event was received and the method was canceled <br/>
+        /// </summary>
+        /// <param name="timeout"></param>
+        /// <param name="func"></param>
+        /// <returns></returns>
+        public async Task<EventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        {
+            using var tokenSource = new CancellationTokenSource(timeout);
+
+            return await WaitEventOrErrorAsync(func, tokenSource.Token);
+        }
+
+        /// <summary>
         /// Sends a new event where name is the name of the event <br/>
         /// the object can be <see langword="string"/> - so it will be send as simple message <br/>
         /// any other will be serialized to json.

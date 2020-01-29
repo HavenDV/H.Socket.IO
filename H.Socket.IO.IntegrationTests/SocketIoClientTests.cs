@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using H.Socket.IO.EventsArgs;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -114,8 +115,27 @@ namespace H.Socket.IO.IntegrationTests
 
                 await client.ConnectAsync(new Uri(url), cancellationToken);
 
-                await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: cancellationToken);
+                var args = await client.WaitEventOrErrorAsync(async token =>
+                {
+                    await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: token);
+                }, cancellationToken);
+                switch (args)
+                {
+                    case SocketIoEventEventArgs eventArgs:
+                        Console.WriteLine($"WaitEventOrErrorAsync: Event received: {eventArgs}");
+                        break;
+
+                    case SocketIoErrorEventArgs errorArgs:
+                        Assert.Fail($"Error received after add user: {errorArgs}");
+                        break;
+
+                    case null:
+                        Assert.Fail("No event received after add user");
+                        break;
+                }
+
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
+
                 await client.Emit("typing", cancellationToken: cancellationToken);
                 await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
                 await client.Emit("new message", "hello", cancellationToken: cancellationToken);

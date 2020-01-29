@@ -26,7 +26,7 @@
 - Auto Reconnect
 - Open to suggestions and problems on the github
     </Description>
-    <Version>0.14.0</Version>
+    <Version>0.15.0</Version>
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>

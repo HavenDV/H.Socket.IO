@@ -61,10 +61,12 @@ namespace H.Socket.IO
 
         public string Encode()
         {
-            var namespaceBody = Namespace == DefaultNamespace  ? string.Empty : $"/{Namespace.TrimStart('/')}";
+            var namespaceBody = Namespace == DefaultNamespace
+                ? string.Empty
+                : $"/{Namespace.TrimStart('/')}";
             namespaceBody += !string.IsNullOrWhiteSpace(namespaceBody) && !string.IsNullOrWhiteSpace(Value)
                 ? ","
-                : "";
+                : string.Empty;
 
             return $"{Prefix}{namespaceBody}{Value}";
         }

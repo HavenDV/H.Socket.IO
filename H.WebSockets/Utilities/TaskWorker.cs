@@ -63,7 +63,7 @@ namespace H.WebSockets.Utilities
             await Task.ConfigureAwait(false);
 
             // Some system code can still use CancellationToken, so we wait
-            await Task.Delay(1);
+            await Task.Delay(TimeSpan.FromMilliseconds(1));
 
             CancellationTokenSource.Dispose();
             Task.Dispose();

@@ -43,7 +43,7 @@ namespace H.Socket.IO
         /// </summary>
         public string? DefaultNamespace { get; set; }
 
-        private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>? Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
+        private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
 
         #endregion
 
@@ -238,9 +238,12 @@ namespace H.Socket.IO
         /// <param name="namespaces"></param>
         /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
         /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, CancellationToken cancellationToken = default, params string[] namespaces)
         {
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
             EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
 
             if (!EngineIoClient.IsOpened)
@@ -314,28 +317,42 @@ namespace H.Socket.IO
         }
 
         /// <summary>
-        /// It connects to the server and asynchronously waits for a connection message with the selected timeout.
+        /// It connects to the server and asynchronously waits for a connection message with the selected timeout. <br/>
+        /// Throws <see cref="OperationCanceledException"/> if the waiting time exceeded
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeout"></param>
         /// <param name="namespaces"></param>
+        /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout, params string[] namespaces)
         {
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
+
             using var cancellationSource = new CancellationTokenSource(timeout);
 
             return await ConnectAsync(uri, cancellationSource.Token, namespaces).ConfigureAwait(false);
         }
 
         /// <summary>
-        /// It connects to the server and asynchronously waits for a connection message with the selected timeout.
+        /// It connects to the server and asynchronously waits for a connection message with the selected timeout. <br/>
+        /// Throws <see cref="OperationCanceledException"/> if the waiting time exceeded
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeoutInSeconds"></param>
         /// <param name="namespaces"></param>
+        /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="OperationCanceledException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
         public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds, params string[] namespaces)
         {
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
+
             return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds), namespaces).ConfigureAwait(false);
         }
 
@@ -441,7 +458,9 @@ namespace H.Socket.IO
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object, <paramref name="action"/>.<see langword="string"/> is raw text.
+        /// Performs an action after receiving a specific event. <br/>
+        /// <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object, <br/>
+        /// <paramref name="action"/>.<see langword="string"/> is raw text.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
@@ -449,11 +468,6 @@ namespace H.Socket.IO
         /// <param name="customNamespace"></param>
         public void On<T>(string name, Action<T?, string?> action, string? customNamespace = null) where T : class
         {
-            if (Actions == null)
-            {
-                return;
-            }
-
             var key = $"{name}{customNamespace ?? "/"}";
             if (!Actions.ContainsKey(key))
             {
@@ -464,7 +478,8 @@ namespace H.Socket.IO
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object.
+        /// Performs an action after receiving a specific event. <br/>
+        /// <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="name"></param>
@@ -476,7 +491,8 @@ namespace H.Socket.IO
         }
 
         /// <summary>
-        /// Performs an action after receiving a specific event. <paramref name="action"/>.<see langword="string"/> is a raw text.
+        /// Performs an action after receiving a specific event. <br/>
+        /// <paramref name="action"/>.<see langword="string"/> is a raw text.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="action"></param>

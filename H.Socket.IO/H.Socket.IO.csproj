@@ -16,6 +16,10 @@
   <PropertyGroup>
     <LangVersion>8</LangVersion>
     <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>0.15.3</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient
@@ -23,11 +27,10 @@ Implemented features:
 - Namespaces
 
 Note: This is an alpha version. Some features may not be available. Please see examples or tests.</Description>
-    <Version>0.15.2</Version>
     <PackageProjectUrl>https://github.com/HavenDV/H.SocketIO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.SocketIO</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added WaitEventOrErrorAsync method</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Dispose method(for some specific use cases)</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

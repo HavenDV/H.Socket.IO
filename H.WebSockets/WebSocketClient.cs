@@ -14,7 +14,7 @@ namespace H.WebSockets
     /// <summary>
     /// 
     /// </summary>
-    public sealed class WebSocketClient : IAsyncDisposable
+    public sealed class WebSocketClient : IDisposable, IAsyncDisposable
     {
         #region Properties
 
@@ -294,7 +294,20 @@ namespace H.WebSockets
         }
 
         /// <summary>
-        /// 
+        /// Cancel receive task(if it's not completed) and dispose internal resources
+        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// </summary>
+        public void Dispose()
+        {
+            ReceiveWorker?.Dispose();
+            ReceiveWorker = null;
+
+            Socket?.Dispose();
+            Socket = null;
+        }
+
+        /// <summary>
+        /// Cancel receive task(if it's not completed) and dispose internal resources
         /// </summary>
         /// <returns></returns>
         public async ValueTask DisposeAsync()

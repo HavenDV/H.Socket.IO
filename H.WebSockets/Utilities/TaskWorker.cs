@@ -9,7 +9,7 @@ namespace H.WebSockets.Utilities
     /// <summary>
     /// A class designed to run code using <see cref="Task"/> with <see cref="TaskCreationOptions.LongRunning"/> <br/>
     /// and supporting automatic cancellation after <see cref="DisposeAsync"/>
-    /// <![CDATA[Version: 1.0.0.3]]>
+    /// <![CDATA[Version: 1.0.0.4]]>
     /// </summary>
     internal class TaskWorker : IDisposable, IAsyncDisposable
     {
@@ -48,6 +48,7 @@ namespace H.WebSockets.Utilities
 
         /// <summary>
         /// Cancel task(if it's not completed) and dispose internal resources
+        /// Prefer <see cref="DisposeAsync"/> if possible
         /// </summary>
         public void Dispose()
         {

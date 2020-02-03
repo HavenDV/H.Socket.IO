@@ -15,7 +15,7 @@ namespace H.Engine.IO
     /// <summary>
     /// Engine.IO Client
     /// </summary>
-    public sealed class EngineIoClient : IAsyncDisposable
+    public sealed class EngineIoClient : IDisposable, IAsyncDisposable
     {
         #region Constants
 
@@ -344,7 +344,7 @@ namespace H.Engine.IO
         }
 
         /// <summary>
-        /// 
+        /// Sends new data with message prefix
         /// </summary>
         /// <param name="message"></param>
         /// <param name="cancellationToken"></param>
@@ -357,7 +357,21 @@ namespace H.Engine.IO
         }
 
         /// <summary>
-        /// 
+        /// Dispose internal resources
+        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// </summary>
+        /// <returns></returns>
+        public void Dispose()
+        {
+            WebSocketClient?.Dispose();
+            WebSocketClient = null;
+
+            Timer?.Dispose();
+            Timer = null;
+        }
+
+        /// <summary>
+        /// Dispose internal resources
         /// </summary>
         /// <returns></returns>
         public async ValueTask DisposeAsync()

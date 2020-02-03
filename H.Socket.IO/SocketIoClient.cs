@@ -18,7 +18,7 @@ namespace H.Socket.IO
     /// <summary>
     /// Socket.IO Client.
     /// </summary>
-    public sealed class SocketIoClient : IAsyncDisposable
+    public sealed class SocketIoClient : IDisposable, IAsyncDisposable
     {
         #region Properties
 
@@ -511,6 +511,17 @@ namespace H.Socket.IO
         public void On(string name, Action action, string? customNamespace = null)
         {
             On<object>(name, (obj, text) => action?.Invoke(), customNamespace);
+        }
+
+        /// <summary>
+        /// Disposes an object. <br/>
+        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// </summary>
+        /// <returns></returns>
+        public void Dispose()
+        {
+            EngineIoClient?.Dispose();
+            EngineIoClient = null;
         }
 
         /// <summary>

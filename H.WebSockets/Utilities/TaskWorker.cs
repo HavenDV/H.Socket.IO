@@ -8,22 +8,38 @@ namespace H.WebSockets.Utilities
 {
     /// <summary>
     /// A class designed to run code using <see cref="Task"/> with <see cref="TaskCreationOptions.LongRunning"/> <br/>
-    /// and supporting automatic cancellation after <see cref="DisposeAsync"/>
-    /// <![CDATA[Version: 1.0.0.4]]>
+    /// and supporting automatic cancellation after <see cref="DisposeAsync"/> <br/>
+    /// <![CDATA[Version: 1.0.0.6]]> <br/>
     /// </summary>
     internal class TaskWorker : IDisposable, IAsyncDisposable
     {
-        #region Properties
-
-        public Task Task { get; set; }
-        public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
+        #region Fields
 
         private volatile bool _isDisposed;
 
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// Internal task
+        /// </summary>
+        public Task Task { get; set; }
+
+        /// <summary>
+        /// Internal task CancellationTokenSource
+        /// </summary>
+        public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
+
+        #endregion
+
         #region Constructors
 
+        /// <summary>
+        /// Creates and starts <see cref="TaskWorker"/>
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="exceptionAction"></param>
         public TaskWorker(Func<CancellationToken, Task> action, Action<Exception>? exceptionAction = null)
         {
             Task = Task.Factory.StartNew(async () =>
@@ -47,8 +63,8 @@ namespace H.WebSockets.Utilities
         #region IDisposable
 
         /// <summary>
-        /// Cancel task(if it's not completed) and dispose internal resources
-        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// Cancel task(if it's not completed) and dispose internal resources <br/>
+        /// Prefer <see cref="DisposeAsync"/> if possible <br/>
         /// </summary>
         public void Dispose()
         {
@@ -56,7 +72,7 @@ namespace H.WebSockets.Utilities
         }
 
         /// <summary>
-        /// Cancel task(if it's not completed) and dispose internal resources
+        /// Cancel task(if it's not completed) and dispose internal resources <br/>
         /// </summary>
         public async ValueTask DisposeAsync()
         {
@@ -69,7 +85,13 @@ namespace H.WebSockets.Utilities
 
             CancellationTokenSource.Cancel();
 
-            await Task.ConfigureAwait(false);
+            try
+            {
+                await Task.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
 
             // Some system code can still use CancellationToken, so we wait
             await Task.Delay(TimeSpan.FromMilliseconds(1)).ConfigureAwait(false);

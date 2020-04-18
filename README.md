@@ -36,12 +36,17 @@ public class ChatMessage
     public long NumUsers { get; set; }
 }
 
-public static async Task<Uri> GetRedirectedUrl(Uri uri)
+public static async Task<Uri> GetRedirectedUrlAsync(Uri uri, CancellationToken cancellationToken = default)
 {
-    using var client = new HttpClient();
-    using var response = await client.GetAsync(uri);
+    using var client = new HttpClient(new HttpClientHandler
+    {
+        AllowAutoRedirect = false,
+    }, true);
+    using var response = await client.GetAsync(uri, cancellationToken);
 
-    return response.RequestMessage.RequestUri;
+    return (int)response.StatusCode == 308
+        ? new Uri(response.Headers.GetValues("Location").First())
+        : response.RequestMessage.RequestUri;
 }
 	
 public async Task ConnectToChatNowShTest()
@@ -81,7 +86,7 @@ public async Task ConnectToChatNowShTest()
         Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
     });
 	
-    var uri = await GetRedirectedUrl(new Uri("https://socket-io-chat.now.sh/"));
+    var uri = await GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));
 	await client.ConnectAsync(new Uri($"wss://{uri.Host}/"));
 
     await client.Emit("add user", "C# H.Socket.IO Test User");

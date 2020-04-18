@@ -53,7 +53,7 @@ namespace H.Socket.IO.IntegrationTests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
-            var uri = await SocketIoClientTests.GetRedirectedUrl(new Uri("https://socket-io-chat.now.sh/"));
+            var uri = await SocketIoClientTests.GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));
 
             await ConnectToChatBaseTest($"wss://{uri.Host}/");
         }

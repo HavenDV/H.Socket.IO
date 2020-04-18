@@ -151,17 +151,22 @@ namespace H.Socket.IO.IntegrationTests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
-            var uri = await GetRedirectedUrl(new Uri("https://socket-io-chat.now.sh/"));
+            var uri = await GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));
 
             await ConnectToChatBaseTest($"wss://{uri.Host}/");
         }
 
-        public static async Task<Uri> GetRedirectedUrl(Uri uri)
+        public static async Task<Uri> GetRedirectedUrlAsync(Uri uri, CancellationToken cancellationToken = default)
         {
-            using var client = new HttpClient();
-            using var response = await client.GetAsync(uri);
+            using var client = new HttpClient(new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+            }, true);
+            using var response = await client.GetAsync(uri, cancellationToken);
 
-            return response.RequestMessage.RequestUri;
+            return (int)response.StatusCode == 308
+                ? new Uri(response.Headers.GetValues("Location").First())
+                : response.RequestMessage.RequestUri;
         }
 
         [TestMethod]

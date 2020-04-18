@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
@@ -150,10 +151,21 @@ namespace H.Socket.IO.IntegrationTests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
-            await ConnectToChatBaseTest("wss://socket-io-chat.now.sh/");
+            var uri = await GetRedirectedUrl(new Uri("https://socket-io-chat.now.sh/"));
+
+            await ConnectToChatBaseTest($"wss://{uri.Host}/");
+        }
+
+        public static async Task<Uri> GetRedirectedUrl(Uri uri)
+        {
+            using var client = new HttpClient();
+            using var response = await client.GetAsync(uri);
+
+            return response.RequestMessage.RequestUri;
         }
 
         [TestMethod]
+        [Ignore]
         public async Task Test()
         {
             await Assert.ThrowsExceptionAsync<InvalidOperationException>(async () => await ConnectToChatBaseTest("ws://test.ubetia.net:3005/"));

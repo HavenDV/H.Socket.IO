@@ -36,6 +36,14 @@ public class ChatMessage
     public long NumUsers { get; set; }
 }
 
+public static async Task<Uri> GetRedirectedUrl(Uri uri)
+{
+    using var client = new HttpClient();
+    using var response = await client.GetAsync(uri);
+
+    return response.RequestMessage.RequestUri;
+}
+	
 public async Task ConnectToChatNowShTest()
 {
     await using var client = new SocketIoClient();
@@ -73,7 +81,8 @@ public async Task ConnectToChatNowShTest()
         Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
     });
 	
-    await client.ConnectAsync(new Uri("wss://socket-io-chat.now.sh/"));
+    var uri = await GetRedirectedUrl(new Uri("https://socket-io-chat.now.sh/"));
+	await client.ConnectAsync(new Uri($"wss://{uri.Host}/"));
 
     await client.Emit("add user", "C# H.Socket.IO Test User");
 
@@ -97,7 +106,7 @@ public async Task ConnectToChatNowShTest()
 
 ### Live Example
 
-.NET Fiddle - https://dotnetfiddle.net/yJ1Grb <br/>
+.NET Fiddle - https://dotnetfiddle.net/5r7L7o <br/>
 Http client of the tested Socket.IO server - https://socket-io-chat.now.sh/
 
 ### Used documentation

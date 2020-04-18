@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+#pragma warning disable CS8603 // A default expression introduces a null value for a type parameter.
+
 namespace H.WebSockets.Utilities
 {
     /// <summary>
     /// Extensions that work with <see langword="event"/> <br/>
-    /// <![CDATA[Version: 1.0.0.2]]> <br/>
+    /// <![CDATA[Version: 1.0.0.3]]> <br/>
     /// </summary>
     public static class EventExtensions
     {
@@ -17,7 +19,7 @@ namespace H.WebSockets.Utilities
             public TaskCompletionSource<T>? Source { get; set; }
 
             // ReSharper disable once UnusedParameter.Local
-            public void HandleEvent(object sender, T e)
+            public void HandleEvent(object _, T e)
             {
                 Source?.TrySetResult(e);
             }
@@ -128,9 +130,7 @@ namespace H.WebSockets.Utilities
                     }
                     catch (OperationCanceledException)
                     {
-#pragma warning disable CS8653 // A default expression introduces a null value for a type parameter.
                         return default;
-#pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.
                     }
                 })
                 .ToList();
@@ -185,9 +185,7 @@ namespace H.WebSockets.Utilities
                     }
                     catch (OperationCanceledException)
                     {
-#pragma warning disable CS8653 // A default expression introduces a null value for a type parameter.
                         return default;
-#pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.
                     }
                 })
                 .ToList();
@@ -213,3 +211,5 @@ namespace H.WebSockets.Utilities
         }
     }
 }
+
+#pragma warning restore CS8603 // A default expression introduces a null value for a type parameter.

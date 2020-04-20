@@ -87,7 +87,7 @@ public async Task ConnectToChatNowShTest()
     });
 	
     var uri = await GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));
-	await client.ConnectAsync(new Uri($"wss://{uri.Host}/"));
+    await client.ConnectAsync(new Uri($"wss://{uri.Host}/"));
 
     await client.Emit("add user", "C# H.Socket.IO Test User");
 

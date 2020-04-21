@@ -13,7 +13,7 @@ namespace H.Socket.IO.IntegrationTests
         [TestMethod]
         public async Task DoubleConnectToWebSocketOrgTest()
         {
-            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
             await using var client = new WebSocketClient();
 
@@ -54,7 +54,7 @@ namespace H.Socket.IO.IntegrationTests
                 Console.WriteLine("# After DisconnectAsync");
 
                 Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-            }, cancellationTokenSource.Token, events);
+            }, tokenSource.Token, events);
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");
@@ -89,7 +89,7 @@ namespace H.Socket.IO.IntegrationTests
                 Console.WriteLine("# After DisconnectAsync");
 
                 Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-            }, cancellationTokenSource.Token, events);
+            }, tokenSource.Token, events);
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");

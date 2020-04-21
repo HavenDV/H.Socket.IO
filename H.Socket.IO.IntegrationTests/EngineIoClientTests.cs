@@ -1,5 +1,4 @@
 using System;
-using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
 using H.Engine.IO;
@@ -11,10 +10,8 @@ namespace H.Socket.IO.IntegrationTests
     [TestClass]
     public class EngineIoClientTests
     {
-        private static async Task ConnectToChatBaseTest(string url)
+        private static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
-            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
             await using var client = new EngineIoClient("socket.io");
 
             client.MessageReceived += (sender, args) => Console.WriteLine($"MessageReceived: {args.Value}");
@@ -22,7 +19,7 @@ namespace H.Socket.IO.IntegrationTests
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
-            var results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async token =>
             {
                 Console.WriteLine("# Before OpenAsync");
 
@@ -30,14 +27,14 @@ namespace H.Socket.IO.IntegrationTests
 
                 Console.WriteLine("# Before Delay");
 
-                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(2), token);
 
                 Console.WriteLine("# Before CloseAsync");
 
-                await client.CloseAsync(cancellationToken);
+                await client.CloseAsync(token);
 
                 Console.WriteLine("# After CloseAsync");
-            }, cancellationTokenSource.Token, nameof(client.Opened), nameof(client.Closed));
+            }, cancellationToken, nameof(client.Opened), nameof(client.Closed));
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.WebSocketClient.Socket.State}");
@@ -53,22 +50,22 @@ namespace H.Socket.IO.IntegrationTests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
-            var uri = await SocketIoClientTests.GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            await ConnectToChatBaseTest($"wss://{uri.Host}/");
+            var uri = await SocketIoClientTests.GetRedirectedUrlAsync(
+                new Uri("https://socket-io-chat.now.sh/"),
+                tokenSource.Token);
+
+            await ConnectToChatBaseTestAsync($"wss://{uri.Host}/", tokenSource.Token);
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ConnectToLocalChatServerTest()
         {
-            try
-            {
-                await ConnectToChatBaseTest("ws://localhost:1465/");
-            }
-            catch (WebSocketException exception)
-            {
-                Console.WriteLine(exception);
-            }
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+            await ConnectToChatBaseTestAsync(SocketIoClientTests.LocalCharServerUrl, tokenSource.Token);
         }
     }
 }

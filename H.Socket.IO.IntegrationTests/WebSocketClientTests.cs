@@ -14,6 +14,7 @@ namespace H.Socket.IO.IntegrationTests
         public async Task DoubleConnectToWebSocketOrgTest()
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var cancellationToken = tokenSource.Token;
 
             await using var client = new WebSocketClient();
 
@@ -24,7 +25,7 @@ namespace H.Socket.IO.IntegrationTests
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
-            var results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async () =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 
@@ -54,7 +55,7 @@ namespace H.Socket.IO.IntegrationTests
                 Console.WriteLine("# After DisconnectAsync");
 
                 Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-            }, tokenSource.Token, events);
+            }, cancellationToken, events);
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");
@@ -66,7 +67,7 @@ namespace H.Socket.IO.IntegrationTests
                 Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
 
-            results = await client.WaitAllEventsAsync<EventArgs>(async cancellationToken =>
+            results = await client.WaitAllEventsAsync<EventArgs>(async () =>
             {
                 Console.WriteLine("# Before ConnectAsync");
 
@@ -89,7 +90,7 @@ namespace H.Socket.IO.IntegrationTests
                 Console.WriteLine("# After DisconnectAsync");
 
                 Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
-            }, tokenSource.Token, events);
+            }, cancellationToken, events);
 
             Console.WriteLine();
             Console.WriteLine($"WebSocket State: {client.Socket.State}");

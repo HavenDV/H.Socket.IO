@@ -75,7 +75,7 @@ namespace H.WebSockets.Utilities
 
         /// <summary>
         /// Asynchronously expects <see langword="event"/> until they occur or until canceled <br/>
-        /// <![CDATA[Version: 1.0.0.2]]> <br/>
+        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -88,7 +88,7 @@ namespace H.WebSockets.Utilities
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public static async Task<T> WaitEventAsync<T>(this object value, Func<CancellationToken, Task> func, string eventName, CancellationToken cancellationToken = default)
+        public static async Task<T> WaitEventAsync<T>(this object value, Func<Task> func, string eventName, CancellationToken cancellationToken = default)
         {
             value = value ?? throw new ArgumentNullException(nameof(value));
             func = func ?? throw new ArgumentNullException(nameof(func));
@@ -96,7 +96,7 @@ namespace H.WebSockets.Utilities
 
             var task = value.WaitEventAsync<T>(eventName, cancellationToken);
 
-            await func(cancellationToken).ConfigureAwait(false);
+            await func().ConfigureAwait(false);
 
             return await task.ConfigureAwait(false);
         }
@@ -104,7 +104,7 @@ namespace H.WebSockets.Utilities
         /// <summary>
         /// Asynchronously expects all <see langword="event"/>'s until they occur or until canceled <br/>
         /// This method DOES NOT throw an exception after canceling with a CancellationToken, but returns control and current results instantly <br/>
-        /// <![CDATA[Version: 1.0.0.2]]> <br/>
+        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -116,7 +116,7 @@ namespace H.WebSockets.Utilities
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         /// <returns></returns>
-        public static async Task<Dictionary<string, T>> WaitAllEventsAsync<T>(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
+        public static async Task<Dictionary<string, T>> WaitAllEventsAsync<T>(this object value, Func<Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
         {
             value = value ?? throw new ArgumentNullException(nameof(value));
             func = func ?? throw new ArgumentNullException(nameof(func));
@@ -138,7 +138,7 @@ namespace H.WebSockets.Utilities
 
             try
             {
-                await func(cancellationToken).ConfigureAwait(false);
+                await func().ConfigureAwait(false);
 
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
@@ -159,7 +159,7 @@ namespace H.WebSockets.Utilities
         /// <summary>
         /// Asynchronously expects any <see langword="event"/> until it occurs or until canceled <br/>
         /// This method DOES NOT throw an exception after canceling with a CancellationToken, but returns control and current results instantly <br/>
-        /// <![CDATA[Version: 1.0.0.2]]> <br/>
+        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -171,7 +171,7 @@ namespace H.WebSockets.Utilities
         /// <exception cref="ArgumentException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         /// <returns></returns>
-        public static async Task<Dictionary<string, T>> WaitAnyEventAsync<T>(this object value, Func<CancellationToken, Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
+        public static async Task<Dictionary<string, T>> WaitAnyEventAsync<T>(this object value, Func<Task> func, CancellationToken cancellationToken = default, params string[] eventNames)
         {
             value = value ?? throw new ArgumentNullException(nameof(value));
             func = func ?? throw new ArgumentNullException(nameof(func));
@@ -193,7 +193,7 @@ namespace H.WebSockets.Utilities
 
             try
             {
-                await func(cancellationToken).ConfigureAwait(false);
+                await func().ConfigureAwait(false);
 
                 await Task.WhenAny(tasks).ConfigureAwait(false);
             }

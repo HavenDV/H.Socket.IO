@@ -19,7 +19,7 @@ namespace H.Socket.IO.IntegrationTests
             client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
             client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
-            var results = await client.WaitAllEventsAsync<EventArgs>(async token =>
+            var results = await client.WaitAllEventsAsync<EventArgs>(async () =>
             {
                 Console.WriteLine("# Before OpenAsync");
 
@@ -27,11 +27,11 @@ namespace H.Socket.IO.IntegrationTests
 
                 Console.WriteLine("# Before Delay");
 
-                await Task.Delay(TimeSpan.FromSeconds(2), token);
+                await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
 
                 Console.WriteLine("# Before CloseAsync");
 
-                await client.CloseAsync(token);
+                await client.CloseAsync(cancellationToken);
 
                 Console.WriteLine("# After CloseAsync");
             }, cancellationToken, nameof(client.Opened), nameof(client.Closed));

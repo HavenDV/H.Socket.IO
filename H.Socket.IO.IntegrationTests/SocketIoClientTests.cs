@@ -166,16 +166,6 @@ namespace H.Socket.IO.IntegrationTests
 
         [TestMethod]
         [Ignore]
-        public async Task Test()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
-            await Assert.ThrowsExceptionAsync<InvalidOperationException>(
-                async () => await ConnectToChatBaseTestAsync("ws://test.ubetia.net:3005/", tokenSource.Token));
-        }
-
-        [TestMethod]
-        [Ignore]
         public async Task ConnectToLocalChatServerTest()
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));

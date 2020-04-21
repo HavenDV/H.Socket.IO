@@ -180,15 +180,20 @@ namespace H.WebSockets
                 return;
             }
             
-            await this.WaitEventAsync<WebSocketCloseEventArgs>(async token =>
+            await this.WaitEventAsync<WebSocketCloseEventArgs>(async () =>
             {
-                await Socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closed by client", token).ConfigureAwait(false);
+                await Socket.CloseAsync(
+                    WebSocketCloseStatus.NormalClosure, 
+                    "Closed by client", 
+                    cancellationToken)
+                    .ConfigureAwait(false);
 
                 if (Socket.State == WebSocketState.Aborted)
                 {
                     OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
                 }
-            }, nameof(Disconnected), cancellationToken).ConfigureAwait(false);
+            }, nameof(Disconnected), cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -236,10 +241,10 @@ namespace H.WebSockets
         /// <param name="cancellationToken"></param>
         /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<string>> WaitTextAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<DataEventArgs<string>> WaitTextAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             return await this.WaitEventAsync<DataEventArgs<string>>(
-                func ?? (token => Task.CompletedTask), 
+                func ?? (() => Task.CompletedTask), 
                 nameof(TextReceived),
                 cancellationToken);
         }
@@ -253,11 +258,12 @@ namespace H.WebSockets
         /// <param name="func"></param>
         /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<string>> WaitTextAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        public async Task<DataEventArgs<string>> WaitTextAsync(TimeSpan timeout, Func<Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
+            var cancellationToken = tokenSource.Token;
 
-            return await WaitTextAsync(func, tokenSource.Token);
+            return await WaitTextAsync(func, cancellationToken);
         }
 
         /// <summary>
@@ -269,10 +275,10 @@ namespace H.WebSockets
         /// <param name="cancellationToken"></param>
         /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>>(
-                func ?? (token => Task.CompletedTask),
+                func ?? (() => Task.CompletedTask),
                 nameof(BytesReceived),
                 cancellationToken);
         }
@@ -286,7 +292,7 @@ namespace H.WebSockets
         /// <param name="func"></param>
         /// <exception cref="OperationCanceledException"></exception>
         /// <returns></returns>
-        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(TimeSpan timeout, Func<Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 

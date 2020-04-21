@@ -106,9 +106,9 @@ namespace H.Socket.IO.IntegrationTests
 
                 await client.ConnectAsync(new Uri(url), cancellationToken);
 
-                var args = await client.WaitEventOrErrorAsync(async waitToken =>
+                var args = await client.WaitEventOrErrorAsync(async () =>
                 {
-                    await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: waitToken);
+                    await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: cancellationToken);
                 }, cancellationToken);
                 switch (args)
                 {

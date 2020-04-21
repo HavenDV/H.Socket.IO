@@ -248,9 +248,9 @@ namespace H.Socket.IO
 
             if (!EngineIoClient.IsOpened)
             {
-                var results = await this.WaitAnyEventAsync<EventArgs>(async token =>
+                var results = await this.WaitAnyEventAsync<EventArgs>(async () =>
                 {
-                    await EngineIoClient.OpenAsync(uri, token).ConfigureAwait(false);
+                    await EngineIoClient.OpenAsync(uri, cancellationToken).ConfigureAwait(false);
                 }, cancellationToken, nameof(Connected), nameof(ErrorReceived)).ConfigureAwait(false);
 
                 if (results[nameof(ErrorReceived)] is SocketIoErrorEventArgs error)
@@ -289,13 +289,13 @@ namespace H.Socket.IO
                 return true;
             }
 
-            return await this.WaitEventAsync<SocketIoEventEventArgs>(async token =>
+            return await this.WaitEventAsync<SocketIoEventEventArgs>(async () =>
             {
                 foreach (var @namespace in namespaces)
                 {
                     var packet = new SocketIoPacket(SocketIoPacket.ConnectPrefix, @namespace: @namespace);
 
-                    await EngineIoClient.SendMessageAsync(packet.Encode(), token).ConfigureAwait(false);
+                    await EngineIoClient.SendMessageAsync(packet.Encode(), cancellationToken).ConfigureAwait(false);
                 }
             }, nameof(Connected), cancellationToken).ConfigureAwait(false) != null;
         }
@@ -408,10 +408,10 @@ namespace H.Socket.IO
         /// <param name="func"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitEventOrErrorAsync(Func<CancellationToken, Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<EventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             var dictionary = await this.WaitAnyEventAsync<EventArgs?>(
-                func ?? (token => Task.CompletedTask),
+                func ?? (() => Task.CompletedTask),
                 cancellationToken,
                 nameof(EventReceived), nameof(ErrorReceived));
 
@@ -428,7 +428,7 @@ namespace H.Socket.IO
         /// <param name="timeout"></param>
         /// <param name="func"></param>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<CancellationToken, Task>? func = null)
+        public async Task<EventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 

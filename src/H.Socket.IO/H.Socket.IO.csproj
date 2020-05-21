@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.15.8</Version>
+    <Version>0.15.9</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Simple client for Socket.IO, supports the latest version. Includes EngineIoClient and WebSocketClient
@@ -30,7 +30,7 @@ Note: This is an alpha version. Some features may not be available. Please see e
     <PackageProjectUrl>https://github.com/HavenDV/H.SocketIO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.SocketIO</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Added strong key name</PackageReleaseNotes>
+    <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
@@ -47,8 +47,6 @@ Note: This is an alpha version. Some features may not be available. Please see e
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>
         $(MSBuildProjectName).Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100f9a1359ae275b9bc511738bded87ff331b809c321e6df1ed059574b26a06c7de64d8b6b4ad9d8c97e15d6a31ab58ff200faec07dc14d2f7b95e9174ee117e1a162928a04017a2d6a6b151242398a6ef3692899e229675bf646058e37e59a996fb48e4c401ca7c5b41579349bf419a8301b0d99a40d6c6720ac4d872a3257b9b8

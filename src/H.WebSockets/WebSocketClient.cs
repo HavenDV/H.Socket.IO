@@ -14,7 +14,10 @@ namespace H.WebSockets
     /// <summary>
     /// 
     /// </summary>
-    public sealed class WebSocketClient : IDisposable, IAsyncDisposable
+    public sealed class WebSocketClient : IDisposable
+#if NETSTANDARD2_1
+        , IAsyncDisposable
+#endif
     {
         #region Properties
 
@@ -45,7 +48,7 @@ namespace H.WebSockets
             }
         }
 
-        private TaskWorker? ReceiveWorker { get; set; }
+        private TaskWorker ReceiveWorker { get; } = new TaskWorker();
 
         #endregion
 
@@ -103,6 +106,18 @@ namespace H.WebSockets
 
         #endregion
 
+        #region Constructors
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public WebSocketClient()
+        {
+            ReceiveWorker.ExceptionOccurred += (sender, exception) => OnExceptionOccurred(exception);
+        }
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -129,15 +144,9 @@ namespace H.WebSockets
 
             await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
 
-            if (ReceiveWorker == null ||
-                ReceiveWorker.Task.IsCompleted)
+            if (ReceiveWorker.Task.IsCompleted)
             {
-                if (ReceiveWorker != null)
-                {
-                    await ReceiveWorker.DisposeAsync();
-                }
-
-                ReceiveWorker = new TaskWorker(async token => await ReceiveAsync(token).ConfigureAwait(false), OnExceptionOccurred);
+                ReceiveWorker.Start(async token => await ReceiveAsync(token).ConfigureAwait(false));
             }
 
             OnConnected();
@@ -301,31 +310,25 @@ namespace H.WebSockets
 
         /// <summary>
         /// Cancel receive task(if it's not completed) and dispose internal resources
-        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// Prefer DisposeAsync if possible
         /// </summary>
         public void Dispose()
         {
-            ReceiveWorker?.Dispose();
-            ReceiveWorker = null;
-
+            ReceiveWorker.Dispose();
             Socket.Dispose();
         }
 
+#if NETSTANDARD2_1
         /// <summary>
         /// Cancel receive task(if it's not completed) and dispose internal resources
         /// </summary>
         /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
-            if (ReceiveWorker != null)
-            {
-                await ReceiveWorker.DisposeAsync().ConfigureAwait(false);
-
-                ReceiveWorker = null;
-            }
-
+            await ReceiveWorker.DisposeAsync().ConfigureAwait(false);
             Socket.Dispose();
         }
+#endif
 
         #endregion
 

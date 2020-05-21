@@ -10,7 +10,11 @@ namespace H.Engine.IO.IntegrationTests
     {
         public static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
+#if NETCOREAPP3_1 || NETCOREAPP3_0
             await using var client = new EngineIoClient("socket.io");
+#else
+            using var client = new EngineIoClient("socket.io");
+#endif
 
             client.MessageReceived += (sender, args) => Console.WriteLine($"MessageReceived: {args.Value}");
             client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");

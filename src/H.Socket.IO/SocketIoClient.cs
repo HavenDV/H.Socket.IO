@@ -18,9 +18,12 @@ namespace H.Socket.IO
     /// <summary>
     /// Socket.IO Client.
     /// </summary>
-    public sealed class SocketIoClient : IDisposable, IAsyncDisposable
+    public sealed class SocketIoClient : IDisposable
+#if NETSTANDARD2_1
+        , IAsyncDisposable
+#endif
     {
-        #region Properties
+#region Properties
 
         /// <summary>
         /// Internal Engine.IO Client.
@@ -45,9 +48,9 @@ namespace H.Socket.IO
 
         private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
 
-        #endregion
+#endregion
 
-        #region Events
+#region Events
 
         /// <summary>
         /// Occurs after a successful connection to each namespace
@@ -118,9 +121,9 @@ namespace H.Socket.IO
             ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
         }
 
-        #endregion
+#endregion
 
-        #region Constructors
+#region Constructors
 
         /// <summary>
         /// Creates Engine.IO client internally.
@@ -133,9 +136,9 @@ namespace H.Socket.IO
             EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Reason, args.Status);
         }
 
-        #endregion
+#endregion
 
-        #region Event Handlers
+#region Event Handlers
 
         private void EngineIoClient_MessageReceived(object? sender, DataEventArgs<string>? args)
         {
@@ -221,14 +224,14 @@ namespace H.Socket.IO
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private methods
+#region Private methods
 
 
-        #endregion
+#endregion
 
-        #region Public methods
+#region Public methods
 
         /// <summary>
         /// It connects to the server and asynchronously waits for a connection message.
@@ -515,7 +518,7 @@ namespace H.Socket.IO
 
         /// <summary>
         /// Disposes an object. <br/>
-        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// Prefer DisposeAsync if possible
         /// </summary>
         /// <returns></returns>
         public void Dispose()
@@ -523,6 +526,7 @@ namespace H.Socket.IO
             EngineIoClient.Dispose();
         }
 
+#if NETSTANDARD2_1
         /// <summary>
         /// Asynchronously disposes an object.
         /// </summary>
@@ -534,7 +538,8 @@ namespace H.Socket.IO
                 await EngineIoClient.DisposeAsync().ConfigureAwait(false);
             }
         }
+#endif
 
-        #endregion
+#endregion
     }
 }

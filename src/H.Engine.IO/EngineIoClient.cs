@@ -15,7 +15,10 @@ namespace H.Engine.IO
     /// <summary>
     /// Engine.IO Client
     /// </summary>
-    public sealed class EngineIoClient : IDisposable, IAsyncDisposable
+    public sealed class EngineIoClient : IDisposable
+#if NETSTANDARD2_1
+        , IAsyncDisposable
+#endif
     {
         #region Constants
 
@@ -358,7 +361,7 @@ namespace H.Engine.IO
 
         /// <summary>
         /// Dispose internal resources
-        /// Prefer <see cref="DisposeAsync"/> if possible
+        /// Prefer DisposeAsync if possible
         /// </summary>
         /// <returns></returns>
         public void Dispose()
@@ -369,6 +372,7 @@ namespace H.Engine.IO
             Timer = null;
         }
 
+#if NETSTANDARD2_1
         /// <summary>
         /// Dispose internal resources
         /// </summary>
@@ -380,7 +384,8 @@ namespace H.Engine.IO
             Timer?.Dispose();
             Timer = null;
         }
+#endif
 
-        #endregion
+#endregion
     }
 }

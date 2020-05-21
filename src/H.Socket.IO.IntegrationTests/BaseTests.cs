@@ -15,7 +15,11 @@ namespace H.Socket.IO.IntegrationTests
             CancellationToken cancellationToken = default, 
             params string[] additionalEvents)
         {
+#if NETCOREAPP3_1 || NETCOREAPP3_0
             await using var client = new SocketIoClient();
+#else
+            using var client = new SocketIoClient();
+#endif
 
             client.Connected += (sender, args) => Console.WriteLine($"Connected: {args.Namespace}");
             client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");

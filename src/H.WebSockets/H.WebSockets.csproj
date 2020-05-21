@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -33,7 +33,7 @@
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>WebSockets, WebSocket, web sockets, sockets, websock</PackageTags>
-    <PackageReleaseNotes>Added strong key name</PackageReleaseNotes>
+    <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
@@ -50,8 +50,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>$(MSBuildProjectName).IntegrationTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010009b7ddef1e7923b311a6cea9a98da8e9883eb1e3a4016c14b8febf68d4e33e458f8da70817c97b95cd9daa277ba2bbea224efac0b985be2bcf9db3ba4ddb8dd99a0564c5a1817b4b05a2b6517cb00f112130ca0e9626340448f7bf323c0361543eb1159eba34a6e9ec3ddc784a6f180a0283438fec6dc08f4f1434b403ff1fcb</_Parameter1>
     </AssemblyAttribute>

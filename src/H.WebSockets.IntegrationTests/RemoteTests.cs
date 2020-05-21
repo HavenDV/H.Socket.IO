@@ -15,7 +15,12 @@ namespace H.WebSockets.IntegrationTests
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var cancellationToken = tokenSource.Token;
 
+#if NETCOREAPP3_1 || NETCOREAPP3_0
             await using var client = new WebSocketClient();
+#else
+            using var client = new WebSocketClient();
+#endif
+
             client.TextReceived += (sender, args) => Console.WriteLine($"TextReceived: {args.Value}");
             client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
             client.BytesReceived += (sender, args) => Console.WriteLine($"BytesReceived: {args.Value?.Count}");

@@ -1,6 +1,7 @@
 var app = require("express")();
-var http = require("http").Server(app);
-var io = require("socket.io")(http);
+var server = require("http").createServer(app);
+var io = require("socket.io")(server);
+var port = 1465;
 
 app.get("/", function (req, res) {
 	res.sendfile("index.html");
@@ -19,6 +20,6 @@ nsp.on("connection", function (socket) {
     });
 });
 
-http.listen(1465, function () {
+server.listen(port, function () {
 	console.log("listening on localhost:1465");
 });

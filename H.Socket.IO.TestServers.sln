@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29509.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Socket.IO.ChatExample", "Socket.IO.ChatExample\Socket.IO.ChatExample.njsproj", "{AEFFA4C6-7658-4704-A711-09FE824C1973}"
+Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "Socket.IO.ChatExample", "src\TestServers\Socket.IO.ChatExample\Socket.IO.ChatExample.njsproj", "{AEFFA4C6-7658-4704-A711-09FE824C1973}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

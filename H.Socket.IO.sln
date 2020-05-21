@@ -22,6 +22,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.WebSockets", "src\H.WebSo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Engine.IO", "src\H.Engine.IO\H.Engine.IO.csproj", "{20FF7182-3433-4362-93E1-8A346E3C4CD1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Engine.IO.IntegrationTests", "src\H.Engine.IO.IntegrationTests\H.Engine.IO.IntegrationTests.csproj", "{720B4547-3361-4B00-B7E8-4558F93BDEC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Engine.IO.Tests", "src\H.Engine.IO.Tests\H.Engine.IO.Tests.csproj", "{9329BAFB-9319-471A-93DC-44082F86CDBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +52,14 @@ Global
 		{20FF7182-3433-4362-93E1-8A346E3C4CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20FF7182-3433-4362-93E1-8A346E3C4CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20FF7182-3433-4362-93E1-8A346E3C4CD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{720B4547-3361-4B00-B7E8-4558F93BDEC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{720B4547-3361-4B00-B7E8-4558F93BDEC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{720B4547-3361-4B00-B7E8-4558F93BDEC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{720B4547-3361-4B00-B7E8-4558F93BDEC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9329BAFB-9319-471A-93DC-44082F86CDBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9329BAFB-9319-471A-93DC-44082F86CDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9329BAFB-9319-471A-93DC-44082F86CDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9329BAFB-9319-471A-93DC-44082F86CDBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

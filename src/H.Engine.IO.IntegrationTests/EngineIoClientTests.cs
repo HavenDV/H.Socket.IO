@@ -1,15 +1,31 @@
 using System;
+using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Engine.IO;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Socket.IO.IntegrationTests
+namespace H.Engine.IO.IntegrationTests
 {
     [TestClass]
     public class EngineIoClientTests
     {
+        public const string LocalCharServerUrl = "ws://localhost:1465/";
+
+        public static async Task<Uri> GetRedirectedUrlAsync(Uri uri, CancellationToken cancellationToken = default)
+        {
+            using var client = new HttpClient(new HttpClientHandler
+            {
+                AllowAutoRedirect = false,
+            }, true);
+            using var response = await client.GetAsync(uri, cancellationToken);
+
+            return (int)response.StatusCode == 308
+                ? new Uri(response.Headers.GetValues("Location").First())
+                : response.RequestMessage.RequestUri;
+        }
+
         private static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
             await using var client = new EngineIoClient("socket.io");
@@ -52,7 +68,7 @@ namespace H.Socket.IO.IntegrationTests
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            var uri = await SocketIoClientTests.GetRedirectedUrlAsync(
+            var uri = await GetRedirectedUrlAsync(
                 new Uri("https://socket-io-chat.now.sh/"),
                 tokenSource.Token);
 
@@ -65,7 +81,7 @@ namespace H.Socket.IO.IntegrationTests
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            await ConnectToChatBaseTestAsync(SocketIoClientTests.LocalCharServerUrl, tokenSource.Token);
+            await ConnectToChatBaseTestAsync(LocalCharServerUrl, tokenSource.Token);
         }
     }
 }

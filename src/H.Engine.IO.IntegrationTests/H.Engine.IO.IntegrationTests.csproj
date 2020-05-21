@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\H.Socket.IO\H.Socket.IO.csproj" />
+    <ProjectReference Include="..\H.Engine.IO\H.Engine.IO.csproj" />
   </ItemGroup>
 
 </Project>

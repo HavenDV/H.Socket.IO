@@ -4,14 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-#pragma warning disable CS8603 // A default expression introduces a null value for a type parameter.
-#pragma warning disable CS8653 // A default expression introduces a null value for a type parameter.
-
 namespace H.WebSockets.Utilities
 {
     /// <summary>
     /// Extensions that work with <see langword="event"/> <br/>
-    /// <![CDATA[Version: 1.0.0.3]]> <br/>
+    /// <![CDATA[Version: 1.0.0.4]]> <br/>
     /// </summary>
     public static class EventExtensions
     {
@@ -28,7 +25,6 @@ namespace H.WebSockets.Utilities
 
         /// <summary>
         /// Asynchronously expects <see langword="event"/> until they occur or until canceled <br/>
-        /// <![CDATA[Version: 1.0.0.2]]> <br/>
         /// <![CDATA[Dependency: WaitObject]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -75,7 +71,6 @@ namespace H.WebSockets.Utilities
 
         /// <summary>
         /// Asynchronously expects <see langword="event"/> until they occur or until canceled <br/>
-        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -104,7 +99,6 @@ namespace H.WebSockets.Utilities
         /// <summary>
         /// Asynchronously expects all <see langword="event"/>'s until they occur or until canceled <br/>
         /// This method DOES NOT throw an exception after canceling with a CancellationToken, but returns control and current results instantly <br/>
-        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -131,7 +125,7 @@ namespace H.WebSockets.Utilities
                     }
                     catch (OperationCanceledException)
                     {
-                        return default;
+                        return default!;
                     }
                 })
                 .ToList();
@@ -153,13 +147,12 @@ namespace H.WebSockets.Utilities
                     pair =>
                         pair.task.IsCompleted && !pair.task.IsCanceled
                             ? pair.task.Result
-                            : default);
+                            : default!);
         }
 
         /// <summary>
         /// Asynchronously expects any <see langword="event"/> until it occurs or until canceled <br/>
         /// This method DOES NOT throw an exception after canceling with a CancellationToken, but returns control and current results instantly <br/>
-        /// <![CDATA[Version: 1.0.0.3]]> <br/>
         /// <![CDATA[Dependency: WaitEventAsync(this object value, string eventName, CancellationToken cancellationToken = default)]]> <br/>
         /// </summary>
         /// <param name="value"></param>
@@ -186,7 +179,7 @@ namespace H.WebSockets.Utilities
                     }
                     catch (OperationCanceledException)
                     {
-                        return default;
+                        return default!;
                     }
                 })
                 .ToList();
@@ -208,10 +201,7 @@ namespace H.WebSockets.Utilities
                     pair =>
                         pair.task.IsCompleted && !pair.task.IsCanceled
                             ? pair.task.Result
-                            : default);
+                            : default!);
         }
     }
 }
-
-#pragma warning restore CS8603 // A default expression introduces a null value for a type parameter.
-#pragma warning restore CS8653 // A default expression introduces a null value for a type parameter.

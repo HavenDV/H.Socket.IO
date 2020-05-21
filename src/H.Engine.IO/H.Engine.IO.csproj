@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.15.6</Version>
+    <Version>0.15.8</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -33,11 +33,13 @@
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Updated references</PackageReleaseNotes>
+    <PackageReleaseNotes>Added strong key name</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

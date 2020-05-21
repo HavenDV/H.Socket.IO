@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>aeffa4c6-7658-4704-a711-09fe824c1973</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>chat.js</StartupFile>
+    <StartupFile>rooms.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>

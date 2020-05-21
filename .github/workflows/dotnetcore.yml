@@ -44,14 +44,14 @@ jobs:
     - name: Try Publish(if the version has changed) H.WebSockets
       if: runner.os == 'Windows' &&
           matrix.dotnet == '3.1.200'
-      run: dotnet nuget push H.WebSockets\bin\Release\H.WebSockets.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      run: dotnet nuget push src\H.WebSockets\bin\Release\H.WebSockets.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
       
     - name: Try Publish(if the version has changed) H.Engine.IO
       if: runner.os == 'Windows' &&
           matrix.dotnet == '3.1.200'
-      run: dotnet nuget push H.Engine.IO\bin\Release\H.Engine.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      run: dotnet nuget push src\H.Engine.IO\bin\Release\H.Engine.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
       
     - name: Try Publish(if the version has changed) H.Socket.IO
       if: runner.os == 'Windows' &&
           matrix.dotnet == '3.1.200'
-      run: dotnet nuget push H.Socket.IO\bin\Release\H.Socket.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0
+      run: dotnet nuget push src\H.Socket.IO\bin\Release\H.Socket.IO.*.nupkg -k ${{ secrets.NUGET_KEY }} -s https://api.nuget.org/v3/index.json; exit 0

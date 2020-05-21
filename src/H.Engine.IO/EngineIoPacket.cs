@@ -5,7 +5,7 @@ namespace H.Engine.IO
     /// <summary>
     /// See https://github.com/socketio/engine.io-protocol#packet
     /// </summary>
-    public class EngineIoPacket
+    internal class EngineIoPacket
     {
         #region Constants
 

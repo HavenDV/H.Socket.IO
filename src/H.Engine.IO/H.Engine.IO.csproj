@@ -54,7 +54,14 @@
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>$(MSBuildProjectName).Tests</_Parameter1>
+      <_Parameter1>
+        $(MSBuildProjectName).Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100910f0aeda0b2806e0f95246987f056bdd4fe07483bb20ea0a06ed89e31eb269d0ff69c0e4750872d925b35c625eb65211f811dd61080dca4775be43faba8da32f9b6c2259225f64850b6037b52b3a420c0d197f53cbae444e95ace1eb5328256d722be091718fed142aaee0b288149ea2ba5790426d44b8828433437f88afbcf
+      </_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>
+        $(MSBuildProjectName).IntegrationTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100e96ede62578bcdd965497305af2bdd771fbd2bc21f45cc41e2053c0fd4be09c95d83890a94cd9581bf0ad129a40b8d75444be85690cd0001eb7fb544fc6f1ff0c8785770f4238b8327f2e09c0d7cdef90467281e2ae627214be0d5de2a8aed066864d8401a5f4f55f3eb2d9fbbcb87e928c175c0a5bf5411b2202a56c0e73fd2
+      </_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 

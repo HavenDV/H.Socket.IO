@@ -16,6 +16,8 @@
   <PropertyGroup>
     <LangVersion>8</LangVersion>
     <Nullable>enable</Nullable>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>

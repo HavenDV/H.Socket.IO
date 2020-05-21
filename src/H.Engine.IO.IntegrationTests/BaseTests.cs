@@ -6,12 +6,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace H.Engine.IO.IntegrationTests
 {
-    [TestClass]
-    public class EngineIoClientTests
+    internal class BaseTests
     {
-        public const string LocalCharServerUrl = "ws://localhost:1465/";
-
-        private static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
+        public static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
             await using var client = new EngineIoClient("socket.io");
 
@@ -46,23 +43,6 @@ namespace H.Engine.IO.IntegrationTests
             {
                 Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
             }
-        }
-
-        [TestMethod]
-        public async Task ConnectToChatNowShTest()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
-            await ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", tokenSource.Token);
-        }
-
-        [TestMethod]
-        [Ignore]
-        public async Task ConnectToLocalChatServerTest()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-
-            await ConnectToChatBaseTestAsync(LocalCharServerUrl, tokenSource.Token);
         }
     }
 }

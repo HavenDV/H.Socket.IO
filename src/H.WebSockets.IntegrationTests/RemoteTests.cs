@@ -7,10 +7,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace H.WebSockets.IntegrationTests
 {
     [TestClass]
-    public class WebSocketClientTests
+    public class RemoteTests
     {
         [TestMethod]
-        public async Task DoubleConnectToWebSocketOrgTest()
+        public async Task WebSocketOrgTest()
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var cancellationToken = tokenSource.Token;

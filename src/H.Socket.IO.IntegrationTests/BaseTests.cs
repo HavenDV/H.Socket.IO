@@ -8,12 +8,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace H.Socket.IO.IntegrationTests
 {
-    [TestClass]
-    public class SocketIoClientTests
+    internal class BaseTests
     {
-        public const string LocalCharServerUrl = "ws://localhost:1465/";
-
-        private static async Task BaseTestAsync(
+        public static async Task BaseTestAsync(
             Func<SocketIoClient, Task> func,
             CancellationToken cancellationToken = default, 
             params string[] additionalEvents)
@@ -65,16 +62,14 @@ namespace H.Socket.IO.IntegrationTests
             client.EngineIoClient.WebSocketClient.BytesReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        // ReSharper disable UnusedAutoPropertyAccessor.Local
-        private class ChatMessage
+        public class ChatMessage
         {
             public string? Username { get; set; }
             public string? Message { get; set; }
             public long NumUsers { get; set; }
         }
 
-        private static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
+        public static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
             await BaseTestAsync(async client =>
             {
@@ -135,106 +130,6 @@ namespace H.Socket.IO.IntegrationTests
 
                 await client.DisconnectAsync(cancellationToken);
             }, cancellationToken, nameof(SocketIoClient.EventReceived));
-        }
-
-        [TestMethod]
-        public async Task ConnectToChatNowShTest()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var cancellationToken = tokenSource.Token;
-
-            await ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", cancellationToken);
-        }
-
-        [TestMethod]
-        [Ignore]
-        public async Task ConnectToLocalChatServerTest()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var cancellationToken = tokenSource.Token;
-
-            await ConnectToChatBaseTestAsync(LocalCharServerUrl, cancellationToken);
-        }
-
-        [TestMethod]
-        [Ignore]
-        public async Task ConnectToLocalChatServerNamespaceTest1()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var cancellationToken = tokenSource.Token;
-
-            await BaseTestAsync(
-                async client =>
-                {
-                    EnableDebug(client);
-
-                    client.DefaultNamespace = "my";
-
-                    await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
-
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("message", "hello", cancellationToken: cancellationToken);
-                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-
-                    await client.DisconnectAsync(cancellationToken);
-                },
-                cancellationToken, 
-                nameof(SocketIoClient.EventReceived), 
-                nameof(SocketIoClient.UnhandledEventReceived));
-        }
-
-        [TestMethod]
-        [Ignore]
-        public async Task ConnectToLocalChatServerNamespaceTest2()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var cancellationToken = tokenSource.Token;
-
-            await BaseTestAsync(
-                async client =>
-                {
-                    EnableDebug(client);
-
-                    await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
-
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("message", "hello", "my", cancellationToken);
-                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-
-                    await client.DisconnectAsync(cancellationToken);
-                },
-                cancellationToken,
-                nameof(SocketIoClient.EventReceived), 
-                nameof(SocketIoClient.UnhandledEventReceived));
-        }
-
-        [TestMethod]
-        [Ignore]
-        public async Task ConnectToLocalChatServerDebugTest()
-        {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            var cancellationToken = tokenSource.Token;
-
-            await BaseTestAsync(
-                async client =>
-                {
-                    EnableDebug(client);
-
-                    await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
-
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("add user", "C# H.Socket.IO Test User", cancellationToken: cancellationToken);
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("typing", cancellationToken: cancellationToken);
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("new message", "hello", cancellationToken: cancellationToken);
-                    await Task.Delay(TimeSpan.FromMilliseconds(200), cancellationToken);
-                    await client.Emit("stop typing", cancellationToken: cancellationToken);
-                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-
-                    await client.DisconnectAsync(cancellationToken);
-                },
-                cancellationToken);
         }
     }
 }

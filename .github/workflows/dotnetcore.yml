@@ -39,7 +39,7 @@ jobs:
       run: dotnet build H.Socket.IO.sln --configuration Release --nologo
     
     - name: Run tests
-      run: dotnet test H.Socket.IO.sln --configuration Release --nologo
+      run: dotnet test H.Socket.IO.sln --configuration Release --nologo --filter TestCategory!=Local
       
     - name: Try Publish(if the version has changed) H.WebSockets
       if: runner.os == 'Windows' &&

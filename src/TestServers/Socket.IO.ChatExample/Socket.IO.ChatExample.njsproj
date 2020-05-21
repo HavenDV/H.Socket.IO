@@ -11,7 +11,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>aeffa4c6-7658-4704-a711-09fe824c1973</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>index.js</StartupFile>
+    <StartupFile>chat.js</StartupFile>
     <StartWebBrowser>False</StartWebBrowser>
     <SearchPath>
     </SearchPath>
@@ -28,13 +28,12 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="custom-namespaces.js">
+    <Content Include="namespaces.js">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="rooms-test.js" />
-    <Content Include="index.js" />
+    <Content Include="rooms.js" />
+    <Content Include="chat.js" />
     <Content Include="package.json" />
-    <Content Include="README.md" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
 </Project>

@@ -3,6 +3,10 @@ var server = require("http").createServer(app);
 var io = require("socket.io")(server);
 var port = 1465;
 
+server.listen(port, () => {
+	console.log("Server listening at port %d", port);
+});
+
 app.get("/", function (req, res) {
 	res.sendfile("index.html");
 });
@@ -18,8 +22,4 @@ nsp.on("connection", function (socket) {
 		    message: data
 	    });
     });
-});
-
-server.listen(port, function () {
-	console.log("listening on localhost:1465");
 });

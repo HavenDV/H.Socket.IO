@@ -70,8 +70,8 @@ namespace H.Socket.IO.IntegrationTests
         // ReSharper disable UnusedAutoPropertyAccessor.Local
         private class ChatMessage
         {
-            public string Username { get; set; }
-            public string Message { get; set; }
+            public string? Username { get; set; }
+            public string? Message { get; set; }
             public long NumUsers { get; set; }
         }
 
@@ -81,27 +81,27 @@ namespace H.Socket.IO.IntegrationTests
             {
                 client.On<ChatMessage>("login", message =>
                 {
-                    Console.WriteLine($"You are logged in. Total number of users: {message.NumUsers}");
+                    Console.WriteLine($"You are logged in. Total number of users: {message?.NumUsers}");
                 });
                 client.On<ChatMessage>("user joined", message =>
                 {
-                    Console.WriteLine($"User joined: {message.Username}. Total number of users: {message.NumUsers}");
+                    Console.WriteLine($"User joined: {message?.Username}. Total number of users: {message?.NumUsers}");
                 });
                 client.On<ChatMessage>("user left", message =>
                 {
-                    Console.WriteLine($"User left: {message.Username}. Total number of users: {message.NumUsers}");
+                    Console.WriteLine($"User left: {message?.Username}. Total number of users: {message?.NumUsers}");
                 });
                 client.On<ChatMessage>("typing", message =>
                 {
-                    Console.WriteLine($"User typing: {message.Username}");
+                    Console.WriteLine($"User typing: {message?.Username}");
                 });
                 client.On<ChatMessage>("stop typing", message =>
                 {
-                    Console.WriteLine($"User stop typing: {message.Username}");
+                    Console.WriteLine($"User stop typing: {message?.Username}");
                 });
                 client.On<ChatMessage>("new message", message =>
                 {
-                    Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
+                    Console.WriteLine($"New message from user \"{message?.Username}\": {message?.Message}");
                 });
 
                 await client.ConnectAsync(new Uri(url), cancellationToken);

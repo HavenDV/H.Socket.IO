@@ -29,10 +29,12 @@ using System;
 using System.Threading.Tasks;
 using H.Socket.IO;
 
+#nullable enable
+
 public class ChatMessage
 {
-    public string Username { get; set; }
-    public string Message { get; set; }
+    public string? Username { get; set; }
+    public string? Message { get; set; }
     public long NumUsers { get; set; }
 }
 
@@ -63,27 +65,27 @@ public async Task ConnectToChatNowShTest()
 
     client.On<ChatMessage>("login", message =>
     {
-        Console.WriteLine($"You are logged in. Total number of users: {message.NumUsers}");
+        Console.WriteLine($"You are logged in. Total number of users: {message?.NumUsers}");
     });
     client.On<ChatMessage>("user joined", message =>
     {
-        Console.WriteLine($"User joined: {message.Username}. Total number of users: {message.NumUsers}");
+        Console.WriteLine($"User joined: {message?.Username}. Total number of users: {message?.NumUsers}");
     });
     client.On<ChatMessage>("user left", message =>
     {
-        Console.WriteLine($"User left: {message.Username}. Total number of users: {message.NumUsers}");
+        Console.WriteLine($"User left: {message?.Username}. Total number of users: {message?.NumUsers}");
     });
     client.On<ChatMessage>("typing", message =>
     {
-        Console.WriteLine($"User typing: {message.Username}");
+        Console.WriteLine($"User typing: {message?.Username}");
     });
     client.On<ChatMessage>("stop typing", message =>
     {
-        Console.WriteLine($"User stop typing: {message.Username}");
+        Console.WriteLine($"User stop typing: {message?.Username}");
     });
     client.On<ChatMessage>("new message", message =>
     {
-        Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
+        Console.WriteLine($"New message from user \"{message?.Username}\": {message?.Message}");
     });
 	
     var uri = await GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"));

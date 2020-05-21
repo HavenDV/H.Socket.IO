@@ -13,6 +13,7 @@ nsp.on("connection", function (socket) {
 
 	socket.on("message", (data) => {
 		console.log(`new message: ${data}`);
+
 	    socket.emit("message", {
 		    message: data
 	    });

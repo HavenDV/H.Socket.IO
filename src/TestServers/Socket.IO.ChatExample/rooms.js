@@ -10,6 +10,8 @@ server.listen(port, () => {
 var numUsers = 0;
 
 io.on("connection", (socket) => {
+    console.log("someone connected");
+
     var addedUser = false;
 
     socket.join("some room");

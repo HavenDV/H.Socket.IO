@@ -184,24 +184,8 @@ namespace H.WebSockets.Utilities
 
             _isDisposed = true;
 
-            if (Task != Task.CompletedTask)
-            {
-                CancellationTokenSource.Cancel();
-
-                try
-                {
-                    Task.Wait(TimeSpan.FromSeconds(1));
-                }
-                catch (OperationCanceledException)
-                {
-                }
-
-                // Some system code can still use CancellationToken, so we wait
-                Task.Delay(TimeSpan.FromMilliseconds(1)).Wait(TimeSpan.FromMilliseconds(10));
-            }
-
+            CancellationTokenSource.Cancel();
             CancellationTokenSource.Dispose();
-            Task.Dispose();
         }
 
 #if NETSTANDARD2_1

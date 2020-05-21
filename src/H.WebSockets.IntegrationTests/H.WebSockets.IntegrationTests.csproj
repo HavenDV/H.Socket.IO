@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Choose>
+    <When Condition="'$(OS)' == 'Windows_NT'">
+      <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;netcoreapp2.0;net47;net461;</TargetFrameworks>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TargetFrameworks>netcoreapp3.1;netcoreapp3.0;</TargetFrameworks>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <PropertyGroup>
+    <LangVersion>8</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.4.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\H.WebSockets\H.WebSockets.csproj" />
+  </ItemGroup>
+
+</Project>

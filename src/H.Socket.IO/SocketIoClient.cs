@@ -415,8 +415,8 @@ namespace H.Socket.IO
                 cancellationToken,
                 nameof(EventReceived), nameof(ErrorReceived));
 
-            return dictionary[nameof(EventReceived)] 
-                   ?? dictionary[nameof(EventReceived)];
+            return dictionary[nameof(EventReceived)] ?? 
+                   dictionary[nameof(ErrorReceived)];
         }
 
         /// <summary>

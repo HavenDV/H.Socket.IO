@@ -99,7 +99,8 @@ public async Task ConnectToChatNowShTest()
 
 ### Live Example
 
-.NET Fiddle - https://dotnetfiddle.net/FWMpQ3 <br/>
+C# .NET Fiddle - https://dotnetfiddle.net/FWMpQ3 <br/>
+VB.NET .NET Fiddle - https://dotnetfiddle.net/3VJWRc <br/>
 Http client of the tested Socket.IO server - https://socket-io-chat.now.sh/
 
 ### Used documentation

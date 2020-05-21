@@ -1,11 +1,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using H.WebSockets;
 using H.WebSockets.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Socket.IO.IntegrationTests
+namespace H.WebSockets.IntegrationTests
 {
     [TestClass]
     public class WebSocketClientTests

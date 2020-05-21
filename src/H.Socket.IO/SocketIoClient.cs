@@ -25,7 +25,7 @@ namespace H.Socket.IO
         /// <summary>
         /// Internal Engine.IO Client.
         /// </summary>
-        public EngineIoClient? EngineIoClient { get; private set; }
+        public EngineIoClient EngineIoClient { get; private set; }
 
         /// <summary>
         /// Using proxy.
@@ -520,8 +520,7 @@ namespace H.Socket.IO
         /// <returns></returns>
         public void Dispose()
         {
-            EngineIoClient?.Dispose();
-            EngineIoClient = null;
+            EngineIoClient.Dispose();
         }
 
         /// <summary>
@@ -533,7 +532,6 @@ namespace H.Socket.IO
             if (EngineIoClient != null)
             {
                 await EngineIoClient.DisposeAsync().ConfigureAwait(false);
-                EngineIoClient = null;
             }
         }
 

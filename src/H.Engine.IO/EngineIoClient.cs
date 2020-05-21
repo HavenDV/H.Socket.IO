@@ -28,7 +28,7 @@ namespace H.Engine.IO
         /// <summary>
         /// Internal WebSocket Client
         /// </summary>
-        public WebSocketClient? WebSocketClient { get; private set; }
+        public WebSocketClient WebSocketClient { get; private set; }
 
         /// <summary>
         /// Proxy
@@ -363,8 +363,7 @@ namespace H.Engine.IO
         /// <returns></returns>
         public void Dispose()
         {
-            WebSocketClient?.Dispose();
-            WebSocketClient = null;
+            WebSocketClient.Dispose();
 
             Timer?.Dispose();
             Timer = null;
@@ -376,11 +375,7 @@ namespace H.Engine.IO
         /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
-            if (WebSocketClient != null)
-            {
-                await WebSocketClient.DisposeAsync().ConfigureAwait(false);
-                WebSocketClient = null;
-            }
+            await WebSocketClient.DisposeAsync().ConfigureAwait(false);
 
             Timer?.Dispose();
             Timer = null;

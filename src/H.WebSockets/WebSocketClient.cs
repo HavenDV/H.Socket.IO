@@ -21,7 +21,7 @@ namespace H.WebSockets
         /// <summary>
         /// 
         /// </summary>
-        public ClientWebSocket? Socket { get; private set; } = new ClientWebSocket();
+        public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
 
         /// <summary>
         /// 
@@ -308,8 +308,7 @@ namespace H.WebSockets
             ReceiveWorker?.Dispose();
             ReceiveWorker = null;
 
-            Socket?.Dispose();
-            Socket = null;
+            Socket.Dispose();
         }
 
         /// <summary>
@@ -325,8 +324,7 @@ namespace H.WebSockets
                 ReceiveWorker = null;
             }
 
-            Socket?.Dispose();
-            Socket = null;
+            Socket.Dispose();
         }
 
         #endregion

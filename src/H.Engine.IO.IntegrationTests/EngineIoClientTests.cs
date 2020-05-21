@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using H.WebSockets.Utilities;
@@ -12,19 +10,6 @@ namespace H.Engine.IO.IntegrationTests
     public class EngineIoClientTests
     {
         public const string LocalCharServerUrl = "ws://localhost:1465/";
-
-        public static async Task<Uri> GetRedirectedUrlAsync(Uri uri, CancellationToken cancellationToken = default)
-        {
-            using var client = new HttpClient(new HttpClientHandler
-            {
-                AllowAutoRedirect = false,
-            }, true);
-            using var response = await client.GetAsync(uri, cancellationToken);
-
-            return (int)response.StatusCode == 308
-                ? new Uri(response.Headers.GetValues("Location").First())
-                : response.RequestMessage.RequestUri;
-        }
 
         private static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
@@ -68,11 +53,7 @@ namespace H.Engine.IO.IntegrationTests
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-            var uri = await GetRedirectedUrlAsync(
-                new Uri("https://socket-io-chat.now.sh/"),
-                tokenSource.Token);
-
-            await ConnectToChatBaseTestAsync($"wss://{uri.Host}/", tokenSource.Token);
+            await ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", tokenSource.Token);
         }
 
         [TestMethod]

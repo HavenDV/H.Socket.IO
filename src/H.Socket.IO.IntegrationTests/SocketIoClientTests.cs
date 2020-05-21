@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using H.Socket.IO.EventsArgs;
@@ -138,28 +137,13 @@ namespace H.Socket.IO.IntegrationTests
             }, cancellationToken, nameof(SocketIoClient.EventReceived));
         }
 
-        public static async Task<Uri> GetRedirectedUrlAsync(Uri uri, CancellationToken cancellationToken = default)
-        {
-            using var client = new HttpClient(new HttpClientHandler
-            {
-                AllowAutoRedirect = false,
-            }, true);
-            using var response = await client.GetAsync(uri, cancellationToken);
-
-            return (int)response.StatusCode == 308
-                ? new Uri(response.Headers.GetValues("Location").First())
-                : response.RequestMessage.RequestUri;
-        }
-
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
             var cancellationToken = tokenSource.Token;
 
-            var uri = await GetRedirectedUrlAsync(new Uri("https://socket-io-chat.now.sh/"), cancellationToken);
-
-            await ConnectToChatBaseTestAsync($"wss://{uri.Host}/", cancellationToken);
+            await ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", cancellationToken);
         }
 
         [TestMethod]

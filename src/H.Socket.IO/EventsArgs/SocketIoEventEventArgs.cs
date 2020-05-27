@@ -10,17 +10,17 @@ namespace H.Socket.IO.EventsArgs
         /// <summary>
         /// Value
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; }
 
         /// <summary>
         /// Namespace
         /// </summary>
-        public string Namespace { get; set; }
+        public string Namespace { get; }
 
         /// <summary>
         /// IsHandled
         /// </summary>
-        public bool IsHandled { get; set; }
+        public bool IsHandled { get; }
 
         /// <summary>
         /// Base constructor
@@ -30,8 +30,8 @@ namespace H.Socket.IO.EventsArgs
         /// <param name="isHandled"></param>
         public SocketIoEventEventArgs(string value, string @namespace, bool isHandled)
         {
-            Value = value;
-            Namespace = @namespace;
+            Value = value ?? throw new ArgumentNullException(nameof(value));
+            Namespace = @namespace ?? throw new ArgumentNullException(nameof(@namespace));
             IsHandled = isHandled;
         }
     }

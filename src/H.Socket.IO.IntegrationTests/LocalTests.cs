@@ -9,7 +9,7 @@ namespace H.Socket.IO.IntegrationTests
     [TestCategory("Local")]
     public class LocalTests
     {
-        public const string LocalCharServerUrl = "ws://localhost:1465/";
+        private const string LocalCharServerUrl = "ws://localhost:1465/";
 
         [TestMethod]
         public async Task ConnectToLocalChatServerTest()

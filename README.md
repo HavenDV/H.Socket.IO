@@ -5,13 +5,15 @@
 [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
 [![Build Status](https://github.com/HavenDV/H.Socket.IO/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/H.Socket.IO/actions?query=workflow%3A%22.NET+Core%22)
 
-High-performance event based .NET Socket.IO library with a convenient interface, 
-aimed at writing the smallest possible code on the user side. 
-The library is null-free and does not contain NRE. 
-It supports the latest version of Socket.IO server. 
+High-performance event-based .NET Socket.IO library with a convenient interface,  
+aimed at writing the smallest possible code on the user side.
   
-Implemented features:
-- Namespaces
+Features:
+- Supports the latest version of Socket.IO server
+- Supports namespaces
+- The library is null-free and does not contain NRE
+- Event-based
+- Completely asynchronous
 
 ### Nuget
 

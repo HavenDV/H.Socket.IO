@@ -66,10 +66,14 @@ namespace H.Socket.IO.IntegrationTests
             client.EngineIoClient.WebSocketClient.BytesReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
         }
 
+        // ReSharper disable once ClassNeverInstantiated.Global
         public class ChatMessage
         {
+            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public string? Username { get; set; }
+            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public string? Message { get; set; }
+            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public long NumUsers { get; set; }
         }
 
@@ -77,29 +81,37 @@ namespace H.Socket.IO.IntegrationTests
         {
             await BaseTestAsync(async client =>
             {
+                client.On("login", () =>
+                {
+                    Console.WriteLine("You are logged in.");
+                });
+                client.On("login", json =>
+                {
+                    Console.WriteLine($"You are logged in. Json: \"{json}\"");
+                });
                 client.On<ChatMessage>("login", message =>
                 {
-                    Console.WriteLine($"You are logged in. Total number of users: {message?.NumUsers}");
+                    Console.WriteLine($"You are logged in. Total number of users: {message.NumUsers}");
                 });
                 client.On<ChatMessage>("user joined", message =>
                 {
-                    Console.WriteLine($"User joined: {message?.Username}. Total number of users: {message?.NumUsers}");
+                    Console.WriteLine($"User joined: {message.Username}. Total number of users: {message.NumUsers}");
                 });
                 client.On<ChatMessage>("user left", message =>
                 {
-                    Console.WriteLine($"User left: {message?.Username}. Total number of users: {message?.NumUsers}");
+                    Console.WriteLine($"User left: {message.Username}. Total number of users: {message.NumUsers}");
                 });
                 client.On<ChatMessage>("typing", message =>
                 {
-                    Console.WriteLine($"User typing: {message?.Username}");
+                    Console.WriteLine($"User typing: {message.Username}");
                 });
                 client.On<ChatMessage>("stop typing", message =>
                 {
-                    Console.WriteLine($"User stop typing: {message?.Username}");
+                    Console.WriteLine($"User stop typing: {message.Username}");
                 });
                 client.On<ChatMessage>("new message", message =>
                 {
-                    Console.WriteLine($"New message from user \"{message?.Username}\": {message?.Message}");
+                    Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
                 });
 
                 await client.ConnectAsync(new Uri(url), cancellationToken);
@@ -115,11 +127,11 @@ namespace H.Socket.IO.IntegrationTests
                         break;
 
                     case SocketIoErrorEventArgs errorArgs:
-                        Assert.Fail($"Error received after add user: {errorArgs}");
+                        Assert.Fail($"WaitEventOrErrorAsync: Error received after add user: {errorArgs}");
                         break;
 
                     case null:
-                        Assert.Fail("No event received after add user");
+                        Assert.Fail("WaitEventOrErrorAsync: No event received after add user");
                         break;
                 }
 

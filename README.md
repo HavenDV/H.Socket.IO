@@ -5,12 +5,13 @@
 [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
 [![Build Status](https://github.com/HavenDV/H.Socket.IO/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/H.Socket.IO/actions?query=workflow%3A%22.NET+Core%22)
 
-This is the Socket.IO client for .NET, which is base on `ClientWebSocket`, provide a simple way to connect to the Socket.IO server. The target framework is **.NET Standard 2.0** <br/>
-<br/>
+High-performance event based .NET Socket.IO library with a convenient interface, 
+aimed at writing the smallest possible code on the user side. 
+The library is null-free and does not contain NRE. 
+It supports the latest version of Socket.IO server. 
+  
 Implemented features:
 - Namespaces
-
-**Note: This is an alpha version. Some features may not be available. Please see examples or tests.**
 
 ### Nuget
 
@@ -49,30 +50,38 @@ public async Task ConnectToChatNowShTest()
     client.UnhandledEventReceived += (sender, args) => Console.WriteLine($"UnhandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
     client.ErrorReceived += (sender, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
     client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
-
+    
+    client.On("login", () =>
+    {
+        Console.WriteLine("You are logged in.");
+    });
+    client.On("login", json =>
+    {
+        Console.WriteLine($"You are logged in. Json: \"{json}\"");
+    });
     client.On<ChatMessage>("login", message =>
     {
-        Console.WriteLine($"You are logged in. Total number of users: {message?.NumUsers}");
+        Console.WriteLine($"You are logged in. Total number of users: {message.NumUsers}");
     });
     client.On<ChatMessage>("user joined", message =>
     {
-        Console.WriteLine($"User joined: {message?.Username}. Total number of users: {message?.NumUsers}");
+        Console.WriteLine($"User joined: {message.Username}. Total number of users: {message.NumUsers}");
     });
     client.On<ChatMessage>("user left", message =>
     {
-        Console.WriteLine($"User left: {message?.Username}. Total number of users: {message?.NumUsers}");
+        Console.WriteLine($"User left: {message.Username}. Total number of users: {message.NumUsers}");
     });
     client.On<ChatMessage>("typing", message =>
     {
-        Console.WriteLine($"User typing: {message?.Username}");
+        Console.WriteLine($"User typing: {message.Username}");
     });
     client.On<ChatMessage>("stop typing", message =>
     {
-        Console.WriteLine($"User stop typing: {message?.Username}");
+        Console.WriteLine($"User stop typing: {message.Username}");
     });
     client.On<ChatMessage>("new message", message =>
     {
-        Console.WriteLine($"New message from user \"{message?.Username}\": {message?.Message}");
+        Console.WriteLine($"New message from user \"{message.Username}\": {message.Message}");
     });
 	
     await client.ConnectAsync(new Uri("wss://socketio-chat-h9jt.herokuapp.com/"));

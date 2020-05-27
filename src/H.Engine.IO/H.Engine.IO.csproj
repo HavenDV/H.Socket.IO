@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>0.15.10</Version>
+    <Version>1.0.0</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -33,7 +33,7 @@
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
+    <PackageReleaseNotes>Released</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

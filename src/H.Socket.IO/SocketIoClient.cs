@@ -23,7 +23,7 @@ namespace H.Socket.IO
         , IAsyncDisposable
 #endif
     {
-#region Properties
+        #region Properties
 
         /// <summary>
         /// Internal Engine.IO Client.
@@ -46,11 +46,18 @@ namespace H.Socket.IO
         /// </summary>
         public string? DefaultNamespace { get; set; }
 
-        private Dictionary<string, List<(Action<object?, string?> Action, Type Type)>> Actions { get; } = new Dictionary<string, List<(Action<object?, string?> Action, Type Type)>>();
+        private Dictionary<string, List<(Action<object, string> Action, Type Type)>> JsonDeserializeActions { get; } = 
+            new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
 
-#endregion
+        private Dictionary<string, List<Action<string>>> TextActions { get; } =
+            new Dictionary<string, List<Action<string>>>();
 
-#region Events
+        private Dictionary<string, List<Action>> Actions { get; } =
+            new Dictionary<string, List<Action>>();
+
+        #endregion
+
+        #region Events
 
         /// <summary>
         /// Occurs after a successful connection to each namespace
@@ -121,9 +128,9 @@ namespace H.Socket.IO
             ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
         }
 
-#endregion
+        #endregion
 
-#region Constructors
+        #region Constructors
 
         /// <summary>
         /// Creates Engine.IO client internally.
@@ -136,9 +143,9 @@ namespace H.Socket.IO
             EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Reason, args.Status);
         }
 
-#endregion
+        #endregion
 
-#region Event Handlers
+        #region Event Handlers
 
         private void EngineIoClient_MessageReceived(object? sender, DataEventArgs<string>? args)
         {
@@ -180,26 +187,71 @@ namespace H.Socket.IO
                             var name = values.ElementAtOrDefault(0);
                             var text = values.ElementAtOrDefault(1);
 
-                            if (!Actions.TryGetValue($"{name}{packet.Namespace}", out var actions))
+                            var key = GetOnKey(name, packet.Namespace);
+                            if (Actions.TryGetValue(key, out var actions))
                             {
-                                break;
+                                foreach (var action in actions)
+                                {
+                                    isHandled = true;
+
+                                    try
+                                    {
+                                        action?.Invoke();
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        OnExceptionOccurred(exception);
+                                    }
+                                }
                             }
 
-                            foreach (var (action, type) in actions)
+                            if (TextActions.TryGetValue(key, out var textActions))
                             {
-                                isHandled = true;
-
-                                try
+                                foreach (var action in textActions)
                                 {
-                                    var obj = text == null
-                                        ? null
-                                        : JsonConvert.DeserializeObject(text, type);
+                                    isHandled = true;
 
-                                    action?.Invoke(obj, text);
+                                    try
+                                    {
+                                        if (text == null)
+                                        {
+                                            throw new InvalidOperationException($"Received json text for event named \"{name}\" is null");
+                                        }
+
+                                        action?.Invoke(text);
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        OnExceptionOccurred(exception);
+                                    }
                                 }
-                                catch (Exception exception)
+                            }
+
+                            if (JsonDeserializeActions.TryGetValue(key, out var jsonDeserializeActions))
+                            {
+                                foreach (var (action, type) in jsonDeserializeActions)
                                 {
-                                    OnExceptionOccurred(exception);
+                                    isHandled = true;
+
+                                    try
+                                    {
+                                        if (text == null)
+                                        {
+                                            throw new InvalidOperationException($"Received json text for event named \"{name}\" is null");
+                                        }
+
+                                        var obj = JsonConvert.DeserializeObject(text, type);
+                                        if (obj == null)
+                                        {
+                                            throw new InvalidOperationException($"Deserialized object for json text(\"{text}\") and for event named \"{name}\" is null");
+                                        }
+
+                                        action?.Invoke(obj, text);
+                                    }
+                                    catch (Exception exception)
+                                    {
+                                        OnExceptionOccurred(exception);
+                                    }
                                 }
                             }
                         }
@@ -224,14 +276,18 @@ namespace H.Socket.IO
             }
         }
 
-#endregion
+        #endregion
 
-#region Private methods
+        #region Private methods
 
+        private static string GetOnKey(string name, string? customNamespace = null)
+        {
+            return $"{name}{customNamespace ?? "/"}";
+        }
 
-#endregion
+        #endregion
 
-#region Public methods
+        #region Public methods
 
         /// <summary>
         /// It connects to the server and asynchronously waits for a connection message.
@@ -411,9 +467,9 @@ namespace H.Socket.IO
         /// <param name="func"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
+        public async Task<SocketIoEventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
-            var dictionary = await this.WaitAnyEventAsync<EventArgs?>(
+            var dictionary = await this.WaitAnyEventAsync<SocketIoEventArgs?>(
                 func ?? (() => Task.CompletedTask),
                 cancellationToken,
                 nameof(EventReceived), nameof(ErrorReceived));
@@ -431,7 +487,7 @@ namespace H.Socket.IO
         /// <param name="timeout"></param>
         /// <param name="func"></param>
         /// <returns></returns>
-        public async Task<EventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<Task>? func = null)
+        public async Task<SocketIoEventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<Task>? func = null)
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 
@@ -469,15 +525,18 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
-        public void On<T>(string name, Action<T?, string?> action, string? customNamespace = null) where T : class
+        public void On<T>(string name, Action<T, string> action, string? customNamespace = null) where T : class
         {
-            var key = $"{name}{customNamespace ?? "/"}";
-            if (!Actions.ContainsKey(key))
+            name = name ?? throw new ArgumentNullException(nameof(name));
+            action = action ?? throw new ArgumentNullException(nameof(action));
+
+            var key = GetOnKey(name, customNamespace);
+            if (!JsonDeserializeActions.ContainsKey(key))
             {
-                Actions[key] = new List<(Action<object?, string?> Action, Type Type)>();
+                JsonDeserializeActions[key] = new List<(Action<object, string> Action, Type Type)>();
             }
 
-            Actions[key].Add(((obj, text) => action?.Invoke((T?)obj, text), typeof(T)));
+            JsonDeserializeActions[key].Add(((obj, text) => action?.Invoke((T)obj, text), typeof(T)));
         }
 
         /// <summary>
@@ -488,8 +547,11 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
-        public void On<T>(string name, Action<T?> action, string? customNamespace = null) where T : class
+        public void On<T>(string name, Action<T> action, string? customNamespace = null) where T : class
         {
+            name = name ?? throw new ArgumentNullException(nameof(name));
+            action = action ?? throw new ArgumentNullException(nameof(action));
+
             On<T>(name, (obj, text) => action?.Invoke(obj), customNamespace);
         }
 
@@ -500,9 +562,18 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
-        public void On(string name, Action<string?> action, string? customNamespace = null)
+        public void On(string name, Action<string> action, string? customNamespace = null)
         {
-            On<object>(name, (obj, text) => action?.Invoke(text), customNamespace);
+            name = name ?? throw new ArgumentNullException(nameof(name));
+            action = action ?? throw new ArgumentNullException(nameof(action));
+
+            var key = GetOnKey(name, customNamespace);
+            if (!TextActions.ContainsKey(key))
+            {
+                TextActions[key] = new List<Action<string>>();
+            }
+
+            TextActions[key].Add(action);
         }
 
         /// <summary>
@@ -513,7 +584,16 @@ namespace H.Socket.IO
         /// <param name="customNamespace"></param>
         public void On(string name, Action action, string? customNamespace = null)
         {
-            On<object>(name, (obj, text) => action?.Invoke(), customNamespace);
+            name = name ?? throw new ArgumentNullException(nameof(name));
+            action = action ?? throw new ArgumentNullException(nameof(action));
+
+            var key = GetOnKey(name, customNamespace);
+            if (!Actions.ContainsKey(key))
+            {
+                Actions[key] = new List<Action>();
+            }
+
+            Actions[key].Add(action);
         }
 
         /// <summary>
@@ -540,6 +620,6 @@ namespace H.Socket.IO
         }
 #endif
 
-#endregion
+        #endregion
     }
 }

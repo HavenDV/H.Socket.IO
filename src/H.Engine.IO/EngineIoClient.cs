@@ -60,7 +60,7 @@ namespace H.Engine.IO
 #pragma warning restore 1574
         public bool IsOpened { get; set; }
 
-        private string? Framework { get; }
+        private string Framework { get; }
         private Uri? Uri { get; set; }
         private System.Timers.Timer? Timer { get; set; }
 
@@ -289,6 +289,19 @@ namespace H.Engine.IO
             }
 
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
+            var socketIoUri = ToWebSocketUri(uri, Framework);
+
+            return await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage>>(async () =>
+            {
+                await WebSocketClient.ConnectAsync(socketIoUri, cancellationToken).ConfigureAwait(false);
+            }, nameof(Opened), cancellationToken).ConfigureAwait(false) != null;
+        }
+
+        internal static Uri ToWebSocketUri(Uri uri, string framework)
+        {
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
+            framework = framework ?? throw new ArgumentNullException(nameof(framework));
+
             var scheme = uri.Scheme switch
             {
                 "http" => "ws",
@@ -297,12 +310,8 @@ namespace H.Engine.IO
                 "wss" => "wss",
                 _ => throw new ArgumentException($"Scheme is not supported: {uri.Scheme}"),
             };
-            var socketIoUri = new Uri($"{scheme}://{Uri.Host}:{Uri.Port}/{Framework}/?EIO=3&transport=websocket&{Uri.Query.TrimStart('?')}");
 
-            return await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage>>(async () =>
-            {
-                await WebSocketClient.ConnectAsync(socketIoUri, cancellationToken).ConfigureAwait(false);
-            }, nameof(Opened), cancellationToken).ConfigureAwait(false) != null;
+            return new Uri($"{scheme}://{uri.Host}:{uri.Port}{uri.AbsolutePath.TrimEnd('/')}/{framework}/?EIO=3&transport=websocket&{uri.Query.TrimStart('?')}");
         }
 
         /// <summary>

@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -33,7 +33,7 @@
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Released</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

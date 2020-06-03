@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.0.2</Version>
+    <Version>1.0.1</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>High-performance event-based .NET Socket.IO library with a convenient interface,
@@ -35,7 +35,7 @@ Features:
     <PackageProjectUrl>https://github.com/HavenDV/H.SocketIO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.SocketIO</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>On callbacks now do not return null objects. If a null object is received from the server (due to deserialization or an empty response), an exception will be thrown through the ExceptionOccurred event.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>

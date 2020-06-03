@@ -3,7 +3,7 @@
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;netstandard2.0;net46</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>High-performance event-based .NET Socket.IO library with a convenient interface,

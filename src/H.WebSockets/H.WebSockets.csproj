@@ -3,7 +3,7 @@
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;netstandard2.0;</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;netstandard2.0;net46</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.0.10</Version>
+    <Version>1.0.11</Version>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -53,6 +53,10 @@
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>$(MSBuildProjectName).IntegrationTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010009b7ddef1e7923b311a6cea9a98da8e9883eb1e3a4016c14b8febf68d4e33e458f8da70817c97b95cd9daa277ba2bbea224efac0b985be2bcf9db3ba4ddb8dd99a0564c5a1817b4b05a2b6517cb00f112130ca0e9626340448f7bf323c0361543eb1159eba34a6e9ec3ddc784a6f180a0283438fec6dc08f4f1434b403ff1fcb</_Parameter1>
     </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net46'" />
   </ItemGroup>
 
 </Project>

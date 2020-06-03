@@ -18,8 +18,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <Version>1.0.2</Version>
+  <PropertyGroup Label="Signing">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
+    <Version>1.0.3</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Authors>havendv</Authors>
     <Company>havendv</Company>
     <Description>Features:
@@ -38,19 +47,17 @@
     <Copyright>Copyright (c) 2020 havendv</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
+    <PackageIcon>H_transparent.png</PackageIcon>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-  </PropertyGroup>
+  <ItemGroup Label="Nuget">
+    <None Include="..\..\docs\H_transparent.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  <ItemGroup Label="Tests">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>
         $(MSBuildProjectName).Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100910f0aeda0b2806e0f95246987f056bdd4fe07483bb20ea0a06ed89e31eb269d0ff69c0e4750872d925b35c625eb65211f811dd61080dca4775be43faba8da32f9b6c2259225f64850b6037b52b3a420c0d197f53cbae444e95ace1eb5328256d722be091718fed142aaee0b288149ea2ba5790426d44b8828433437f88afbcf
@@ -65,6 +72,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\H.WebSockets\H.WebSockets.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
 </Project>

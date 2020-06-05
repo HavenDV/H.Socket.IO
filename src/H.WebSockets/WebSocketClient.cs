@@ -255,7 +255,8 @@ namespace H.WebSockets
             return await this.WaitEventAsync<DataEventArgs<string>>(
                 func ?? (() => Task.CompletedTask), 
                 nameof(TextReceived),
-                cancellationToken);
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -272,7 +273,8 @@ namespace H.WebSockets
             using var tokenSource = new CancellationTokenSource(timeout);
             var cancellationToken = tokenSource.Token;
 
-            return await WaitTextAsync(func, cancellationToken);
+            return await WaitTextAsync(func, cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -289,7 +291,8 @@ namespace H.WebSockets
             return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>>(
                 func ?? (() => Task.CompletedTask),
                 nameof(BytesReceived),
-                cancellationToken);
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -305,7 +308,8 @@ namespace H.WebSockets
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 
-            return await WaitBytesAsync(func, tokenSource.Token);
+            return await WaitBytesAsync(func, tokenSource.Token)
+                .ConfigureAwait(false);
         }
 
         /// <summary>

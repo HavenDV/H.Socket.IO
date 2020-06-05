@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
@@ -61,7 +60,10 @@ namespace H.Engine.IO
         public bool IsOpened { get; set; }
 
         private string Framework { get; }
-        private Uri? Uri { get; set; }
+        /// <summary>
+        /// Opened uri.
+        /// </summary>
+        public Uri? Uri { get; set; }
         private System.Timers.Timer? Timer { get; set; }
 
         #endregion
@@ -221,10 +223,10 @@ namespace H.Engine.IO
         {
             try
             {
-                var text = args?.Value ?? throw new InvalidDataException("Null Engine.IO string");
+                var text = args?.Value ?? throw new InvalidOperationException("Null Engine.IO string");
                 if (string.IsNullOrWhiteSpace(text))
                 {
-                    throw new InvalidDataException("Empty Engine.IO string");
+                    throw new InvalidOperationException("Empty Engine.IO string");
                 }
 
                 var packet = EngineIoPacket.Decode(text);

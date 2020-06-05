@@ -472,7 +472,8 @@ namespace H.Socket.IO
             var dictionary = await this.WaitAnyEventAsync<SocketIoEventArgs?>(
                 func ?? (() => Task.CompletedTask),
                 cancellationToken,
-                nameof(EventReceived), nameof(ErrorReceived));
+                nameof(EventReceived), nameof(ErrorReceived))
+                .ConfigureAwait(false);
 
             return dictionary[nameof(EventReceived)] ?? 
                    dictionary[nameof(ErrorReceived)];
@@ -491,7 +492,8 @@ namespace H.Socket.IO
         {
             using var tokenSource = new CancellationTokenSource(timeout);
 
-            return await WaitEventOrErrorAsync(func, tokenSource.Token);
+            return await WaitEventOrErrorAsync(func, tokenSource.Token)
+                .ConfigureAwait(false);
         }
 
         /// <summary>

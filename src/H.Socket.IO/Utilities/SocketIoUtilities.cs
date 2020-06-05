@@ -17,7 +17,7 @@ namespace H.Socket.IO.Utilities
         public static string[] GetJsonArrayValues(this string text)
         {
             text = text ?? throw new ArgumentNullException(nameof(text));
-            if (!text.StartsWith("[") || !text.EndsWith("]"))
+            if (!text.StartsWith("[", StringComparison.OrdinalIgnoreCase) || !text.EndsWith("]", StringComparison.OrdinalIgnoreCase))
             {
                 throw new ArgumentException("text must begin with \'[\' and end with \']\'");
             }

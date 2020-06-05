@@ -45,7 +45,7 @@ namespace H.Socket.IO
             var prefix = message.Substring(0, 1);
             if (message.ElementAtOrDefault(1) == '/')
             {
-                var index = message.IndexOf(',');
+                var index = message.IndexOf(",", StringComparison.OrdinalIgnoreCase);
                 var @namespace = index >= 0
                     ? message.Substring(1, index - 1)
                     : message.Substring(1);

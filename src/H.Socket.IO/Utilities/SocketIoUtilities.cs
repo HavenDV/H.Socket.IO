@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using H.Socket.IO.Properties;
 
 namespace H.Socket.IO.Utilities
 {
@@ -19,7 +20,7 @@ namespace H.Socket.IO.Utilities
             text = text ?? throw new ArgumentNullException(nameof(text));
             if (!text.StartsWith("[", StringComparison.OrdinalIgnoreCase) || !text.EndsWith("]", StringComparison.OrdinalIgnoreCase))
             {
-                throw new ArgumentException("text must begin with \'[\' and end with \']\'");
+                throw new ArgumentException(Resources.SocketIoUtilities_GetJsonArrayValues_text_must_begin_with_____and_end_with____);
             }
 
             text = text.Trim('[', ']');

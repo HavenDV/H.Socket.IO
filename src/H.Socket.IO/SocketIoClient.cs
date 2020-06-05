@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.WebSockets;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using H.Engine.IO;
 using H.Socket.IO.EventsArgs;
+using H.Socket.IO.Properties;
 using H.Socket.IO.Utilities;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
@@ -153,7 +153,7 @@ namespace H.Socket.IO
             {
                 if (args?.Value == null)
                 {
-                    throw new InvalidDataException("Engine.IO message is null");
+                    throw new InvalidOperationException(Resources.SocketIoClient_EngineIoClient_MessageReceived_Engine_IO_message_is_null);
                 }
 
                 if (args.Value.Length < 1)

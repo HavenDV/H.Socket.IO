@@ -23,10 +23,11 @@ namespace H.Socket.IO.Utilities
                 throw new ArgumentException(Resources.SocketIoUtilities_GetJsonArrayValues_text_must_begin_with_____and_end_with____);
             }
 
-            text = text.Trim('[', ']');
+            text = text.Substring(1, text.Length - 2);
 
             var indexes = new List<int>();
             var countOfObjects = 0;
+            var countOfArrays = 0;
             for (var i = 0; i < text.Length; i++)
             {
                 switch (text[i])
@@ -35,11 +36,19 @@ namespace H.Socket.IO.Utilities
                         countOfObjects++;
                         break;
 
+                    case '[':
+                        countOfArrays++;
+                        break;
+
                     case '}':
                         countOfObjects--;
                         break;
 
-                    case ',' when countOfObjects == 0:
+                    case ']':
+                        countOfArrays--;
+                        break;
+
+                    case ',' when countOfObjects == 0 && countOfArrays == 0:
                         indexes.Add(i);
                         break;
                 }

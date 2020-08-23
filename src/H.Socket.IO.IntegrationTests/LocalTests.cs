@@ -92,6 +92,35 @@ namespace H.Socket.IO.IntegrationTests
         }
 
         [TestMethod]
+        public async Task ArraysTest()
+        {
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var cancellationToken = tokenSource.Token;
+
+            await BaseTests.BaseTestAsync(
+                async client =>
+                {
+                    client.On<BaseTests.ChatMessage[]>("messages", data =>
+                    {
+                        Console.WriteLine(@"Messages:");
+                        foreach (var value in data)
+                        {
+                            Console.WriteLine(value.Message);
+                        };
+                    });
+
+                    await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);
+                    await client.Emit("message", "message", cancellationToken: cancellationToken);
+
+                    await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+
+                    await client.DisconnectAsync(cancellationToken);
+                },
+                cancellationToken,
+                nameof(SocketIoClient.EventReceived));
+        }
+
+        [TestMethod]
         public async Task ConnectToLocalChatServerDebugTest()
         {
             using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));

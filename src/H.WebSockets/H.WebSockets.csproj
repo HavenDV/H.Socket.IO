@@ -44,7 +44,7 @@
     <PackageTags>WebSockets, WebSocket, web sockets, sockets, websock</PackageTags>
     <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
-    <Copyright>Copyright (c) 2020 havendv</Copyright>
+    <Copyright>Copyright © havendv 2020</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>H_transparent.png</PackageIcon>

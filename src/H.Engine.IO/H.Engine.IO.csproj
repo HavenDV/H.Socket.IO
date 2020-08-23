@@ -44,7 +44,7 @@
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
     <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
-    <Copyright>Copyright (c) 2020 havendv</Copyright>
+    <Copyright>Copyright © havendv 2020</Copyright>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>H_transparent.png</PackageIcon>

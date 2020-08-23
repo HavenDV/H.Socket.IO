@@ -25,7 +25,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
-    <Version>1.0.4</Version>
+    <Version>1.0.4.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IncludeSymbols>true</IncludeSymbols>
@@ -45,7 +45,7 @@ Features:
     <PackageProjectUrl>https://github.com/HavenDV/H.SocketIO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.SocketIO</RepositoryUrl>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed bug when the server sends arrays.</PackageReleaseNotes>
     <PackageLicenseFile></PackageLicenseFile>
     <Copyright>Copyright © havendv 2020</Copyright>
     <RepositoryType>git</RepositoryType>

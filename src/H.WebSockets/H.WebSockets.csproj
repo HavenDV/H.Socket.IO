@@ -3,34 +3,17 @@
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;netstandard2.0;net46</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;</TargetFrameworks>
+        <TargetFrameworks>netstandard2.1</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>
 
-  <PropertyGroup>
-    <LangVersion>8</LangVersion>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Signing">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>key.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
-    <Version>1.0.13</Version>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Authors>havendv</Authors>
-    <Company>havendv</Company>
+  <PropertyGroup Label="NuGet">
     <Description>Features:
 - Very simple use in several lines - all the code for obtaining the data is already written and working in a background thread
 - It's event based class - available TextMessageReceived and BinaryMessageReceived events
@@ -39,34 +22,20 @@
 - Auto Reconnect
 - Open to suggestions and problems on the github
     </Description>
-    <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO.git</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO.git</RepositoryUrl>
     <PackageTags>WebSockets, WebSocket, web sockets, sockets, websock</PackageTags>
     <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
-    <PackageLicenseFile></PackageLicenseFile>
-    <Copyright>Copyright © havendv 2020</Copyright>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>H_transparent.png</PackageIcon>
   </PropertyGroup>
-
-  <ItemGroup Label="Nuget">
-    <None Include="..\..\docs\H_transparent.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup Label="Tests">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>
-        $(MSBuildProjectName).IntegrationTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010009b7ddef1e7923b311a6cea9a98da8e9883eb1e3a4016c14b8febf68d4e33e458f8da70817c97b95cd9daa277ba2bbea224efac0b985be2bcf9db3ba4ddb8dd99a0564c5a1817b4b05a2b6517cb00f112130ca0e9626340448f7bf323c0361543eb1159eba34a6e9ec3ddc784a6f180a0283438fec6dc08f4f1434b403ff1fcb
+        $(MSBuildProjectName).IntegrationTests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100e9ab3263d6bc64676685e78935316b51c0ae454114b74545524688ece2ed7a5c687d303c8aca618917c5a2f8f375ce8a2132a3139518f7ae27425af2e29f3708727e3555772030bbfae29ea55c1b94cc43e41dff4bf1d6ed3e46efe60167a2053d897d5c3ae07eb67f83704f3bbc426b8be621c72209690cb88857819ec362b9
       </_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net46'" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net4.6'" />
   </ItemGroup>
 
 </Project>

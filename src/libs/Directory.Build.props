@@ -1,4 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project>
+
+  <Import Project="..\Directory.Build.props" />
 
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
@@ -13,18 +15,30 @@
     </Otherwise>
   </Choose>
 
-  <PropertyGroup Label="NuGet">
-    <Description>Features:
-- Very simple use in several lines - all the code for obtaining the data is already written and working in a background thread
-- It's event based class - available TextMessageReceived and BinaryMessageReceived events
-- Also available Connected, Disconnected and ExceptionOccurred events
-- Right async methods that support CancellationToken's
-- Auto Reconnect
-- Open to suggestions and problems on the github
-    </Description>
-    <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
+  <PropertyGroup Label="Common">
+    <NoWarn>$(NoWarn);CA1031</NoWarn>
   </PropertyGroup>
+  
+  <PropertyGroup Label="Nuget">
+    <Version>1.1.0</Version>
+    <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Authors>havendv</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/HavenDV/H.Pipes</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HavenDV/H.Pipes</RepositoryUrl>
+    <PackageTags>pipes, named pipes, async, async named pipes, namedpipes async, namedpipes, pipes async</PackageTags>
+    <PackageIcon>nuget_icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget">
+    <None Include="$(SolutionDir)\docs\nuget_icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup Label="Tests">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
@@ -39,12 +53,11 @@
     </AssemblyAttribute>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\H.WebSockets\H.WebSockets.csproj" />
+  <ItemGroup Label="Analyzers">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

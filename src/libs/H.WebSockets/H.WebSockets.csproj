@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="NuGet">
+    <Description>Features:
+- Very simple use in several lines - all the code for obtaining the data is already written and working in a background thread
+- It's event based class - available TextMessageReceived and BinaryMessageReceived events
+- Also available Connected, Disconnected and ExceptionOccurred events
+- Right async methods that support CancellationToken's
+- Auto Reconnect
+- Open to suggestions and problems on the github
+    </Description>
+    <PackageTags>WebSockets, WebSocket, web sockets, sockets, websock</PackageTags>
+    <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net4.6'" />
+  </ItemGroup>
+
+</Project>

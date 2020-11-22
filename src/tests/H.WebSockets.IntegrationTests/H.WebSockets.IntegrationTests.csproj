@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\H.WebSockets\H.WebSockets.csproj" />
+  </ItemGroup>
+
+</Project>

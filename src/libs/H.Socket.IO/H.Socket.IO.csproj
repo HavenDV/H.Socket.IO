@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="NuGet">
+    <Description>High-performance event-based .NET Socket.IO library with a convenient interface,
+aimed at writing the smallest possible code on the user side.
+
+Features:
+- Supports the latest version of Socket.IO server
+- Supports namespaces
+- The library is null-free and does not contain NRE
+- Event-based
+- Completely asynchronous
+    </Description>
+    <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
+    <PackageReleaseNotes>Fixed bug when the server sends arrays.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup Label="Resources">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\H.Engine.IO\H.Engine.IO.csproj" />
+  </ItemGroup>
+
+</Project>

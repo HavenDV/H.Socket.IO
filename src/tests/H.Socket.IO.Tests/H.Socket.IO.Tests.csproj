@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\H.Socket.IO\H.Socket.IO.csproj" />
+  </ItemGroup>
+
+</Project>

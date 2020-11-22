@@ -2,18 +2,9 @@
 
   <Import Project="..\Directory.Build.props" />
 
-  <Choose>
-    <When Condition="'$(OS)' == 'Windows_NT'">
-      <PropertyGroup>
-        <TargetFrameworks>net5.0;net4.7.2;net4.6.1</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <TargetFrameworks>net5.0</TargetFrameworks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
+  <PropertyGroup Label="Common">
+    <TargetFrameworks>net5.0;net4.8</TargetFrameworks>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.0-preview-20201020-06" />

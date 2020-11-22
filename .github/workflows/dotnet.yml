@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         dotnet: [ '5.0.x' ]
-        os: [ ubuntu-latest, ubuntu-16.04, windows-latest, macos-latest ]
+        os: [ windows-latest ]
 
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }} - ${{ matrix.dotnet }}
@@ -27,8 +27,6 @@ jobs:
       run: dotnet test H.Socket.IO.sln --configuration Release --nologo --filter TestCategory!=Local
         
     - name: Publish
-      if: runner.os == 'Windows' &&
-          matrix.dotnet == '5.0.x'
       run: dotnet nuget push
         src\**.nupkg
         --api-key ${{ secrets.NUGET_KEY }}

@@ -5,12 +5,12 @@
   <Choose>
     <When Condition="'$(OS)' == 'Windows_NT'">
       <PropertyGroup>
-        <TargetFrameworks>net5.0;netcoreapp3.1;net4.7.2;net4.6.1</TargetFrameworks>
+        <TargetFrameworks>net5.0;net4.7.2;net4.6.1</TargetFrameworks>
       </PropertyGroup>
     </When>
     <Otherwise>
       <PropertyGroup>
-        <TargetFrameworks>net5.0;netcoreapp3.1</TargetFrameworks>
+        <TargetFrameworks>net5.0</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>

@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
+  </PropertyGroup>
+	  
   <PropertyGroup Label="NuGet">
     <Description>Features:
 - Very simple use in several lines - all the code for obtaining the data is already written and working in a background thread

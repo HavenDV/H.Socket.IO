@@ -2,19 +2,6 @@
 
   <Import Project="..\Directory.Build.props" />
 
-  <Choose>
-    <When Condition="'$(OS)' == 'Windows_NT'">
-      <PropertyGroup>
-        <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <TargetFrameworks>netstandard2.1</TargetFrameworks>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-
   <PropertyGroup Label="Common">
     <NoWarn>$(NoWarn);CA1031</NoWarn>
   </PropertyGroup>

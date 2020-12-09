@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
+  </PropertyGroup>
+	  
   <PropertyGroup Label="NuGet">
     <Description>High-performance event-based .NET Socket.IO library with a convenient interface,
 aimed at writing the smallest possible code on the user side.

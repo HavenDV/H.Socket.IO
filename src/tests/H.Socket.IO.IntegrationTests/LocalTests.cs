@@ -106,7 +106,7 @@ namespace H.Socket.IO.IntegrationTests
                         foreach (var value in data)
                         {
                             Console.WriteLine(value.Message);
-                        };
+                        }
                     });
 
                     await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken);

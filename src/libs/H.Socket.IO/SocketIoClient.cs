@@ -41,7 +41,9 @@ namespace H.Socket.IO
         }
 
         /// <summary>
-        /// Optional property which is used when sending a message
+        /// Will be sent with all messages(Unless otherwise stated). <br/>
+        /// Also automatically connects to it. <br/>
+        /// Default is <see langword="null"/>.
         /// </summary>
         public string? DefaultNamespace { get; set; }
 

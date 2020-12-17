@@ -109,6 +109,22 @@ public async Task ConnectToChatNowShTest()
 }
 ```
 
+### Namespaces
+
+```cs
+// Will be sent with all messages(Unless otherwise stated).
+// Also automatically connects to it.
+client.DefaultNamespace = "my";
+
+// or
+
+// Connects to "my" namespace.
+ await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
+// Sends message to "my" namespace.
+await client.Emit("message", "hello", "my", cancellationToken);
+
+```
+
 ### Live Example
 
 C# .NET Fiddle - https://dotnetfiddle.net/FWMpQ3 <br/>

@@ -11,7 +11,7 @@ namespace H.WebSockets.Args
         /// <summary>
         /// Reason of disconnect
         /// </summary>
-        public string? Reason { get; set; }
+        public string Reason { get; set; }
 
         /// <summary>
         /// Status of WebSocket
@@ -23,9 +23,10 @@ namespace H.WebSockets.Args
         /// </summary>
         /// <param name="reason"></param>
         /// <param name="status"></param>
-        public WebSocketCloseEventArgs(string? reason, WebSocketCloseStatus? status)
+        /// <exception cref="ArgumentNullException"></exception>
+        public WebSocketCloseEventArgs(string reason, WebSocketCloseStatus? status)
         {
-            Reason = reason;
+            Reason = reason ?? throw new ArgumentNullException(nameof(reason));
             Status = status;
         }
     }

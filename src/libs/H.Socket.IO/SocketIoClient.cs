@@ -33,7 +33,7 @@ namespace H.Socket.IO
         /// Using proxy.
         /// </summary>
         public IWebProxy? Proxy {
-            get => EngineIoClient?.Proxy;
+            get => EngineIoClient.Proxy;
             set {
                 EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
                 EngineIoClient.Proxy = value;
@@ -45,14 +45,11 @@ namespace H.Socket.IO
         /// </summary>
         public string? DefaultNamespace { get; set; }
 
-        private Dictionary<string, List<(Action<object, string> Action, Type Type)>> JsonDeserializeActions { get; } = 
-            new Dictionary<string, List<(Action<object, string> Action, Type Type)>>();
+        private Dictionary<string, List<(Action<object, string> Action, Type Type)>> JsonDeserializeActions { get; } = new ();
 
-        private Dictionary<string, List<Action<string>>> TextActions { get; } =
-            new Dictionary<string, List<Action<string>>>();
+        private Dictionary<string, List<Action<string>>> TextActions { get; } = new ();
 
-        private Dictionary<string, List<Action>> Actions { get; } =
-            new Dictionary<string, List<Action>>();
+        private Dictionary<string, List<Action>> Actions { get; } = new ();
 
         #endregion
 
@@ -98,7 +95,7 @@ namespace H.Socket.IO
             Connected?.Invoke(this, new SocketIoEventEventArgs(string.Empty, value, false));
         }
 
-        private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
+        private void OnDisconnected(string reason, WebSocketCloseStatus? status)
         {
             Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
@@ -138,8 +135,8 @@ namespace H.Socket.IO
         {
             EngineIoClient = new EngineIoClient("socket.io");
             EngineIoClient.MessageReceived += EngineIoClient_MessageReceived;
-            EngineIoClient.ExceptionOccurred += (sender, args) => OnExceptionOccurred(args.Value);
-            EngineIoClient.Closed += (sender, args) => OnDisconnected(args.Reason, args.Status);
+            EngineIoClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Value);
+            EngineIoClient.Closed += (_, args) => OnDisconnected(args.Reason, args.Status);
         }
 
         #endregion
@@ -176,14 +173,13 @@ namespace H.Socket.IO
                         var isHandled = false;
                         try
                         {
-                            if (Actions == null ||
-                                string.IsNullOrWhiteSpace(packet.Value))
+                            if (string.IsNullOrWhiteSpace(packet.Value))
                             {
                                 break;
                             }
 
                             var values = packet.Value.GetJsonArrayValues();
-                            var name = values.ElementAtOrDefault(0);
+                            var name = values.ElementAt(0);
                             var text = values.ElementAtOrDefault(1);
 
                             var key = GetOnKey(name, packet.Namespace);
@@ -245,7 +241,7 @@ namespace H.Socket.IO
                                             throw new InvalidOperationException($"Deserialized object for json text(\"{text}\") and for event named \"{name}\" is null");
                                         }
 
-                                        action?.Invoke(obj, text);
+                                        action(obj, text);
                                     }
                                     catch (Exception exception)
                                     {
@@ -537,7 +533,7 @@ namespace H.Socket.IO
                 JsonDeserializeActions[key] = new List<(Action<object, string> Action, Type Type)>();
             }
 
-            JsonDeserializeActions[key].Add(((obj, text) => action?.Invoke((T)obj, text), typeof(T)));
+            JsonDeserializeActions[key].Add(((obj, text) => action((T)obj, text), typeof(T)));
         }
 
         /// <summary>
@@ -553,7 +549,7 @@ namespace H.Socket.IO
             name = name ?? throw new ArgumentNullException(nameof(name));
             action = action ?? throw new ArgumentNullException(nameof(action));
 
-            On<T>(name, (obj, text) => action?.Invoke(obj), customNamespace);
+            On<T>(name, (obj, _) => action(obj), customNamespace);
         }
 
         /// <summary>
@@ -614,10 +610,7 @@ namespace H.Socket.IO
         /// <returns></returns>
         public async ValueTask DisposeAsync()
         {
-            if (EngineIoClient != null)
-            {
-                await EngineIoClient.DisposeAsync().ConfigureAwait(false);
-            }
+            await EngineIoClient.DisposeAsync().ConfigureAwait(false);
         }
 #endif
 

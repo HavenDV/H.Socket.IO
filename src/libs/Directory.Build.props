@@ -3,7 +3,7 @@
   <Import Project="..\Directory.Build.props" />
 
   <PropertyGroup Label="Common">
-    <NoWarn>$(NoWarn);CA1031</NoWarn>
+    <NoWarn>$(NoWarn);CA1031;1574</NoWarn>
   </PropertyGroup>
   
   <PropertyGroup Label="Nuget">

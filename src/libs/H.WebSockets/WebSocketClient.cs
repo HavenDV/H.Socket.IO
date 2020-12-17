@@ -24,7 +24,7 @@ namespace H.WebSockets
         /// <summary>
         /// 
         /// </summary>
-        public ClientWebSocket Socket { get; private set; } = new ClientWebSocket();
+        public ClientWebSocket Socket { get; private set; } = new ();
 
         /// <summary>
         /// 
@@ -34,21 +34,21 @@ namespace H.WebSockets
         /// <summary>
         /// 
         /// </summary>
-        public bool IsConnected => Socket?.State == WebSocketState.Open;
+        public bool IsConnected => Socket.State == WebSocketState.Open;
 
         /// <summary>
         /// 
         /// </summary>
         public IWebProxy? Proxy
         {
-            get => Socket?.Options?.Proxy;
+            get => Socket.Options.Proxy;
             set {
                 Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
                 Socket.Options.Proxy = value;
             }
         }
 
-        private TaskWorker ReceiveWorker { get; } = new TaskWorker();
+        private TaskWorker ReceiveWorker { get; } = new ();
 
         #endregion
 
@@ -84,7 +84,7 @@ namespace H.WebSockets
             Connected?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnDisconnected(string? reason, WebSocketCloseStatus? status)
+        private void OnDisconnected(string reason, WebSocketCloseStatus? status)
         {
             Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
         }
@@ -113,7 +113,7 @@ namespace H.WebSockets
         /// </summary>
         public WebSocketClient()
         {
-            ReceiveWorker.ExceptionOccurred += (sender, exception) => OnExceptionOccurred(exception);
+            ReceiveWorker.ExceptionOccurred += (_, exception) => OnExceptionOccurred(exception);
         }
 
         #endregion
@@ -136,7 +136,7 @@ namespace H.WebSockets
             Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
             if (Socket.State != WebSocketState.None)
             {
-                Socket?.Dispose();
+                Socket.Dispose();
                 Socket = new ClientWebSocket();
             }
 
@@ -342,7 +342,7 @@ namespace H.WebSockets
         {
             try
             {
-                while (Socket?.State == WebSocketState.Open)
+                while (Socket.State == WebSocketState.Open)
                 {
                     var buffer = new byte[1024];
 
@@ -373,7 +373,11 @@ namespace H.WebSockets
                             return;
                         }
 
-                        stream.Write(buffer, 0, result.Count);
+#if NETSTANDARD2_1
+                        await stream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
+#else
+                        await stream.WriteAsync(buffer, 0, result.Count, cancellationToken).ConfigureAwait(false);
+#endif
                     } while (!result.EndOfMessage);
 
                     stream.Seek(0, SeekOrigin.Begin);
@@ -383,7 +387,7 @@ namespace H.WebSockets
                         case WebSocketMessageType.Text:
                         {
                             using var reader = new StreamReader(stream, Encoding.UTF8);
-                            var message = reader.ReadToEnd();
+                            var message = await reader.ReadToEndAsync().ConfigureAwait(false);
                             OnTextReceived(message);
                             break;
                         }
@@ -403,7 +407,7 @@ namespace H.WebSockets
                 OnExceptionOccurred(exception);
             }
 
-            OnDisconnected(Socket?.CloseStatusDescription, Socket?.CloseStatus);
+            OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
         }
 
         #endregion

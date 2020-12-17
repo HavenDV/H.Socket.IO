@@ -37,7 +37,7 @@ namespace H.Engine.IO
         /// </summary>
         public IWebProxy? Proxy
         {
-            get => WebSocketClient?.Proxy;
+            get => WebSocketClient.Proxy;
             set
             {
                 WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
@@ -45,18 +45,14 @@ namespace H.Engine.IO
             }
         }
 
-#pragma warning disable 1574
         /// <summary>
         /// This property contains OpenMessage after successful <seealso cref="OpenAsync(Uri, CancellationToken)"/>
         /// </summary>
-#pragma warning restore 1574
         public EngineIoOpenMessage? OpenMessage { get; private set; }
 
-#pragma warning disable 1574
         /// <summary>
         /// This property is true after successful <seealso cref="OpenAsync(Uri, CancellationToken)"/>
         /// </summary>
-#pragma warning restore 1574
         public bool IsOpened { get; set; }
 
         private string Framework { get; }
@@ -130,7 +126,7 @@ namespace H.Engine.IO
             Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage?>(value));
         }
 
-        private void OnClosed(string? reason, WebSocketCloseStatus? status)
+        private void OnClosed(string reason, WebSocketCloseStatus? status)
         {
             IsOpened = false;
 
@@ -189,8 +185,8 @@ namespace H.Engine.IO
 
             WebSocketClient = new WebSocketClient();
             WebSocketClient.TextReceived += WebSocketClient_OnTextReceived;
-            WebSocketClient.ExceptionOccurred += (sender, args) => OnExceptionOccurred(args.Value);
-            WebSocketClient.Disconnected += (sender, args) => OnClosed(args.Reason, args.Status);
+            WebSocketClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Value);
+            WebSocketClient.Disconnected += (_, args) => OnClosed(args.Reason, args.Status);
         }
 
         #endregion

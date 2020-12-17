@@ -3,6 +3,7 @@
 [![Language](https://img.shields.io/badge/language-C%23-blue.svg?style=flat-square)](https://github.com/HavenDV/H.Socket.IO/search?l=C%23&o=desc&s=&type=Code) 
 [![License](https://img.shields.io/github/license/HavenDV/H.Socket.IO.svg?label=License&maxAge=86400)](LICENSE.md) 
 [![Requirements](https://img.shields.io/badge/Requirements-.NET%20Standard%202.0-blue.svg)](https://github.com/dotnet/standard/blob/master/docs/versions/netstandard2.0.md)
+[![Requirements](https://img.shields.io/badge/Requirements-.NET%20Framework%204.5-blue.svg)](https://github.com/microsoft/dotnet/blob/master/releases/net45/README.md)
 [![Build Status](https://github.com/HavenDV/H.Socket.IO/workflows/.NET%20Core/badge.svg?branch=master)](https://github.com/HavenDV/H.Socket.IO/actions?query=workflow%3A%22.NET+Core%22)
 
 High-performance event-based .NET Socket.IO library with a convenient interface,  

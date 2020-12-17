@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5</TargetFrameworks>
   </PropertyGroup>
 	  
   <PropertyGroup Label="NuGet">
@@ -16,7 +16,6 @@ Features:
 - Completely asynchronous
     </Description>
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed bug when the server sends arrays.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5</TargetFrameworks>
   </PropertyGroup>
 	  
   <PropertyGroup Label="NuGet">
@@ -14,11 +14,10 @@
 - Open to suggestions and problems on the github
     </Description>
     <PackageTags>WebSockets, WebSocket, web sockets, sockets, websock</PackageTags>
-    <PackageReleaseNotes>Deleted AsyncInterfaces reference</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net4.6'" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)' == 'net4.5'" />
   </ItemGroup>
 
 </Project>

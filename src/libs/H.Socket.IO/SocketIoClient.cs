@@ -465,7 +465,7 @@ namespace H.Socket.IO
         public async Task<SocketIoEventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             var dictionary = await this.WaitAnyEventAsync<SocketIoEventArgs?>(
-                func ?? (() => Task.CompletedTask),
+                func ?? (() => Task.FromResult(false)),
                 cancellationToken,
                 nameof(EventReceived), nameof(ErrorReceived))
                 .ConfigureAwait(false);

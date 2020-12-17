@@ -253,7 +253,7 @@ namespace H.WebSockets
         public async Task<DataEventArgs<string>> WaitTextAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             return await this.WaitEventAsync<DataEventArgs<string>>(
-                func ?? (() => Task.CompletedTask), 
+                func ?? (() => Task.FromResult(false)), 
                 nameof(TextReceived),
                 cancellationToken)
                 .ConfigureAwait(false);
@@ -289,7 +289,7 @@ namespace H.WebSockets
         public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
         {
             return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>>(
-                func ?? (() => Task.CompletedTask),
+                func ?? (() => Task.FromResult(false)),
                 nameof(BytesReceived),
                 cancellationToken)
                 .ConfigureAwait(false);

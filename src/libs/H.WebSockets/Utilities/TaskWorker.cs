@@ -32,7 +32,7 @@ namespace H.WebSockets.Utilities
         /// <summary>
         /// Internal task
         /// </summary>
-        public Task Task { get; set; } = Task.CompletedTask;
+        public Task Task { get; set; } = Task.FromResult(false);
 
         /// <summary>
         /// Internal task CancellationTokenSource
@@ -163,7 +163,7 @@ namespace H.WebSockets.Utilities
             {
                 action(cancellationToken);
 
-                return Task.CompletedTask;
+                return Task.FromResult(false);
             });
         }
 

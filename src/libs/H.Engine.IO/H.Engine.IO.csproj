@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5</TargetFrameworks>
   </PropertyGroup>
 	  
   <PropertyGroup Label="NuGet">
@@ -14,7 +14,6 @@
 - Open to suggestions and problems on the github
     </Description>
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
-    <PackageReleaseNotes>Fixed bug when connecting to addresses of the form "https://abc.com/path"</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

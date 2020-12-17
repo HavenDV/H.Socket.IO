@@ -119,7 +119,7 @@ client.DefaultNamespace = "my";
 // or
 
 // Connects to "my" namespace.
- await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
+await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
 // Sends message to "my" namespace.
 await client.Emit("message", "hello", "my", cancellationToken);
 

@@ -12,20 +12,20 @@ namespace H.WebSockets.IntegrationTests
         [TestMethod]
         public async Task WebSocketOrgTest()
         {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(15));
             var cancellationToken = tokenSource.Token;
 
-#if NETCOREAPP3_1 || NETCOREAPP3_0
+#if NET5_0
             await using var client = new WebSocketClient();
 #else
             using var client = new WebSocketClient();
 #endif
 
-            client.TextReceived += (sender, args) => Console.WriteLine($"TextReceived: {args.Value}");
-            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
-            client.BytesReceived += (sender, args) => Console.WriteLine($"BytesReceived: {args.Value?.Count}");
-            client.Connected += (sender, args) => Console.WriteLine("Connected");
-            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.TextReceived += (_, args) => Console.WriteLine($"TextReceived: {args.Value}");
+            client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
+            client.BytesReceived += (_, args) => Console.WriteLine($"BytesReceived: {args.Value.Count}");
+            client.Connected += (_, _) => Console.WriteLine("Connected");
+            client.Disconnected += (_, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var events = new[] { nameof(client.Connected), nameof(client.Disconnected) };
             await ConnectDisconnectTestAsync(client, events, cancellationToken);
@@ -43,7 +43,7 @@ namespace H.WebSockets.IntegrationTests
 
                 Assert.IsFalse(client.IsConnected, nameof(client.IsConnected));
 
-                await client.ConnectAsync(new Uri("ws://echo.websocket.org"), cancellationToken);
+                await client.ConnectAsync(new Uri("wss://echo.websocket.org"), cancellationToken);
 
                 Assert.IsTrue(client.IsConnected, nameof(client.IsConnected));
 

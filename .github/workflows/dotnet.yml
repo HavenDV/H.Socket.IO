@@ -22,11 +22,14 @@ jobs:
       with:
         dotnet-version: ${{ matrix.dotnet }}
     
+    - name: Clean
+      run: dotnet clean --configuration Release && dotnet nuget locals all --clear
+    
     - name: Build
-      run: dotnet build H.Socket.IO.sln --configuration Release --nologo
+      run: dotnet build H.Socket.IO.sln --configuration Release
     
     - name: Run tests
-      run: dotnet test H.Socket.IO.sln --configuration Release --nologo --filter TestCategory!=Local
+      run: dotnet test H.Socket.IO.sln --configuration Release --filter TestCategory!=Local
         
     - name: Publish
       run: dotnet nuget push

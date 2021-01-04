@@ -26,10 +26,10 @@ jobs:
       run: dotnet clean --configuration Release && dotnet nuget locals all --clear
     
     - name: Build
-      run: dotnet build H.Socket.IO.sln --configuration Release
+      run: dotnet build --configuration Release
     
     - name: Run tests
-      run: dotnet test H.Socket.IO.sln --configuration Release --filter TestCategory!=Local
+      run: dotnet test --configuration Release --filter TestCategory!=Local
         
     - name: Publish
       run: dotnet nuget push

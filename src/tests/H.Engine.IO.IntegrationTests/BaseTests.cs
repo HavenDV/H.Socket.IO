@@ -10,16 +10,16 @@ namespace H.Engine.IO.IntegrationTests
     {
         public static async Task ConnectToChatBaseTestAsync(string url, CancellationToken cancellationToken = default)
         {
-#if NETCOREAPP3_1 || NETCOREAPP3_0
+#if NET5_0
             await using var client = new EngineIoClient("socket.io");
 #else
             using var client = new EngineIoClient("socket.io");
 #endif
 
-            client.MessageReceived += (sender, args) => Console.WriteLine($"MessageReceived: {args.Value}");
-            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
-            client.Opened += (sender, args) => Console.WriteLine($"Opened: {args.Value}");
-            client.Closed += (sender, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.MessageReceived += (_, args) => Console.WriteLine($"MessageReceived: {args.Value}");
+            client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
+            client.Opened += (_, args) => Console.WriteLine($"Opened: {args.Value}");
+            client.Closed += (_, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
             var results = await client.WaitAllEventsAsync<EventArgs>(async () =>
             {

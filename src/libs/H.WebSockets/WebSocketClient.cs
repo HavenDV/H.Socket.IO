@@ -199,7 +199,7 @@ namespace H.WebSockets
 
                 if (Socket.State == WebSocketState.Aborted)
                 {
-                    OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
+                    OnDisconnected(Socket.CloseStatusDescription ?? string.Empty, Socket.CloseStatus);
                 }
             }, nameof(Disconnected), cancellationToken)
                 .ConfigureAwait(false);
@@ -369,7 +369,7 @@ namespace H.WebSockets
 
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            OnDisconnected(result.CloseStatusDescription, result.CloseStatus);
+                            OnDisconnected(result.CloseStatusDescription ?? string.Empty, result.CloseStatus);
                             return;
                         }
 
@@ -407,7 +407,7 @@ namespace H.WebSockets
                 OnExceptionOccurred(exception);
             }
 
-            OnDisconnected(Socket.CloseStatusDescription, Socket.CloseStatus);
+            OnDisconnected(Socket.CloseStatusDescription ?? string.Empty, Socket.CloseStatus);
         }
 
         #endregion

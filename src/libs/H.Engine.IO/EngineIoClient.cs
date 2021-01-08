@@ -51,15 +51,22 @@ namespace H.Engine.IO
         public EngineIoOpenMessage? OpenMessage { get; private set; }
 
         /// <summary>
+        /// An unique identifier for the socket session. <br/>
+        /// Set after the <seealso cref="Opened"/> event is triggered.
+        /// </summary>
+        public string? Id => OpenMessage?.Sid;
+
+        /// <summary>
         /// This property is true after successful <seealso cref="OpenAsync(Uri, CancellationToken)"/>
         /// </summary>
         public bool IsOpened { get; set; }
 
-        private string Framework { get; }
         /// <summary>
         /// Opened uri.
         /// </summary>
         public Uri? Uri { get; set; }
+
+        private string Framework { get; }
         private System.Timers.Timer? Timer { get; set; }
 
         #endregion
@@ -275,24 +282,28 @@ namespace H.Engine.IO
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public async Task<bool> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
+        public async Task<EngineIoOpenMessage?> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
         {
             WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
             Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
 
             if (WebSocketClient.IsConnected)
             {
-                return true;
+                return OpenMessage;
             }
 
             Uri = uri ?? throw new ArgumentNullException(nameof(uri));
             var socketIoUri = ToWebSocketUri(uri, Framework);
 
-            return await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage>>(async () =>
+            var args = await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage?>>(async () =>
             {
                 await WebSocketClient.ConnectAsync(socketIoUri, cancellationToken).ConfigureAwait(false);
-            }, nameof(Opened), cancellationToken).ConfigureAwait(false) != null;
+            }, nameof(Opened), cancellationToken).ConfigureAwait(false);
+
+            return args.Value;
         }
 
         internal static Uri ToWebSocketUri(Uri uri, string framework)
@@ -317,23 +328,14 @@ namespace H.Engine.IO
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeout"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<bool> OpenAsync(Uri uri, TimeSpan timeout)
+        public async Task<EngineIoOpenMessage?> OpenAsync(Uri uri, TimeSpan timeout, CancellationToken cancellationToken = default)
         {
-            using var cancellationSource = new CancellationTokenSource(timeout);
+            using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cancellationSource.CancelAfter(timeout);
 
             return await OpenAsync(uri, cancellationSource.Token).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="timeoutInSeconds"></param>
-        /// <returns></returns>
-        public async Task<bool> OpenAsync(Uri uri, int timeoutInSeconds)
-        {
-            return await OpenAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds)).ConfigureAwait(false);
         }
 
         /// <summary>

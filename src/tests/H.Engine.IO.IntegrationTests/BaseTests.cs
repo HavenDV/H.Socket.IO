@@ -25,7 +25,7 @@ namespace H.Engine.IO.IntegrationTests
             {
                 Console.WriteLine("# Before OpenAsync");
 
-                await client.OpenAsync(new Uri(url), 10);
+                await client.OpenAsync(new Uri(url), cancellationToken);
 
                 Console.WriteLine("# Before Delay");
 

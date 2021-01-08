@@ -11,9 +11,10 @@ namespace H.Engine.IO.IntegrationTests
         [TestMethod]
         public async Task ConnectToChatNowShTest()
         {
-            using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            var cancellationToken = cancellationTokenSource.Token;
 
-            await BaseTests.ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", tokenSource.Token);
+            await BaseTests.ConnectToChatBaseTestAsync("wss://socketio-chat-h9jt.herokuapp.com/", cancellationToken);
         }
     }
 }

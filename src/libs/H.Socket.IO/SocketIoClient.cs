@@ -41,6 +41,12 @@ namespace H.Socket.IO
         }
 
         /// <summary>
+        /// An unique identifier for the socket session.. <br/>
+        /// Set after the <seealso cref="Connected"/> event is triggered.
+        /// </summary>
+        public string? Id => EngineIoClient.Id;
+
+        /// <summary>
         /// Will be sent with all messages(Unless otherwise stated). <br/>
         /// Also automatically connects to it. <br/>
         /// Default is <see langword="null"/>.
@@ -391,25 +397,6 @@ namespace H.Socket.IO
             using var cancellationSource = new CancellationTokenSource(timeout);
 
             return await ConnectAsync(uri, cancellationSource.Token, namespaces).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// It connects to the server and asynchronously waits for a connection message with the selected timeout. <br/>
-        /// Throws <see cref="OperationCanceledException"/> if the waiting time exceeded
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="timeoutInSeconds"></param>
-        /// <param name="namespaces"></param>
-        /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
-        /// <exception cref="ObjectDisposedException"></exception>
-        /// <exception cref="OperationCanceledException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        public async Task<bool> ConnectAsync(Uri uri, int timeoutInSeconds, params string[] namespaces)
-        {
-            uri = uri ?? throw new ArgumentNullException(nameof(uri));
-
-            return await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds), namespaces).ConfigureAwait(false);
         }
 
         /// <summary>

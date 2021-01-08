@@ -11,11 +11,12 @@
   </ItemGroup>
   
   <PropertyGroup Label="Nuget">
-    <Version>1.1.3</Version>
+    <Version>1.1.4</Version>
     <PackageReleaseNotes>
       The minimum requirement is now .Net Framework 4.5 instead of 4.6.
       Added assembly: CLSCompliant(true).
       Fixed CloseStatusDescription null bug.
+      Added EngineIoClient.Id and SocketIdClient.Id properties.
     </PackageReleaseNotes>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

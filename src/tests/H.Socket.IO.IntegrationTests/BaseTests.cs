@@ -15,19 +15,19 @@ namespace H.Socket.IO.IntegrationTests
             CancellationToken cancellationToken = default, 
             params string[] additionalEvents)
         {
-#if NETCOREAPP3_1 || NETCOREAPP3_0
+#if NETCOREAPP3_1 || NETCOREAPP3_0 || NET5_0
             await using var client = new SocketIoClient();
 #else
             using var client = new SocketIoClient();
 #endif
 
-            client.Connected += (sender, args) => Console.WriteLine($"Connected: {args.Namespace}");
-            client.Disconnected += (sender, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.EventReceived += (sender, args) => Console.WriteLine($"EventReceived: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
-            client.HandledEventReceived += (sender, args) => Console.WriteLine($"HandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.UnhandledEventReceived += (sender, args) => Console.WriteLine($"UnhandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.ErrorReceived += (sender, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
-            client.ExceptionOccurred += (sender, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
+            client.Connected += (_, args) => Console.WriteLine($"Connected: {args.Namespace}");
+            client.Disconnected += (_, args) => Console.WriteLine($"Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.EventReceived += (_, args) => Console.WriteLine($"EventReceived: Namespace: {args.Namespace}, Value: {args.Value}, IsHandled: {args.IsHandled}");
+            client.HandledEventReceived += (_, args) => Console.WriteLine($"HandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.UnhandledEventReceived += (_, args) => Console.WriteLine($"UnhandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.ErrorReceived += (_, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
+            client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
 
             var results = await client.WaitAllEventsAsync<EventArgs>(
                 async () => await func(client), 
@@ -49,31 +49,27 @@ namespace H.Socket.IO.IntegrationTests
 
         public static void EnableDebug(SocketIoClient client)
         {
-            client.EngineIoClient.Opened += (sender, args) => Console.WriteLine("EngineIoClient.Opened");
-            client.EngineIoClient.Closed += (sender, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.EngineIoClient.Upgraded += (sender, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
-            client.EngineIoClient.ExceptionOccurred += (sender, args) => Console.WriteLine($"EngineIoClient.ExceptionOccurred: {args.Value}");
-            client.EngineIoClient.MessageReceived += (sender, args) => Console.WriteLine($"EngineIoClient.MessageReceived: {args.Value}");
-            client.EngineIoClient.NoopReceived += (sender, args) => Console.WriteLine($"EngineIoClient.NoopReceived: {args.Value}");
-            client.EngineIoClient.PingReceived += (sender, args) => Console.WriteLine($"EngineIoClient.PingReceived: {args.Value}");
-            client.EngineIoClient.PongReceived += (sender, args) => Console.WriteLine($"EngineIoClient.PongReceived: {args.Value}");
-            client.EngineIoClient.PingSent += (sender, args) => Console.WriteLine($"EngineIoClient.PingSent: {args.Value}");
+            client.EngineIoClient.Opened += (_, args) => Console.WriteLine($"EngineIoClient.Opened. Sid: {args.Value?.Sid}");
+            client.EngineIoClient.Closed += (_, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.EngineIoClient.Upgraded += (_, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
+            client.EngineIoClient.ExceptionOccurred += (_, args) => Console.WriteLine($"EngineIoClient.ExceptionOccurred: {args.Value}");
+            client.EngineIoClient.MessageReceived += (_, args) => Console.WriteLine($"EngineIoClient.MessageReceived: {args.Value}");
+            client.EngineIoClient.NoopReceived += (_, args) => Console.WriteLine($"EngineIoClient.NoopReceived: {args.Value}");
+            client.EngineIoClient.PingReceived += (_, args) => Console.WriteLine($"EngineIoClient.PingReceived: {args.Value}");
+            client.EngineIoClient.PongReceived += (_, args) => Console.WriteLine($"EngineIoClient.PongReceived: {args.Value}");
+            client.EngineIoClient.PingSent += (_, args) => Console.WriteLine($"EngineIoClient.PingSent: {args.Value}");
 
-            client.EngineIoClient.WebSocketClient.Connected += (sender, args) => Console.WriteLine("WebSocketClient.Connected");
-            client.EngineIoClient.WebSocketClient.Disconnected += (sender, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-            client.EngineIoClient.WebSocketClient.TextReceived += (sender, args) => Console.WriteLine($"WebSocketClient.TextReceived: {args.Value}");
-            client.EngineIoClient.WebSocketClient.ExceptionOccurred += (sender, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Value}");
-            client.EngineIoClient.WebSocketClient.BytesReceived += (sender, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
+            client.EngineIoClient.WebSocketClient.Connected += (_, _) => Console.WriteLine("WebSocketClient.Connected");
+            client.EngineIoClient.WebSocketClient.Disconnected += (_, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
+            client.EngineIoClient.WebSocketClient.TextReceived += (_, args) => Console.WriteLine($"WebSocketClient.TextReceived: {args.Value}");
+            client.EngineIoClient.WebSocketClient.ExceptionOccurred += (_, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Value}");
+            client.EngineIoClient.WebSocketClient.BytesReceived += (_, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Global
         public class ChatMessage
         {
-            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public string? Username { get; set; }
-            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public string? Message { get; set; }
-            // ReSharper disable once UnusedAutoPropertyAccessor.Global
             public long NumUsers { get; set; }
         }
 

@@ -119,10 +119,16 @@ client.DefaultNamespace = "my";
 // or
 
 // Connects to "my" namespace.
-await client.ConnectAsync(new Uri(LocalCharServerUrl), cancellationToken, "my");
+await client.ConnectAsync(new Uri(LocalCharServerUrl), namespaces: "my");
 // Sends message to "my" namespace.
-await client.Emit("message", "hello", "my", cancellationToken);
+await client.Emit("message", "hello", "my");
 
+```
+
+### Custom arguments
+
+```cs
+await client.ConnectAsync(new Uri($"wss://socketio-chat-h9jt.herokuapp.com/?access_token={mAccessToken}"));
 ```
 
 ### Live Example

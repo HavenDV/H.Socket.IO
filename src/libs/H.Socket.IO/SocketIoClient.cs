@@ -384,17 +384,23 @@ namespace H.Socket.IO
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeout"></param>
+        /// <param name="cancellationToken"></param>
         /// <param name="namespaces"></param>
         /// <exception cref="InvalidOperationException">if AfterError event occurs while wait connect message</exception>
         /// <exception cref="ObjectDisposedException"></exception>
         /// <exception cref="OperationCanceledException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        public async Task<bool> ConnectAsync(Uri uri, TimeSpan timeout, params string[] namespaces)
+        public async Task<bool> ConnectAsync(
+            Uri uri, 
+            TimeSpan timeout, 
+            CancellationToken cancellationToken = default, 
+            params string[] namespaces)
         {
             uri = uri ?? throw new ArgumentNullException(nameof(uri));
 
-            using var cancellationSource = new CancellationTokenSource(timeout);
+            using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cancellationSource.CancelAfter(timeout);
 
             return await ConnectAsync(uri, cancellationSource.Token, namespaces).ConfigureAwait(false);
         }

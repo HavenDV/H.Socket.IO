@@ -11,20 +11,20 @@
   </ItemGroup>
   
   <PropertyGroup Label="Nuget">
-    <Version>1.1.4</Version>
+    <Version>1.1.5</Version>
     <PackageReleaseNotes>
-      The minimum requirement is now .Net Framework 4.5 instead of 4.6.
-      Added assembly: CLSCompliant(true).
-      Fixed CloseStatusDescription null bug.
-      Added EngineIoClient.Id and SocketIdClient.Id properties.
+The minimum requirement is now .Net Framework 4.5 instead of 4.6.
+Added assembly: CLSCompliant(true).
+Fixed CloseStatusDescription null bug.
+Added EngineIoClient.Id and SocketIdClient.Id properties.
+Fixed links.
     </PackageReleaseNotes>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>havendv</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/HavenDV/H.Pipes</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/HavenDV/H.Pipes</RepositoryUrl>
-    <PackageTags>pipes, named pipes, async, async named pipes, namedpipes async, namedpipes, pipes async</PackageTags>
+    <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO</RepositoryUrl>
     <PackageIcon>nuget_icon.png</PackageIcon>
   </PropertyGroup>
 

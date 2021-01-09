@@ -157,23 +157,14 @@ namespace H.WebSockets
         /// </summary>
         /// <param name="uri"></param>
         /// <param name="timeout"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task ConnectAsync(Uri uri, TimeSpan timeout)
+        public async Task ConnectAsync(Uri uri, TimeSpan timeout, CancellationToken cancellationToken = default)
         {
-            using var cancellationSource = new CancellationTokenSource(timeout);
+            using var cancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cancellationSource.CancelAfter(timeout);
 
             await ConnectAsync(uri, cancellationSource.Token).ConfigureAwait(false);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="uri"></param>
-        /// <param name="timeoutInSeconds"></param>
-        /// <returns></returns>
-        public async Task ConnectAsync(Uri uri, int timeoutInSeconds)
-        {
-            await ConnectAsync(uri, TimeSpan.FromSeconds(timeoutInSeconds)).ConfigureAwait(false);
         }
 
         /// <summary>

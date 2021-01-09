@@ -11,13 +11,14 @@
   </ItemGroup>
   
   <PropertyGroup Label="Nuget">
-    <Version>1.1.5</Version>
+    <Version>1.1.6</Version>
     <PackageReleaseNotes>
 The minimum requirement is now .Net Framework 4.5 instead of 4.6.
 Added assembly: CLSCompliant(true).
 Fixed CloseStatusDescription null bug.
 Added EngineIoClient.Id and SocketIdClient.Id properties.
 Fixed links.
+Embed all sources.
     </PackageReleaseNotes>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -29,7 +30,7 @@ Fixed links.
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">
-    <None Include="$(SolutionDir)\docs\nuget_icon.png">
+    <None Include="$(SolutionDir)assets\nuget_icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
@@ -37,7 +38,7 @@ Fixed links.
 
   <PropertyGroup Label="Source Link">
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <EmbedAllSources>true</EmbedAllSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>

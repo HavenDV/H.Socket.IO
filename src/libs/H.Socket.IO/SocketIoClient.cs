@@ -509,6 +509,23 @@ namespace H.Socket.IO
         }
 
         /// <summary>
+        /// Deletes On handle.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="customNamespace"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void Off(string name, string? customNamespace = null)
+        {
+            name = name ?? throw new ArgumentNullException(nameof(name));
+
+            var key = GetOnKey(name, customNamespace);
+            if (JsonDeserializeActions.ContainsKey(key))
+            {
+                JsonDeserializeActions.Remove(key);
+            }
+        }
+
+        /// <summary>
         /// Performs an action after receiving a specific event. <br/>
         /// <paramref name="action"/>.<typeparamref name="T"/> is a json deserialized object, <br/>
         /// <paramref name="action"/>.<see langword="string"/> is raw text.
@@ -517,6 +534,7 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void On<T>(string name, Action<T, string> action, string? customNamespace = null) where T : class
         {
             name = name ?? throw new ArgumentNullException(nameof(name));
@@ -539,6 +557,7 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void On<T>(string name, Action<T> action, string? customNamespace = null) where T : class
         {
             name = name ?? throw new ArgumentNullException(nameof(name));
@@ -554,6 +573,7 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void On(string name, Action<string> action, string? customNamespace = null)
         {
             name = name ?? throw new ArgumentNullException(nameof(name));
@@ -574,6 +594,7 @@ namespace H.Socket.IO
         /// <param name="name"></param>
         /// <param name="action"></param>
         /// <param name="customNamespace"></param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void On(string name, Action action, string? customNamespace = null)
         {
             name = name ?? throw new ArgumentNullException(nameof(name));

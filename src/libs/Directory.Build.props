@@ -11,7 +11,7 @@
   </ItemGroup>
   
   <PropertyGroup Label="Nuget">
-    <Version>1.1.6</Version>
+    <Version>1.1.7</Version>
     <PackageReleaseNotes>
 The minimum requirement is now .Net Framework 4.5 instead of 4.6.
 Added assembly: CLSCompliant(true).
@@ -19,6 +19,7 @@ Fixed CloseStatusDescription null bug.
 Added EngineIoClient.Id and SocketIdClient.Id properties.
 Fixed links.
 Embed all sources.
+Added SocketIoClient.Off method.
     </PackageReleaseNotes>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

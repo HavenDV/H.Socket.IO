@@ -523,6 +523,14 @@ namespace H.Socket.IO
             {
                 JsonDeserializeActions.Remove(key);
             }
+            if (TextActions.ContainsKey(key))
+            {
+                TextActions.Remove(key);
+            }
+            if (Actions.ContainsKey(key))
+            {
+                Actions.Remove(key);
+            }
         }
 
         /// <summary>

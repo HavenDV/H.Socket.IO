@@ -28,12 +28,12 @@ Added SocketIoClient.Off method.
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO</RepositoryUrl>
     <PackageIcon>nuget_icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!--<PackageReadmeFile>README.md</PackageReadmeFile> Bug: https://www.gitmemory.com/issue/NuGet/Home/10791/829457101-->
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">
     <None Include="$(SolutionDir)assets\nuget_icon.png" Pack="true" PackagePath=""/>
-    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="docs"/>
+    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <PropertyGroup Label="Source Link">

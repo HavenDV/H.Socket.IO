@@ -33,7 +33,7 @@ Added SocketIoClient.Off method.
 
   <ItemGroup Label="Nuget">
     <None Include="$(SolutionDir)assets\nuget_icon.png" Pack="true" PackagePath=""/>
-    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath=""/>
+    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="docs"/>
   </ItemGroup>
 
   <PropertyGroup Label="Source Link">

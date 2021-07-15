@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace H.Engine.IO.Tests
 {
@@ -8,9 +9,8 @@ namespace H.Engine.IO.Tests
     {
         private static void ToWebSocketUriBaseTest(string expected, string url, string framework = "engine.io")
         {
-            Assert.AreEqual(
-                new Uri(expected), 
-                EngineIoClient.ToWebSocketUri(new Uri(url), framework));
+            EngineIoClient.ToWebSocketUri(new Uri(url), framework)
+                .Should().Be(new Uri(expected));
         }
 
         [TestMethod]

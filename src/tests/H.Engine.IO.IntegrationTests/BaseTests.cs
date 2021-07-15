@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using H.WebSockets.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace H.Engine.IO.IntegrationTests
 {
@@ -45,7 +45,7 @@ namespace H.Engine.IO.IntegrationTests
 
             foreach (var pair in results)
             {
-                Assert.IsNotNull(pair.Value, $"Client event(\"{pair.Key}\") did not happen");
+                pair.Value.Should().NotBeNull(because: $"Client event(\"{pair.Key}\") did not happen");
             }
         }
     }

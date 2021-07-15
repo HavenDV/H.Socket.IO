@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using H.Socket.IO.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace H.Socket.IO.Tests
 {
@@ -23,9 +24,8 @@ namespace H.Socket.IO.Tests
                 }
             } while (index >= 0);
 
-            CollectionAssert.AreEqual(
-                new[] { "[\"message\"", "\"value\"", "\"value\"", "\"value\"]" },
-                text.SplitByIndexes(indexes.ToArray()));
+            text.SplitByIndexes(indexes.ToArray())
+                .Should().BeEquivalentTo(new[] { "[\"message\"", "\"value\"", "\"value\"", "\"value\"]" });
         }
     }
 }

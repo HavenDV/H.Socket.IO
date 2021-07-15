@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace H.Engine.IO.Tests
 {
@@ -9,8 +10,8 @@ namespace H.Engine.IO.Tests
         {
             var packet = EngineIoPacket.Decode(message);
 
-            Assert.AreEqual(expectedPacket.Prefix, packet.Prefix, $"{nameof(BaseDecodeTest)}.{nameof(packet.Prefix)}: {message}");
-            Assert.AreEqual(expectedPacket.Value, packet.Value, $"{nameof(BaseDecodeTest)}.{nameof(packet.Value)}: {message}");
+            packet.Prefix.Should().Be(expectedPacket.Prefix);
+            packet.Value.Should().Be(expectedPacket.Value);
 
             return packet;
         }
@@ -19,7 +20,7 @@ namespace H.Engine.IO.Tests
         {
             var message = packet.Encode();
 
-            Assert.AreEqual(expectedMessage, message, $"{nameof(BaseEncodeTest)}.{nameof(message)}: {message}");
+            message.Should().Be(expectedMessage);
 
             return message;
         }

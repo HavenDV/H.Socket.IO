@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
 
 namespace H.Socket.IO.Tests
 {
@@ -9,9 +10,9 @@ namespace H.Socket.IO.Tests
         {
             var packet = SocketIoPacket.Decode(message);
 
-            Assert.AreEqual(expectedPacket.Prefix, packet.Prefix, $"{nameof(BaseDecodeTest)}.{nameof(packet.Prefix)}: {message}");
-            Assert.AreEqual(expectedPacket.Namespace, packet.Namespace, $"{nameof(BaseDecodeTest)}.{nameof(packet.Namespace)}: {message}");
-            Assert.AreEqual(expectedPacket.Value, packet.Value, $"{nameof(BaseDecodeTest)}.{nameof(packet.Value)}: {message}");
+            packet.Prefix.Should().Be(expectedPacket.Prefix);
+            packet.Namespace.Should().Be(expectedPacket.Namespace);
+            packet.Value.Should().Be(expectedPacket.Value);
 
             return packet;
         }
@@ -20,7 +21,7 @@ namespace H.Socket.IO.Tests
         {
             var message = packet.Encode();
 
-            Assert.AreEqual(expectedMessage, message, $"{nameof(BaseEncodeTest)}.{nameof(message)}: {message}");
+            message.Should().Be(expectedMessage);
 
             return message;
         }

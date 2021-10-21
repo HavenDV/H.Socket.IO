@@ -133,17 +133,17 @@ await client.ConnectAsync(new Uri($"wss://socketio-chat-h9jt.herokuapp.com/?acce
 
 ### Live Example
 
-C# .NET Fiddle - https://dotnetfiddle.net/FWMpQ3 <br/>
-VB.NET .NET Fiddle - https://dotnetfiddle.net/WzIdnG <br/>
+C# .NET Fiddle - https://dotnetfiddle.net/FWMpQ3  
+VB.NET .NET Fiddle - https://dotnetfiddle.net/WzIdnG  
 Http client of the tested Socket.IO server - https://socket-io-chat.now.sh/
 
 ### Used documentation
 
-Socket.IO Protocol - https://github.com/socketio/socket.io-protocol <br/>
-Engine.IO Protocol - https://github.com/socketio/engine.io-protocol <br/>
+Socket.IO Protocol - https://github.com/socketio/socket.io-protocol  
+Engine.IO Protocol - https://github.com/socketio/engine.io-protocol  
 
-Python implementation of Socket.IO - https://github.com/miguelgrinberg/python-socketio/blob/master/socketio/ <br/>
-Python implementation of Engine.IO - https://github.com/miguelgrinberg/python-engineio/blob/master/engineio/ <br/>
+Python implementation of Socket.IO - https://github.com/miguelgrinberg/python-socketio/blob/master/socketio/  
+Python implementation of Engine.IO - https://github.com/miguelgrinberg/python-engineio/blob/master/engineio/  
 
 ### Contacts
 * [mail](mailto:havendv@gmail.com)

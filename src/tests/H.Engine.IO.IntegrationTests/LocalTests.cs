@@ -1,7 +1,6 @@
 namespace H.Engine.IO.IntegrationTests;
 
 [TestClass]
-[TestCategory("Local")]
 public class EngineIoClientTests
 {
     public const string LocalCharServerUrl = "ws://localhost:1465/";
@@ -9,6 +8,8 @@ public class EngineIoClientTests
     [TestMethod]
     public async Task ConnectToLocalChatServerTest()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         await BaseTests.ConnectToChatBaseTestAsync(LocalCharServerUrl, tokenSource.Token);

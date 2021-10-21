@@ -1,7 +1,6 @@
 namespace H.Socket.IO.IntegrationTests;
 
 [TestClass]
-[TestCategory("Local")]
 public class LocalTests
 {
     private const string LocalCharServerUrl = "ws://localhost:1465/";
@@ -9,6 +8,8 @@ public class LocalTests
     [TestMethod]
     public async Task ConnectToLocalChatServerTest()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 
@@ -18,6 +19,8 @@ public class LocalTests
     [TestMethod]
     public async Task ConnectToLocalChatServerNamespaceTest1()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 
@@ -44,6 +47,8 @@ public class LocalTests
     [TestMethod]
     public async Task ConnectToLocalChatServerNamespaceTest2()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 
@@ -68,6 +73,8 @@ public class LocalTests
     [TestMethod]
     public async Task RoomsTest()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 
@@ -89,6 +96,8 @@ public class LocalTests
     [TestMethod]
     public async Task ArraysTest()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 
@@ -118,6 +127,8 @@ public class LocalTests
     [TestMethod]
     public async Task ConnectToLocalChatServerDebugTest()
     {
+        TestUtilities.CheckDeveloper();
+
         using var tokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         var cancellationToken = tokenSource.Token;
 

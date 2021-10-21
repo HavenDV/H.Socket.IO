@@ -1,59 +1,9 @@
-﻿name: .NET
+﻿name: Build, test and publish
 on: [ push ]
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        dotnet: [ '5.0.x' ]
-        os: [ ubuntu-latest ]
-
-    runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }} - ${{ matrix.dotnet }}
-    env:
-      DOTNET_NOLOGO: true
-    
-    steps:
-    - name: Getting code
-      uses: actions/checkout@v2
-      with: 
-        fetch-depth: 50
-          
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ matrix.dotnet }}
-        include-prerelease: true
-
-    - name: Generate build number
-      if: contains(join(github.event.commits.*.message), 'fix:') || 
-          contains(join(github.event.commits.*.message), 'feat:')
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{ secrets.github_token }}
-      
-    - name: Generate Package Release Notes
-      run: |
-        echo 'PACKAGE_RELEASE_NOTES<<EOF' >> $GITHUB_ENV
-        echo '⭐ Last 10 features:' >> $GITHUB_ENV
-        git log -10 --pretty=format:"- %s %cs" --grep=feat >> $GITHUB_ENV
-        echo '' >> $GITHUB_ENV
-        echo '🐞 Last 10 bug fixes:' >> $GITHUB_ENV
-        git log -10 --pretty=format:"- %s %cs" --grep=fix >> $GITHUB_ENV
-        echo '' >> $GITHUB_ENV
-        echo 'EOF' >> $GITHUB_ENV
-    
-    - name: Build
-      run: dotnet build --configuration Release --nologo
-    
-    - name: Run tests
-      run: dotnet test --configuration Release --nologo --filter TestCategory!=Local
-        
-    - name: Publish
-      if: contains(join(github.event.commits.*.message), 'fix:') || 
-          contains(join(github.event.commits.*.message), 'feat:')
-      run: dotnet nuget push
-        src\**.nupkg
-        --api-key ${{ secrets.NUGET_KEY }}
-        --source https://api.nuget.org/v3/index.json
-        --skip-duplicate
+  build-test-publish:
+    name: Build, test and publish
+    uses: HavenDV/workflows/.github/workflows/dotnet_build-test-publish.yml@main
+    secrets:
+      nuget-key: ${{ secrets.NUGET_KEY }}

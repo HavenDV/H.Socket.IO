@@ -21,7 +21,7 @@
     <PackageProjectUrl>https://github.com/HavenDV/H.Socket.IO</PackageProjectUrl>
     <RepositoryUrl>https://github.com/HavenDV/H.Socket.IO</RepositoryUrl>
     <PackageIcon>nuget_icon.png</PackageIcon>
-    <!--<PackageReadmeFile>README.md</PackageReadmeFile> Bug: https://www.gitmemory.com/issue/NuGet/Home/10791/829457101-->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">

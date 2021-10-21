@@ -18,6 +18,10 @@ Features:
     <PackageTags>SocketIO, EngineIO, Socket.IO, Engine.IO, WebSockets, WebSocket</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net4.5' ">
+    <Reference Include="System.Net.Http" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\H.Engine.IO\H.Engine.IO.csproj" />
   </ItemGroup>

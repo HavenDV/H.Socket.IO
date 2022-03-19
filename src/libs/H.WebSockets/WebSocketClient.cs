@@ -334,56 +334,62 @@ public sealed class WebSocketClient : IDisposable
                 var buffer = new byte[1024];
 
                 WebSocketReceiveResult result;
+
+#pragma warning disable CA2000 // Dispose objects before losing scope
+                var stream = new MemoryStream();
+#pragma warning restore CA2000 // Dispose objects before losing scope
+
 #if NETSTANDARD2_1
-                await using var stream = new MemoryStream();
+                await using (stream.ConfigureAwait(false))
 #else
-                using var stream = new MemoryStream();
+                using (stream)
 #endif
-                do
                 {
-                    try
+                    do
                     {
-                        result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
-                    }
-                    catch (WebSocketException exception) when (LastConnectUri != null)
-                    {
-                        OnExceptionOccurred(exception);
+                        try
+                        {
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
+                        }
+                        catch (WebSocketException exception) when (LastConnectUri != null)
+                        {
+                            OnExceptionOccurred(exception);
 
-                        await ConnectAsync(LastConnectUri, cancellationToken).ConfigureAwait(false);
+                            await ConnectAsync(LastConnectUri, cancellationToken).ConfigureAwait(false);
 
-                        result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
-                    }
+                            result = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), cancellationToken).ConfigureAwait(false);
+                        }
 
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        OnDisconnected(result.CloseStatusDescription ?? string.Empty, result.CloseStatus);
-                        return;
-                    }
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            OnDisconnected(result.CloseStatusDescription ?? string.Empty, result.CloseStatus);
+                            return;
+                        }
 
 #if NETSTANDARD2_1
-                    await stream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
+                        await stream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
 #else
                         await stream.WriteAsync(buffer, 0, result.Count, cancellationToken).ConfigureAwait(false);
 #endif
-                } while (!result.EndOfMessage);
+                    } while (!result.EndOfMessage);
 
-                stream.Seek(0, SeekOrigin.Begin);
+                    stream.Seek(0, SeekOrigin.Begin);
 
-                switch (result.MessageType)
-                {
-                    case WebSocketMessageType.Text:
-                        {
-                            using var reader = new StreamReader(stream, Encoding.UTF8);
-                            var message = await reader.ReadToEndAsync().ConfigureAwait(false);
-                            OnTextReceived(message);
+                    switch (result.MessageType)
+                    {
+                        case WebSocketMessageType.Text:
+                            {
+                                using var reader = new StreamReader(stream, Encoding.UTF8);
+                                var message = await reader.ReadToEndAsync().ConfigureAwait(false);
+                                OnTextReceived(message);
+                                break;
+                            }
+
+                        case WebSocketMessageType.Binary:
+                            OnBytesReceived(stream.ToArray());
                             break;
-                        }
-
-                    case WebSocketMessageType.Binary:
-                        OnBytesReceived(stream.ToArray());
-                        break;
+                    }
                 }
-
             }
         }
         catch (OperationCanceledException)

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5.1</TargetFrameworks>
   </PropertyGroup>
 	  
   <PropertyGroup Label="NuGet">
@@ -20,7 +20,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net4.5' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net4.5.1' ">
     <Reference Include="System.Net.Http" />
   </ItemGroup>
 

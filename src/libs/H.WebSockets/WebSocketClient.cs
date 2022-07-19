@@ -3,13 +3,19 @@ using System.Net.WebSockets;
 using System.Text;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
+using EventGenerator;
 
 namespace H.WebSockets;
 
 /// <summary>
 /// 
 /// </summary>
-public sealed class WebSocketClient : IDisposable
+[Event("Connected")]
+[Event<WebSocketCloseEventArgs>("Disconnected")]
+[Event<DataEventArgs<string>>("TextReceived")]
+[Event<DataEventArgs<IReadOnlyCollection<byte>>>("BytesReceived")]
+[Event<DataEventArgs<Exception>>("ExceptionOccurred")]
+public sealed partial class WebSocketClient : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
 #endif
@@ -48,60 +54,6 @@ public sealed class WebSocketClient : IDisposable
 
     #endregion
 
-    #region Events
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<EventArgs>? Connected;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<WebSocketCloseEventArgs>? Disconnected;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? TextReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<IReadOnlyCollection<byte>>>? BytesReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<Exception>>? ExceptionOccurred;
-
-    private void OnConnected()
-    {
-        Connected?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void OnDisconnected(string reason, WebSocketCloseStatus? status)
-    {
-        Disconnected?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
-    }
-
-    private void OnTextReceived(string value)
-    {
-        TextReceived?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnBytesReceived(IReadOnlyCollection<byte> value)
-    {
-        BytesReceived?.Invoke(this, new DataEventArgs<IReadOnlyCollection<byte>>(value));
-    }
-
-    private void OnExceptionOccurred(Exception value)
-    {
-        ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
-    }
-
-    #endregion
-
     #region Constructors
 
     /// <summary>
@@ -109,7 +61,7 @@ public sealed class WebSocketClient : IDisposable
     /// </summary>
     public WebSocketClient()
     {
-        ReceiveWorker.ExceptionOccurred += (_, exception) => OnExceptionOccurred(exception);
+        ReceiveWorker.ExceptionOccurred += (_, exception) => OnExceptionOccurred(new DataEventArgs<Exception>(exception));
     }
 
     #endregion
@@ -186,7 +138,9 @@ public sealed class WebSocketClient : IDisposable
 
             if (Socket.State == WebSocketState.Aborted)
             {
-                OnDisconnected(Socket.CloseStatusDescription ?? string.Empty, Socket.CloseStatus);
+                OnDisconnected(new WebSocketCloseEventArgs(
+                    reason: Socket.CloseStatusDescription ?? string.Empty,
+                    status: Socket.CloseStatus));
             }
         }, nameof(Disconnected), cancellationToken)
             .ConfigureAwait(false);
@@ -353,7 +307,7 @@ public sealed class WebSocketClient : IDisposable
                         }
                         catch (WebSocketException exception) when (LastConnectUri != null)
                         {
-                            OnExceptionOccurred(exception);
+                            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
 
                             await ConnectAsync(LastConnectUri, cancellationToken).ConfigureAwait(false);
 
@@ -362,7 +316,9 @@ public sealed class WebSocketClient : IDisposable
 
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            OnDisconnected(result.CloseStatusDescription ?? string.Empty, result.CloseStatus);
+                            OnDisconnected(new WebSocketCloseEventArgs(
+                                reason: result.CloseStatusDescription ?? string.Empty,
+                                status: result.CloseStatus));
                             return;
                         }
 
@@ -381,12 +337,12 @@ public sealed class WebSocketClient : IDisposable
                             {
                                 using var reader = new StreamReader(stream, Encoding.UTF8);
                                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
-                                OnTextReceived(message);
+                                OnTextReceived(new DataEventArgs<string>(message));
                                 break;
                             }
 
                         case WebSocketMessageType.Binary:
-                            OnBytesReceived(stream.ToArray());
+                            OnBytesReceived(new DataEventArgs<IReadOnlyCollection<byte>>(stream.ToArray()));
                             break;
                     }
                 }
@@ -397,10 +353,12 @@ public sealed class WebSocketClient : IDisposable
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(exception);
+            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
         }
 
-        OnDisconnected(Socket.CloseStatusDescription ?? string.Empty, Socket.CloseStatus);
+        OnDisconnected(new WebSocketCloseEventArgs(
+            reason: Socket.CloseStatusDescription ?? string.Empty,
+            status: Socket.CloseStatus));
     }
 
     #endregion

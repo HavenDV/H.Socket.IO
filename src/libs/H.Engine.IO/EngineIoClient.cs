@@ -1,17 +1,26 @@
 ﻿using System.Net;
-using System.Net.WebSockets;
 using System.Timers;
 using H.WebSockets;
 using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
+using EventGenerator;
 
 namespace H.Engine.IO;
 
 /// <summary>
 /// Engine.IO Client
 /// </summary>
-public sealed class EngineIoClient : IDisposable
+[Event<DataEventArgs<EngineIoOpenMessage>>("Opened")]
+[Event<WebSocketCloseEventArgs>("Closed")]
+[Event<DataEventArgs<string>>("PingSent")]
+[Event<DataEventArgs<string>>("PingReceived")]
+[Event<DataEventArgs<string>>("PongReceived")]
+[Event<DataEventArgs<string>>("MessageReceived")]
+[Event<DataEventArgs<string>>("Upgraded")]
+[Event<DataEventArgs<string>>("NoopReceived")]
+[Event<DataEventArgs<Exception>>("ExceptionOccurred")]
+public sealed partial class EngineIoClient : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
 #endif
@@ -64,113 +73,7 @@ public sealed class EngineIoClient : IDisposable
     public Uri? Uri { get; set; }
 
     private string Framework { get; }
-    private System.Timers.Timer? Timer { get; set; }
-
-    #endregion
-
-    #region Events
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<EngineIoOpenMessage?>>? Opened;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<WebSocketCloseEventArgs>? Closed;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? PingSent;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? PingReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? PongReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? MessageReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? Upgraded;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<string>>? NoopReceived;
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public event EventHandler<DataEventArgs<Exception>>? ExceptionOccurred;
-
-    private void OnOpened(EngineIoOpenMessage? value)
-    {
-        if (Timer == null)
-        {
-            return;
-        }
-
-        IsOpened = true;
-
-        Timer.Interval = value?.PingInterval ?? 25000;
-        Timer.Start();
-
-        Opened?.Invoke(this, new DataEventArgs<EngineIoOpenMessage?>(value));
-    }
-
-    private void OnClosed(string reason, WebSocketCloseStatus? status)
-    {
-        IsOpened = false;
-
-        Closed?.Invoke(this, new WebSocketCloseEventArgs(reason, status));
-    }
-
-    private void OnPingSent(string value)
-    {
-        PingSent?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnPingReceived(string value)
-    {
-        PingReceived?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnPongReceived(string value)
-    {
-        PongReceived?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnMessageReceived(string value)
-    {
-        MessageReceived?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnUpgraded(string value)
-    {
-        Upgraded?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnNoopReceived(string value)
-    {
-        NoopReceived?.Invoke(this, new DataEventArgs<string>(value));
-    }
-
-    private void OnExceptionOccurred(Exception value)
-    {
-        ExceptionOccurred?.Invoke(this, new DataEventArgs<Exception>(value));
-    }
+    private System.Timers.Timer Timer { get; set; }
 
     #endregion
 
@@ -189,8 +92,12 @@ public sealed class EngineIoClient : IDisposable
 
         WebSocketClient = new WebSocketClient();
         WebSocketClient.TextReceived += WebSocketClient_OnTextReceived;
-        WebSocketClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Value);
-        WebSocketClient.Disconnected += (_, args) => OnClosed(args.Reason, args.Status);
+        WebSocketClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(new DataEventArgs<Exception>(args.Value));
+        WebSocketClient.Disconnected += (_, args) =>
+        {
+            IsOpened = false;
+            OnClosed(args);
+        };
     }
 
     #endregion
@@ -208,14 +115,14 @@ public sealed class EngineIoClient : IDisposable
 
             await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode()).ConfigureAwait(false);
 
-            OnPingSent(PingMessage);
+            OnPingSent(new DataEventArgs<string>(PingMessage));
         }
         catch (OperationCanceledException)
         {
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(exception);
+            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
         }
     }
 
@@ -235,38 +142,44 @@ public sealed class EngineIoClient : IDisposable
                 case EngineIoPacket.OpenPrefix:
                     OpenMessage = JsonConvert.DeserializeObject<EngineIoOpenMessage>(packet.Value);
                     IsOpened = true;
-                    OnOpened(OpenMessage);
+
+                    Timer.Interval = OpenMessage?.PingInterval ?? 25000;
+                    Timer.Start();
+
+                    OnOpened(new DataEventArgs<EngineIoOpenMessage>(OpenMessage ?? new EngineIoOpenMessage()));
                     break;
 
                 case EngineIoPacket.ClosePrefix:
                     IsOpened = false;
-                    OnClosed("Received close message from server", null);
+                    OnClosed(new WebSocketCloseEventArgs(
+                        reason: "Received close message from server",
+                        status: null));
                     break;
 
                 case EngineIoPacket.PingPrefix:
-                    OnPingReceived(packet.Value);
+                    OnPingReceived(new DataEventArgs<string>(packet.Value));
                     break;
 
                 case EngineIoPacket.PongPrefix:
-                    OnPongReceived(packet.Value);
+                    OnPongReceived(new DataEventArgs<string>(packet.Value));
                     break;
 
                 case EngineIoPacket.MessagePrefix:
-                    OnMessageReceived(packet.Value);
+                    OnMessageReceived(new DataEventArgs<string>(packet.Value));
                     break;
 
                 case EngineIoPacket.UpgradePrefix:
-                    OnUpgraded(packet.Value);
+                    OnUpgraded(new DataEventArgs<string>(packet.Value));
                     break;
 
                 case EngineIoPacket.NoopPrefix:
-                    OnNoopReceived(packet.Value);
+                    OnNoopReceived(new DataEventArgs<string>(packet.Value));
                     break;
             }
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(exception);
+            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
         }
     }
 
@@ -285,7 +198,6 @@ public sealed class EngineIoClient : IDisposable
     public async Task<EngineIoOpenMessage?> OpenAsync(Uri uri, CancellationToken cancellationToken = default)
     {
         WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
-        Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
 
         if (WebSocketClient.IsConnected)
         {
@@ -343,7 +255,6 @@ public sealed class EngineIoClient : IDisposable
     public async Task CloseAsync(CancellationToken cancellationToken = default)
     {
         WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
-        Timer = Timer ?? throw new ObjectDisposedException(nameof(Timer));
 
         Timer.Stop();
 
@@ -374,8 +285,7 @@ public sealed class EngineIoClient : IDisposable
     {
         WebSocketClient.Dispose();
 
-        Timer?.Dispose();
-        Timer = null;
+        Timer.Dispose();
     }
 
 #if NETSTANDARD2_1
@@ -387,8 +297,7 @@ public sealed class EngineIoClient : IDisposable
     {
         await WebSocketClient.DisposeAsync().ConfigureAwait(false);
 
-        Timer?.Dispose();
-        Timer = null;
+        Timer.Dispose();
     }
 #endif
 

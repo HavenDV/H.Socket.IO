@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EventGenerator.Generator" Version="0.4.1" PrivateAssets="all" ExcludeAssets="runtime">
+    <PackageReference Include="EventGenerator.Generator" Version="0.4.2" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

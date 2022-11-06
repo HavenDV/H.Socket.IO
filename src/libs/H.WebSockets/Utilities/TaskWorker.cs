@@ -1,3 +1,5 @@
+using EventGenerator;
+
 namespace H.WebSockets.Utilities;
 
 /// <summary>
@@ -5,7 +7,13 @@ namespace H.WebSockets.Utilities;
 /// and supporting automatic cancellation after Dispose <br/>
 /// <![CDATA[Version: 1.0.0.8]]> <br/>
 /// </summary>
-internal class TaskWorker : IDisposable
+[Event("Canceled", Description = "When canceled")]
+[Event("Completed", Description = "When completed(with any result)")]
+[Event("SuccessfulCompleted", Description = "When completed(without exceptions and cancellations)")]
+[Event<OperationCanceledException>("SuccessfulCompletedOrCanceled", Description = "When completed(without exceptions)")]
+[Event<Exception>("FailedOrCanceled", Description = "When canceled or exceptions")]
+[Event<Exception>("ExceptionOccurred", Description = "When a exception occurs(without OperationCanceledException's)")]
+internal partial class TaskWorker : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
 #endif
@@ -32,70 +40,6 @@ internal class TaskWorker : IDisposable
     /// Internal task CancellationTokenSource
     /// </summary>
     public CancellationTokenSource CancellationTokenSource { get; } = new CancellationTokenSource();
-
-    #endregion
-
-    #region Events
-
-    /// <summary>
-    /// When canceled
-    /// </summary>
-    public event EventHandler? Canceled;
-
-    /// <summary>
-    /// When completed(with any result)
-    /// </summary>
-    public event EventHandler? Completed;
-
-    /// <summary>
-    /// When completed(without exceptions and cancellations)
-    /// </summary>
-    public event EventHandler? SuccessfulCompleted;
-
-    /// <summary>
-    /// When completed(without exceptions)
-    /// </summary>
-    public event EventHandler<OperationCanceledException?>? SuccessfulCompletedOrCanceled;
-
-    /// <summary>
-    /// When canceled or exceptions
-    /// </summary>
-    public event EventHandler<Exception>? FailedOrCanceled;
-
-    /// <summary>
-    /// When a exception occurs(without OperationCanceledException's)
-    /// </summary>
-    public event EventHandler<Exception>? ExceptionOccurred;
-
-    private void OnCanceled()
-    {
-        Canceled?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void OnCompleted()
-    {
-        Completed?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void OnSuccessfulCompleted()
-    {
-        SuccessfulCompleted?.Invoke(this, EventArgs.Empty);
-    }
-
-    private void OnSuccessfulCompletedOrCanceled(OperationCanceledException? value)
-    {
-        SuccessfulCompletedOrCanceled?.Invoke(this, value);
-    }
-
-    private void OnFailedOrCanceled(Exception value)
-    {
-        FailedOrCanceled?.Invoke(this, value);
-    }
-
-    private void OnExceptionOccurred(Exception value)
-    {
-        ExceptionOccurred?.Invoke(this, value);
-    }
 
     #endregion
 
@@ -126,7 +70,7 @@ internal class TaskWorker : IDisposable
                 await func(CancellationTokenSource.Token).ConfigureAwait(false);
 
                 OnSuccessfulCompleted();
-                OnSuccessfulCompletedOrCanceled(null);
+                OnSuccessfulCompletedOrCanceled(null!);
             }
             catch (OperationCanceledException exception)
             {

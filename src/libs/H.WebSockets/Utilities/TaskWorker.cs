@@ -10,9 +10,9 @@ namespace H.WebSockets.Utilities;
 [Event("Canceled", Description = "When canceled")]
 [Event("Completed", Description = "When completed(with any result)")]
 [Event("SuccessfulCompleted", Description = "When completed(without exceptions and cancellations)")]
-[Event<OperationCanceledException>("SuccessfulCompletedOrCanceled", Description = "When completed(without exceptions)")]
-[Event<Exception>("FailedOrCanceled", Description = "When canceled or exceptions")]
-[Event<Exception>("ExceptionOccurred", Description = "When a exception occurs(without OperationCanceledException's)")]
+[Event<OperationCanceledException>("SuccessfulCompletedOrCanceled", Description = "When completed(without exceptions)", PropertyNames = new[] { "Exception" })]
+[Event<Exception>("FailedOrCanceled", Description = "When canceled or exceptions", PropertyNames = new[] { "Exception" })]
+[Event<Exception>("ExceptionOccurred", Description = "When a exception occurs(without OperationCanceledException's)", PropertyNames = new[] { "Exception" })]
 internal partial class TaskWorker : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
@@ -70,7 +70,7 @@ internal partial class TaskWorker : IDisposable
                 await func(CancellationTokenSource.Token).ConfigureAwait(false);
 
                 OnSuccessfulCompleted();
-                OnSuccessfulCompletedOrCanceled(null!);
+                OnSuccessfulCompletedOrCanceled((OperationCanceledException)null!);
             }
             catch (OperationCanceledException exception)
             {

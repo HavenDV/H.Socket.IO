@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.WebSockets;
 using System.Text;
-using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using EventGenerator;
 
@@ -11,10 +10,10 @@ namespace H.WebSockets;
 /// 
 /// </summary>
 [Event("Connected")]
-[Event<WebSocketCloseEventArgs>("Disconnected")]
-[Event<DataEventArgs<string>>("TextReceived")]
-[Event<DataEventArgs<IReadOnlyCollection<byte>>>("BytesReceived")]
-[Event<DataEventArgs<Exception>>("ExceptionOccurred")]
+[Event<string, WebSocketCloseStatus?>("Disconnected", PropertyNames = new []{ "Reason", "Status" })]
+[Event<string>("TextReceived", PropertyNames = new[] { "Text" })]
+[Event<IReadOnlyCollection<byte>>("BytesReceived", PropertyNames = new[] { "Bytes" })]
+[Event<Exception>("ExceptionOccurred", PropertyNames = new[] { "Exception" })]
 public sealed partial class WebSocketClient : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
@@ -61,7 +60,7 @@ public sealed partial class WebSocketClient : IDisposable
     /// </summary>
     public WebSocketClient()
     {
-        ReceiveWorker.ExceptionOccurred += (_, exception) => OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+        ReceiveWorker.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Exception);
     }
 
     #endregion
@@ -128,7 +127,7 @@ public sealed partial class WebSocketClient : IDisposable
             return;
         }
 
-        await this.WaitEventAsync<WebSocketCloseEventArgs>(async () =>
+        await this.WaitEventAsync<DisconnectedEventArgs>(async () =>
         {
             await Socket.CloseAsync(
                 WebSocketCloseStatus.NormalClosure,
@@ -138,9 +137,9 @@ public sealed partial class WebSocketClient : IDisposable
 
             if (Socket.State == WebSocketState.Aborted)
             {
-                OnDisconnected(new WebSocketCloseEventArgs(
+                OnDisconnected(
                     reason: Socket.CloseStatusDescription ?? string.Empty,
-                    status: Socket.CloseStatus));
+                    status: Socket.CloseStatus);
             }
         }, nameof(Disconnected), cancellationToken)
             .ConfigureAwait(false);
@@ -191,9 +190,9 @@ public sealed partial class WebSocketClient : IDisposable
     /// <param name="cancellationToken"></param>
     /// <exception cref="OperationCanceledException"></exception>
     /// <returns></returns>
-    public async Task<DataEventArgs<string>> WaitTextAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
+    public async Task<TextReceivedEventArgs> WaitTextAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
     {
-        return await this.WaitEventAsync<DataEventArgs<string>>(
+        return await this.WaitEventAsync<TextReceivedEventArgs>(
             func ?? (() => Task.FromResult(false)),
             nameof(TextReceived),
             cancellationToken)
@@ -209,7 +208,7 @@ public sealed partial class WebSocketClient : IDisposable
     /// <param name="func"></param>
     /// <exception cref="OperationCanceledException"></exception>
     /// <returns></returns>
-    public async Task<DataEventArgs<string>> WaitTextAsync(TimeSpan timeout, Func<Task>? func = null)
+    public async Task<TextReceivedEventArgs> WaitTextAsync(TimeSpan timeout, Func<Task>? func = null)
     {
         using var tokenSource = new CancellationTokenSource(timeout);
         var cancellationToken = tokenSource.Token;
@@ -227,9 +226,9 @@ public sealed partial class WebSocketClient : IDisposable
     /// <param name="cancellationToken"></param>
     /// <exception cref="OperationCanceledException"></exception>
     /// <returns></returns>
-    public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
+    public async Task<BytesReceivedEventArgs> WaitBytesAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
     {
-        return await this.WaitEventAsync<DataEventArgs<IReadOnlyCollection<byte>>>(
+        return await this.WaitEventAsync<BytesReceivedEventArgs>(
             func ?? (() => Task.FromResult(false)),
             nameof(BytesReceived),
             cancellationToken)
@@ -245,7 +244,7 @@ public sealed partial class WebSocketClient : IDisposable
     /// <param name="func"></param>
     /// <exception cref="OperationCanceledException"></exception>
     /// <returns></returns>
-    public async Task<DataEventArgs<IReadOnlyCollection<byte>>> WaitBytesAsync(TimeSpan timeout, Func<Task>? func = null)
+    public async Task<BytesReceivedEventArgs> WaitBytesAsync(TimeSpan timeout, Func<Task>? func = null)
     {
         using var tokenSource = new CancellationTokenSource(timeout);
 
@@ -307,7 +306,7 @@ public sealed partial class WebSocketClient : IDisposable
                         }
                         catch (WebSocketException exception) when (LastConnectUri != null)
                         {
-                            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+                            OnExceptionOccurred(exception);
 
                             await ConnectAsync(LastConnectUri, cancellationToken).ConfigureAwait(false);
 
@@ -316,9 +315,9 @@ public sealed partial class WebSocketClient : IDisposable
 
                         if (result.MessageType == WebSocketMessageType.Close)
                         {
-                            OnDisconnected(new WebSocketCloseEventArgs(
+                            OnDisconnected(
                                 reason: result.CloseStatusDescription ?? string.Empty,
-                                status: result.CloseStatus));
+                                status: result.CloseStatus);
                             return;
                         }
 
@@ -337,12 +336,12 @@ public sealed partial class WebSocketClient : IDisposable
                             {
                                 using var reader = new StreamReader(stream, Encoding.UTF8);
                                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
-                                OnTextReceived(new DataEventArgs<string>(message));
+                                OnTextReceived(message);
                                 break;
                             }
 
                         case WebSocketMessageType.Binary:
-                            OnBytesReceived(new DataEventArgs<IReadOnlyCollection<byte>>(stream.ToArray()));
+                            OnBytesReceived(stream.ToArray());
                             break;
                     }
                 }
@@ -353,12 +352,12 @@ public sealed partial class WebSocketClient : IDisposable
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+            OnExceptionOccurred(exception);
         }
 
-        OnDisconnected(new WebSocketCloseEventArgs(
+        OnDisconnected(
             reason: Socket.CloseStatusDescription ?? string.Empty,
-            status: Socket.CloseStatus));
+            status: Socket.CloseStatus);
     }
 
     #endregion

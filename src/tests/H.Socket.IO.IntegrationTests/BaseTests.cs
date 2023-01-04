@@ -1,4 +1,3 @@
-using H.Socket.IO.EventsArgs;
 using H.WebSockets.Utilities;
 
 namespace H.Socket.IO.IntegrationTests;
@@ -22,7 +21,7 @@ internal class BaseTests
         client.HandledEventReceived += (_, args) => Console.WriteLine($"HandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
         client.UnhandledEventReceived += (_, args) => Console.WriteLine($"UnhandledEventReceived: Namespace: {args.Namespace}, Value: {args.Value}");
         client.ErrorReceived += (_, args) => Console.WriteLine($"ErrorReceived: Namespace: {args.Namespace}, Value: {args.Value}");
-        client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
+        client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Exception}");
 
         var results = await client.WaitAllEventsAsync<EventArgs>(
             async () => await func(client),
@@ -44,21 +43,21 @@ internal class BaseTests
 
     public static void EnableDebug(SocketIoClient client)
     {
-        client.EngineIoClient.Opened += (_, args) => Console.WriteLine($"EngineIoClient.Opened. Sid: {args.Value?.Sid}");
+        client.EngineIoClient.Opened += (_, args) => Console.WriteLine($"EngineIoClient.Opened. Sid: {args.Message?.Sid}");
         client.EngineIoClient.Closed += (_, args) => Console.WriteLine($"EngineIoClient.Closed. Reason: {args.Reason}, Status: {args.Status:G}");
-        client.EngineIoClient.Upgraded += (_, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Value}");
-        client.EngineIoClient.ExceptionOccurred += (_, args) => Console.WriteLine($"EngineIoClient.ExceptionOccurred: {args.Value}");
-        client.EngineIoClient.MessageReceived += (_, args) => Console.WriteLine($"EngineIoClient.MessageReceived: {args.Value}");
-        client.EngineIoClient.NoopReceived += (_, args) => Console.WriteLine($"EngineIoClient.NoopReceived: {args.Value}");
-        client.EngineIoClient.PingReceived += (_, args) => Console.WriteLine($"EngineIoClient.PingReceived: {args.Value}");
-        client.EngineIoClient.PongReceived += (_, args) => Console.WriteLine($"EngineIoClient.PongReceived: {args.Value}");
-        client.EngineIoClient.PingSent += (_, args) => Console.WriteLine($"EngineIoClient.PingSent: {args.Value}");
+        client.EngineIoClient.Upgraded += (_, args) => Console.WriteLine($"EngineIoClient.Upgraded: {args.Message}");
+        client.EngineIoClient.ExceptionOccurred += (_, args) => Console.WriteLine($"EngineIoClient.ExceptionOccurred: {args.Exception}");
+        client.EngineIoClient.MessageReceived += (_, args) => Console.WriteLine($"EngineIoClient.MessageReceived: {args.Message}");
+        client.EngineIoClient.NoopReceived += (_, args) => Console.WriteLine($"EngineIoClient.NoopReceived: {args.Message}");
+        client.EngineIoClient.PingReceived += (_, args) => Console.WriteLine($"EngineIoClient.PingReceived: {args.Message}");
+        client.EngineIoClient.PongReceived += (_, args) => Console.WriteLine($"EngineIoClient.PongReceived: {args.Message}");
+        client.EngineIoClient.PingSent += (_, args) => Console.WriteLine($"EngineIoClient.PingSent: {args.Message}");
 
         client.EngineIoClient.WebSocketClient.Connected += (_, _) => Console.WriteLine("WebSocketClient.Connected");
         client.EngineIoClient.WebSocketClient.Disconnected += (_, args) => Console.WriteLine($"WebSocketClient.Disconnected. Reason: {args.Reason}, Status: {args.Status:G}");
-        client.EngineIoClient.WebSocketClient.TextReceived += (_, args) => Console.WriteLine($"WebSocketClient.TextReceived: {args.Value}");
-        client.EngineIoClient.WebSocketClient.ExceptionOccurred += (_, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Value}");
-        client.EngineIoClient.WebSocketClient.BytesReceived += (_, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Value.Count}");
+        client.EngineIoClient.WebSocketClient.TextReceived += (_, args) => Console.WriteLine($"WebSocketClient.TextReceived: {args.Text}");
+        client.EngineIoClient.WebSocketClient.ExceptionOccurred += (_, args) => Console.WriteLine($"WebSocketClient.ExceptionOccurred: {args.Exception}");
+        client.EngineIoClient.WebSocketClient.BytesReceived += (_, args) => Console.WriteLine($"WebSocketClient.BytesReceived: {args.Bytes.Count}");
     }
 
     public class ChatMessage
@@ -113,11 +112,11 @@ internal class BaseTests
             }, cancellationToken);
             switch (args)
             {
-                case SocketIoEventEventArgs eventArgs:
+                case SocketIoClient.EventReceivedEventArgs eventArgs:
                     Console.WriteLine($"WaitEventOrErrorAsync: Event received: {eventArgs}");
                     break;
 
-                case SocketIoErrorEventArgs errorArgs:
+                case SocketIoClient.ErrorReceivedEventArgs errorArgs:
                     Assert.Fail($"WaitEventOrErrorAsync: Error received after add user: {errorArgs}");
                     break;
 

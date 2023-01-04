@@ -1,8 +1,7 @@
 ﻿using System.Net;
+using System.Net.WebSockets;
 using H.Engine.IO;
-using H.Socket.IO.EventsArgs;
 using H.Socket.IO.Utilities;
-using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
 using EventGenerator;
@@ -12,13 +11,19 @@ namespace H.Socket.IO;
 /// <summary>
 /// Socket.IO Client.
 /// </summary>
-[Event<SocketIoEventEventArgs>("Connected", Description = "Occurs after a successful connection to each namespace.")]
-[Event<WebSocketCloseEventArgs>("Disconnected", Description = "Occurs after a disconnection.")]
-[Event<SocketIoEventEventArgs>("EventReceived", Description = "Occurs after new event.")]
-[Event<SocketIoEventEventArgs>("HandledEventReceived", Description = "Occurs after new handled event(captured by any On).")]
-[Event<SocketIoEventEventArgs>("UnhandledEventReceived", Description = "Occurs after new unhandled event(not captured by any On).")]
-[Event<SocketIoErrorEventArgs>("ErrorReceived", Description = "Occurs after new error.")]
-[Event<DataEventArgs<Exception>>("ExceptionOccurred", Description = "Occurs after new exception.")]
+[Event<string, string, bool>("Connected", Description = "Occurs after a successful connection to each namespace.",
+    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
+[Event<string, WebSocketCloseStatus?>("Disconnected", Description = "Occurs after a disconnection.",
+    PropertyNames = new []{ "Reason", "Status" })]
+[Event<string, string, bool>("EventReceived", Description = "Occurs after new event.",
+    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
+[Event<string, string, bool>("HandledEventReceived", Description = "Occurs after new handled event(captured by any On).",
+    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
+[Event<string, string, bool>("UnhandledEventReceived", Description = "Occurs after new unhandled event(not captured by any On).",
+    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
+[Event<string, string>("ErrorReceived", Description = "Occurs after new error.",
+    PropertyNames = new []{ "Value", "Namespace" })]
+[Event<Exception>("ExceptionOccurred", Description = "Occurs after new exception.", PropertyNames = new []{ "Exception" })]
 public sealed partial class SocketIoClient : IDisposable
 #if NETSTANDARD2_1
     , IAsyncDisposable
@@ -74,40 +79,40 @@ public sealed partial class SocketIoClient : IDisposable
     {
         EngineIoClient = new EngineIoClient("socket.io");
         EngineIoClient.MessageReceived += EngineIoClient_MessageReceived;
-        EngineIoClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(new DataEventArgs<Exception>(args.Value));
-        EngineIoClient.Closed += (_, args) => OnDisconnected(args);
+        EngineIoClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Exception);
+        EngineIoClient.Closed += (_, args) => OnDisconnected(args.Reason, args.Status);
     }
 
     #endregion
 
     #region Event Handlers
 
-    private void EngineIoClient_MessageReceived(object? sender, DataEventArgs<string>? args)
+    private void EngineIoClient_MessageReceived(object? sender, EngineIoClient.MessageReceivedEventArgs args)
     {
         try
         {
-            if (args?.Value == null)
+            if (args?.Message == null)
             {
                 throw new InvalidOperationException("Engine.IO message is null");
             }
 
-            if (args.Value.Length < 1)
+            if (args.Message.Length < 1)
             {
                 // ignore - it's Engine.IO message
                 return;
             }
 
-            var packet = SocketIoPacket.Decode(args.Value);
+            var packet = SocketIoPacket.Decode(args.Message);
             switch (packet.Prefix)
             {
                 case SocketIoPacket.ConnectPrefix:
-                    OnConnected(new SocketIoEventEventArgs(string.Empty, packet.Namespace, false));
+                    OnConnected(value: string.Empty, @namespace: packet.Namespace, isHandled: false);
                     break;
 
                 case SocketIoPacket.DisconnectPrefix:
-                    OnDisconnected(new WebSocketCloseEventArgs(
+                    OnDisconnected(
                         reason: "Received disconnect message from server",
-                        status: null));
+                        status: null);
                     break;
 
                 case SocketIoPacket.EventPrefix:
@@ -136,7 +141,7 @@ public sealed partial class SocketIoClient : IDisposable
                                 }
                                 catch (Exception exception)
                                 {
-                                    OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+                                    OnExceptionOccurred(exception);
                                 }
                             }
                         }
@@ -158,7 +163,7 @@ public sealed partial class SocketIoClient : IDisposable
                                 }
                                 catch (Exception exception)
                                 {
-                                    OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+                                    OnExceptionOccurred(exception);
                                 }
                             }
                         }
@@ -186,40 +191,39 @@ public sealed partial class SocketIoClient : IDisposable
                                 }
                                 catch (Exception exception)
                                 {
-                                    OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+                                    OnExceptionOccurred(exception);
                                 }
                             }
                         }
                     }
                     catch (Exception exception)
                     {
-                        OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+                        OnExceptionOccurred(exception);
                     }
                     finally
                     {
-                        var eventArgs = new SocketIoEventEventArgs(packet.Value, packet.Namespace, isHandled);
-                        OnEventReceived(eventArgs);
+                        OnEventReceived(value: packet.Value, @namespace: packet.Namespace, isHandled: isHandled);
                         if (isHandled)
                         {
-                            OnHandledEventReceived(eventArgs);
+                            OnHandledEventReceived(value: packet.Value, @namespace: packet.Namespace, isHandled: isHandled);
                         }
                         else
                         {
-                            OnUnhandledEventReceived(eventArgs);
+                            OnUnhandledEventReceived(value: packet.Value, @namespace: packet.Namespace, isHandled: isHandled);
                         }
                     }
                     break;
 
                 case SocketIoPacket.ErrorPrefix:
-                    OnErrorReceived(new SocketIoErrorEventArgs(
+                    OnErrorReceived(
                         value: packet.Value.Trim('\"'),
-                        @namespace: packet.Namespace));
+                        @namespace: packet.Namespace);
                     break;
             }
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+            OnExceptionOccurred(exception);
         }
     }
 
@@ -259,9 +263,9 @@ public sealed partial class SocketIoClient : IDisposable
                 await EngineIoClient.OpenAsync(uri, cancellationToken).ConfigureAwait(false);
             }, cancellationToken, nameof(Connected), nameof(ErrorReceived)).ConfigureAwait(false);
 
-            if (results[nameof(ErrorReceived)] is SocketIoErrorEventArgs error)
+            if (results[nameof(ErrorReceived)] is ErrorReceivedEventArgs errorArgs)
             {
-                throw new InvalidOperationException($"Socket.IO returns error: {error.Value}");
+                throw new InvalidOperationException($"Socket.IO returns error: {errorArgs.Value}");
             }
             if (results[nameof(Connected)] == null)
             {
@@ -295,7 +299,7 @@ public sealed partial class SocketIoClient : IDisposable
             return true;
         }
 
-        return await this.WaitEventAsync<SocketIoEventEventArgs>(async () =>
+        return await this.WaitEventAsync<ConnectedEventArgs>(async () =>
         {
             foreach (var @namespace in namespaces)
             {
@@ -394,16 +398,16 @@ public sealed partial class SocketIoClient : IDisposable
 
     /// <summary>
     /// Waits for the next event or error asynchronously <br/>
-    /// Returns <see cref="SocketIoEventEventArgs"/> if event was received <br/>
-    /// Returns <see cref="SocketIoErrorEventArgs"/> if error was received <br/>
+    /// Returns <see cref="EventReceivedEventArgs"/> if event was received <br/>
+    /// Returns <see cref="ErrorReceivedEventArgs"/> if error was received <br/>
     /// Returns null if no event was received and the method was canceled <br/>
     /// </summary>
     /// <param name="func"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<SocketIoEventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
+    public async Task<EventArgs?> WaitEventOrErrorAsync(Func<Task>? func = null, CancellationToken cancellationToken = default)
     {
-        var dictionary = await this.WaitAnyEventAsync<SocketIoEventArgs?>(
+        var dictionary = await this.WaitAnyEventAsync<EventArgs?>(
             func ?? (() => Task.FromResult(false)),
             cancellationToken,
             nameof(EventReceived), nameof(ErrorReceived))
@@ -415,14 +419,14 @@ public sealed partial class SocketIoClient : IDisposable
 
     /// <summary>
     /// Waits for the next event or error asynchronously with specified timeout <br/>
-    /// Returns <see cref="SocketIoEventEventArgs"/> if event was received <br/>
-    /// Returns <see cref="SocketIoErrorEventArgs"/> if error was received <br/>
+    /// Returns <see cref="EventReceivedEventArgs"/> if event was received <br/>
+    /// Returns <see cref="ErrorReceivedEventArgs"/> if error was received <br/>
     /// Returns null if no event was received and the method was canceled <br/>
     /// </summary>
     /// <param name="timeout"></param>
     /// <param name="func"></param>
     /// <returns></returns>
-    public async Task<SocketIoEventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<Task>? func = null)
+    public async Task<EventArgs?> WaitEventOrErrorAsync(TimeSpan timeout, Func<Task>? func = null)
     {
         using var tokenSource = new CancellationTokenSource(timeout);
 

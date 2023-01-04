@@ -12,9 +12,9 @@ internal class BaseTests
         using var client = new EngineIoClient("socket.io");
 #endif
 
-        client.MessageReceived += (_, args) => Console.WriteLine($"MessageReceived: {args.Value}");
-        client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Value}");
-        client.Opened += (_, args) => Console.WriteLine($"Opened: {args.Value}");
+        client.MessageReceived += (_, args) => Console.WriteLine($"MessageReceived: {args.Message}");
+        client.ExceptionOccurred += (_, args) => Console.WriteLine($"ExceptionOccurred: {args.Exception}");
+        client.Opened += (_, args) => Console.WriteLine($"Opened: {args.Message}");
         client.Closed += (_, args) => Console.WriteLine($"Closed. Reason: {args.Reason}, Status: {args.Status:G}");
 
         var results = await client.WaitAllEventsAsync<EventArgs>(async () =>

@@ -1,7 +1,7 @@
 ﻿using System.Net;
+using System.Net.WebSockets;
 using System.Timers;
 using H.WebSockets;
-using H.WebSockets.Args;
 using H.WebSockets.Utilities;
 using Newtonsoft.Json;
 using EventGenerator;
@@ -11,15 +11,15 @@ namespace H.Engine.IO;
 /// <summary>
 /// Engine.IO Client
 /// </summary>
-[Event<DataEventArgs<EngineIoOpenMessage>>("Opened")]
-[Event<WebSocketCloseEventArgs>("Closed")]
-[Event<DataEventArgs<string>>("PingSent")]
-[Event<DataEventArgs<string>>("PingReceived")]
-[Event<DataEventArgs<string>>("PongReceived")]
-[Event<DataEventArgs<string>>("MessageReceived")]
-[Event<DataEventArgs<string>>("Upgraded")]
-[Event<DataEventArgs<string>>("NoopReceived")]
-[Event<DataEventArgs<Exception>>("ExceptionOccurred")]
+[Event<EngineIoOpenMessage>("Opened", PropertyNames = new []{ "Message" })]
+[Event<string, WebSocketCloseStatus?>("Closed", PropertyNames = new []{ "Reason", "Status" })]
+[Event<string>("PingSent", PropertyNames = new []{ "Message" })]
+[Event<string>("PingReceived", PropertyNames = new []{ "Message" })]
+[Event<string>("PongReceived", PropertyNames = new []{ "Message" })]
+[Event<string>("MessageReceived", PropertyNames = new []{ "Message" })]
+[Event<string>("Upgraded", PropertyNames = new []{ "Message" })]
+[Event<string>("NoopReceived", PropertyNames = new []{ "Message" })]
+[Event<Exception>("ExceptionOccurred", PropertyNames = new []{ "Exception" })]
 public sealed partial class EngineIoClient : IDisposable
 #if NETSTANDARD2_1
         , IAsyncDisposable
@@ -92,11 +92,11 @@ public sealed partial class EngineIoClient : IDisposable
 
         WebSocketClient = new WebSocketClient();
         WebSocketClient.TextReceived += WebSocketClient_OnTextReceived;
-        WebSocketClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(new DataEventArgs<Exception>(args.Value));
+        WebSocketClient.ExceptionOccurred += (_, args) => OnExceptionOccurred(args.Exception);
         WebSocketClient.Disconnected += (_, args) =>
         {
             IsOpened = false;
-            OnClosed(args);
+            OnClosed(args.Reason, args.Status);
         };
     }
 
@@ -115,22 +115,22 @@ public sealed partial class EngineIoClient : IDisposable
 
             await WebSocketClient.SendTextAsync(new EngineIoPacket(EngineIoPacket.PingPrefix, PingMessage).Encode()).ConfigureAwait(false);
 
-            OnPingSent(new DataEventArgs<string>(PingMessage));
+            OnPingSent(PingMessage);
         }
         catch (OperationCanceledException)
         {
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+            OnExceptionOccurred(exception);
         }
     }
 
-    private void WebSocketClient_OnTextReceived(object? sender, DataEventArgs<string>? args)
+    private void WebSocketClient_OnTextReceived(object? sender, WebSocketClient.TextReceivedEventArgs? args)
     {
         try
         {
-            var text = args?.Value ?? throw new InvalidOperationException("Null Engine.IO string");
+            var text = args?.Text ?? throw new InvalidOperationException("Null Engine.IO string");
             if (string.IsNullOrWhiteSpace(text))
             {
                 throw new InvalidOperationException("Empty Engine.IO string");
@@ -146,40 +146,40 @@ public sealed partial class EngineIoClient : IDisposable
                     Timer.Interval = OpenMessage?.PingInterval ?? 25000;
                     Timer.Start();
 
-                    OnOpened(new DataEventArgs<EngineIoOpenMessage>(OpenMessage ?? new EngineIoOpenMessage()));
+                    OnOpened(OpenMessage ?? new EngineIoOpenMessage());
                     break;
 
                 case EngineIoPacket.ClosePrefix:
                     IsOpened = false;
-                    OnClosed(new WebSocketCloseEventArgs(
+                    OnClosed(
                         reason: "Received close message from server",
-                        status: null));
+                        status: null);
                     break;
 
                 case EngineIoPacket.PingPrefix:
-                    OnPingReceived(new DataEventArgs<string>(packet.Value));
+                    OnPingReceived(packet.Value);
                     break;
 
                 case EngineIoPacket.PongPrefix:
-                    OnPongReceived(new DataEventArgs<string>(packet.Value));
+                    OnPongReceived(packet.Value);
                     break;
 
                 case EngineIoPacket.MessagePrefix:
-                    OnMessageReceived(new DataEventArgs<string>(packet.Value));
+                    OnMessageReceived(packet.Value);
                     break;
 
                 case EngineIoPacket.UpgradePrefix:
-                    OnUpgraded(new DataEventArgs<string>(packet.Value));
+                    OnUpgraded(packet.Value);
                     break;
 
                 case EngineIoPacket.NoopPrefix:
-                    OnNoopReceived(new DataEventArgs<string>(packet.Value));
+                    OnNoopReceived(packet.Value);
                     break;
             }
         }
         catch (Exception exception)
         {
-            OnExceptionOccurred(new DataEventArgs<Exception>(exception));
+            OnExceptionOccurred(exception);
         }
     }
 
@@ -207,12 +207,12 @@ public sealed partial class EngineIoClient : IDisposable
         Uri = uri ?? throw new ArgumentNullException(nameof(uri));
         var socketIoUri = ToWebSocketUri(uri, Framework);
 
-        var args = await this.WaitEventAsync<DataEventArgs<EngineIoOpenMessage?>>(async () =>
+        var args = await this.WaitEventAsync<OpenedEventArgs>(async () =>
         {
             await WebSocketClient.ConnectAsync(socketIoUri, cancellationToken).ConfigureAwait(false);
         }, nameof(Opened), cancellationToken).ConfigureAwait(false);
 
-        return args.Value;
+        return args.Message;
     }
 
     internal static Uri ToWebSocketUri(Uri uri, string framework)

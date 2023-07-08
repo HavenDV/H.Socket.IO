@@ -4,7 +4,7 @@ using System.Text;
 using H.WebSockets.Utilities;
 using EventGenerator;
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
 using System.Net.Security;
 #endif
 
@@ -19,7 +19,7 @@ namespace H.WebSockets;
 [Event<IReadOnlyCollection<byte>>("BytesReceived", PropertyNames = new[] { "Bytes" })]
 [Event<Exception>("ExceptionOccurred", PropertyNames = new[] { "Exception" })]
 public sealed partial class WebSocketClient : IDisposable
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable
 #endif
 {
@@ -53,7 +53,7 @@ public sealed partial class WebSocketClient : IDisposable
         }
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     /// <summary>
     /// 
     /// </summary>
@@ -109,7 +109,7 @@ public sealed partial class WebSocketClient : IDisposable
 
         LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
         if (RemoteCertificateValidationCallback != null)
         {
             Socket.Options.RemoteCertificateValidationCallback += RemoteCertificateValidationCallback;
@@ -289,7 +289,7 @@ public sealed partial class WebSocketClient : IDisposable
         Socket.Dispose();
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     /// <summary>
     /// Cancel receive task(if it's not completed) and dispose internal resources
     /// </summary>
@@ -319,7 +319,7 @@ public sealed partial class WebSocketClient : IDisposable
                 var stream = new MemoryStream();
 #pragma warning restore CA2000 // Dispose objects before losing scope
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
                 await using (stream.ConfigureAwait(false))
 #else
                 using (stream)
@@ -348,7 +348,7 @@ public sealed partial class WebSocketClient : IDisposable
                             return;
                         }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
                         await stream.WriteAsync(buffer.AsMemory(0, result.Count), cancellationToken).ConfigureAwait(false);
 #else
                         await stream.WriteAsync(buffer, 0, result.Count, cancellationToken).ConfigureAwait(false);
@@ -362,7 +362,11 @@ public sealed partial class WebSocketClient : IDisposable
                         case WebSocketMessageType.Text:
                             {
                                 using var reader = new StreamReader(stream, Encoding.UTF8);
+#if NET7_0_OR_GREATER
+                                var message = await reader.ReadToEndAsync(cancellationToken).ConfigureAwait(false);
+#else
                                 var message = await reader.ReadToEndAsync().ConfigureAwait(false);
+#endif
                                 OnTextReceived(message);
                                 break;
                             }

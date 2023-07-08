@@ -25,7 +25,7 @@ namespace H.Socket.IO;
     PropertyNames = new []{ "Value", "Namespace" })]
 [Event<Exception>("ExceptionOccurred", Description = "Occurs after new exception.", PropertyNames = new []{ "Exception" })]
 public sealed partial class SocketIoClient : IDisposable
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     , IAsyncDisposable
 #endif
 {
@@ -467,18 +467,9 @@ public sealed partial class SocketIoClient : IDisposable
         name = name ?? throw new ArgumentNullException(nameof(name));
 
         var key = GetOnKey(name, customNamespace);
-        if (JsonDeserializeActions.ContainsKey(key))
-        {
-            JsonDeserializeActions.Remove(key);
-        }
-        if (TextActions.ContainsKey(key))
-        {
-            TextActions.Remove(key);
-        }
-        if (Actions.ContainsKey(key))
-        {
-            Actions.Remove(key);
-        }
+        _ = JsonDeserializeActions.Remove(key);
+        _ = TextActions.Remove(key);
+        _ = Actions.Remove(key);
     }
 
     /// <summary>
@@ -575,7 +566,7 @@ public sealed partial class SocketIoClient : IDisposable
         EngineIoClient.Dispose();
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     /// <summary>
     /// Asynchronously disposes an object.
     /// </summary>

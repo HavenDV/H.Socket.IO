@@ -14,7 +14,7 @@ namespace H.WebSockets.Utilities;
 [Event<Exception>("FailedOrCanceled", Description = "When canceled or exceptions", PropertyNames = new[] { "Exception" })]
 [Event<Exception>("ExceptionOccurred", Description = "When a exception occurs(without OperationCanceledException's)", PropertyNames = new[] { "Exception" })]
 internal partial class TaskWorker : IDisposable
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable
 #endif
 {
@@ -126,7 +126,7 @@ internal partial class TaskWorker : IDisposable
         CancellationTokenSource.Dispose();
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     /// <summary>
     /// Cancel task(if it's not completed) and dispose internal resources <br/>
     /// </summary>

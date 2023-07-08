@@ -21,7 +21,7 @@ namespace H.Engine.IO;
 [Event<string>("NoopReceived", PropertyNames = new []{ "Message" })]
 [Event<Exception>("ExceptionOccurred", PropertyNames = new []{ "Exception" })]
 public sealed partial class EngineIoClient : IDisposable
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable
 #endif
 {
@@ -104,7 +104,7 @@ public sealed partial class EngineIoClient : IDisposable
 
     #region Event Handlers
 
-    private async void Timer_Elapsed(object sender, ElapsedEventArgs args)
+    private async void Timer_Elapsed(object? sender, ElapsedEventArgs args)
     {
         WebSocketClient = WebSocketClient ?? throw new ObjectDisposedException(nameof(WebSocketClient));
 
@@ -288,7 +288,7 @@ public sealed partial class EngineIoClient : IDisposable
         Timer.Dispose();
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET5_0_OR_GREATER
     /// <summary>
     /// Dispose internal resources
     /// </summary>

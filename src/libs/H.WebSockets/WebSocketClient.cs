@@ -4,6 +4,10 @@ using System.Text;
 using H.WebSockets.Utilities;
 using EventGenerator;
 
+#if NETSTANDARD2_1
+using System.Net.Security;
+#endif
+
 namespace H.WebSockets;
 
 /// <summary>
@@ -49,6 +53,22 @@ public sealed partial class WebSocketClient : IDisposable
         }
     }
 
+#if NETSTANDARD2_1
+    /// <summary>
+    /// 
+    /// </summary>
+    public RemoteCertificateValidationCallback? RemoteCertificateValidationCallback { get; set; }
+#endif
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public void SetHeader(string name, string value)
+    {
+        Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+        Socket.Options.SetRequestHeader(name, value);
+    }
+
     private TaskWorker ReceiveWorker { get; } = new();
 
     #endregion
@@ -88,6 +108,13 @@ public sealed partial class WebSocketClient : IDisposable
         }
 
         LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
+
+#if NETSTANDARD2_1
+        if (RemoteCertificateValidationCallback != null)
+        {
+            Socket.Options.RemoteCertificateValidationCallback += RemoteCertificateValidationCallback;
+        }
+#endif
 
         await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
 

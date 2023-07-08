@@ -3,8 +3,8 @@ using System.Net.WebSockets;
 using System.Timers;
 using H.WebSockets;
 using H.WebSockets.Utilities;
-using Newtonsoft.Json;
 using EventGenerator;
+using System.Text.Json;
 
 namespace H.Engine.IO;
 
@@ -140,7 +140,10 @@ public sealed partial class EngineIoClient : IDisposable
             switch (packet.Prefix)
             {
                 case EngineIoPacket.OpenPrefix:
-                    OpenMessage = JsonConvert.DeserializeObject<EngineIoOpenMessage>(packet.Value);
+                    OpenMessage = JsonSerializer.Deserialize<EngineIoOpenMessage>(packet.Value, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true,
+                    });
                     IsOpened = true;
 
                     Timer.Interval = OpenMessage?.PingInterval ?? 25000;

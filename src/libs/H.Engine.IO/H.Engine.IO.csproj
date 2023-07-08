@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.5.1;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net4.6.2;net6.0;net7.0</TargetFrameworks>
     <NoWarn>$(NoWarn);CA1031;CS3016</NoWarn>
   </PropertyGroup>
 	  
@@ -21,11 +21,19 @@
     <PackageReference Include="EventGenerator.Generator" Version="0.13.0" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net4.5.1' ">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'">
     <Reference Include="System.Net.Http" />
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Text.Json" Version="7.0.3" />
   </ItemGroup>
 
   <ItemGroup>

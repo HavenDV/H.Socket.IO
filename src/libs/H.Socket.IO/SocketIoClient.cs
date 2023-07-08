@@ -1,9 +1,9 @@
 ﻿using System.Net;
 using System.Net.WebSockets;
+using System.Text.Json;
 using H.Engine.IO;
 using H.Socket.IO.Utilities;
 using H.WebSockets.Utilities;
-using Newtonsoft.Json;
 using EventGenerator;
 
 namespace H.Socket.IO;
@@ -181,7 +181,7 @@ public sealed partial class SocketIoClient : IDisposable
                                         throw new InvalidOperationException($"Received json text for event named \"{name}\" is null");
                                     }
 
-                                    var obj = JsonConvert.DeserializeObject(text, type);
+                                    var obj = JsonSerializer.Deserialize(text, type);
                                     if (obj == null)
                                     {
                                         throw new InvalidOperationException($"Deserialized object for json text(\"{text}\") and for event named \"{name}\" is null");
@@ -450,7 +450,7 @@ public sealed partial class SocketIoClient : IDisposable
         {
             null => new[] { $"\"{name}\"" },
             string message => new[] { $"\"{name}\"", $"\"{message}\"" },
-            _ => new[] { $"\"{name}\"", JsonConvert.SerializeObject(value) },
+            _ => new[] { $"\"{name}\"", JsonSerializer.Serialize(value) },
         };
 
         await SendEventAsync($"[{string.Join(",", messages)}]", customNamespace, cancellationToken).ConfigureAwait(false);

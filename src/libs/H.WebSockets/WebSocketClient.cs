@@ -5,7 +5,7 @@ using H.WebSockets.Utilities;
 using EventGenerator;
 
 #if NETSTANDARD2_1
-    using System.Net.Security;
+using System.Net.Security;
 #endif
 
 namespace H.WebSockets;

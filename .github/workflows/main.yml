@@ -10,6 +10,5 @@ jobs:
     uses: HavenDV/workflows/.github/workflows/dotnet_build-test-publish.yml@main
     with:
       additional-test-arguments: '--logger GitHubActions'
-      run-tests: false
     secrets:
       nuget-key: ${{ secrets.NUGET_KEY }}

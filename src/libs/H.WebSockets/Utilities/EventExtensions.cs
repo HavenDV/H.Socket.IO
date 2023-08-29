@@ -163,12 +163,13 @@ public static class EventExtensions
         value = value ?? throw new ArgumentNullException(nameof(value));
         func = func ?? throw new ArgumentNullException(nameof(func));
 
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var tasks = eventNames
             .Select(async name =>
             {
                 try
                 {
-                    return await value.WaitEventAsync<T>(name, cancellationToken)
+                    return await value.WaitEventAsync<T>(name, cts.Token)
                         .ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
@@ -183,6 +184,8 @@ public static class EventExtensions
             await func().ConfigureAwait(false);
 
             await Task.WhenAny(tasks).ConfigureAwait(false);
+            
+            cts.Cancel();
         }
         catch (OperationCanceledException)
         {

@@ -12,6 +12,5 @@ jobs:
       generate-build-number: false
       conventional-commits-publish-conditions: false
       additional-test-arguments: '--logger GitHubActions'
-      run-tests: false
     secrets:
       nuget-key: ${{ secrets.NUGET_KEY }}

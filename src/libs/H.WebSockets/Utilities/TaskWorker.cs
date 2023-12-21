@@ -141,7 +141,11 @@ internal partial class TaskWorker : IDisposable
 
         if (Task != Task.CompletedTask)
         {
+#if NET8_0_OR_GREATER
+            await CancellationTokenSource.CancelAsync().ConfigureAwait(false);
+#else
             CancellationTokenSource.Cancel();
+#endif
 
             try
             {

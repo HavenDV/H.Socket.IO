@@ -33,6 +33,11 @@ public sealed partial class EngineIoClient : IDisposable
 
     #region Properties
 
+    private JsonSerializerOptions _jsonSerializerOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+    };
+    
     /// <summary>
     /// Internal WebSocket Client
     /// </summary>
@@ -140,10 +145,7 @@ public sealed partial class EngineIoClient : IDisposable
             switch (packet.Prefix)
             {
                 case EngineIoPacket.OpenPrefix:
-                    OpenMessage = JsonSerializer.Deserialize<EngineIoOpenMessage>(packet.Value, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true,
-                    });
+                    OpenMessage = JsonSerializer.Deserialize<EngineIoOpenMessage>(packet.Value, _jsonSerializerOptions);
                     IsOpened = true;
 
                     Timer.Interval = OpenMessage?.PingInterval ?? 25000;

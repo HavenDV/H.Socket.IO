@@ -285,16 +285,19 @@ public sealed partial class SocketIoClient : IDisposable
     /// <param name="namespaces"></param>
     /// <exception cref="ObjectDisposedException"></exception>
     /// <returns></returns>
-    public async Task<bool> ConnectToNamespacesAsync(CancellationToken cancellationToken = default, params string[] namespaces)
+    public async Task<bool> ConnectToNamespacesAsync(
+        CancellationToken cancellationToken = default,
+        params string[] namespaces)
     {
         EngineIoClient = EngineIoClient ?? throw new ObjectDisposedException(nameof(EngineIoClient));
-
+        namespaces = namespaces ?? throw new ArgumentNullException(nameof(namespaces));
+        
         if (!EngineIoClient.IsOpened)
         {
             return false;
         }
 
-        if (!namespaces.Any())
+        if (namespaces.Length == 0)
         {
             return true;
         }
@@ -488,12 +491,13 @@ public sealed partial class SocketIoClient : IDisposable
         action = action ?? throw new ArgumentNullException(nameof(action));
 
         var key = GetOnKey(name, customNamespace);
-        if (!JsonDeserializeActions.ContainsKey(key))
+        if (!JsonDeserializeActions.TryGetValue(key, out var value))
         {
-            JsonDeserializeActions[key] = new List<(Action<object, string> Action, Type Type)>();
+            value = new List<(Action<object, string> Action, Type Type)>();
+            JsonDeserializeActions[key] = value;
         }
 
-        JsonDeserializeActions[key].Add(((obj, text) => action((T)obj, text), typeof(T)));
+        value.Add(((obj, text) => action((T)obj, text), typeof(T)));
     }
 
     /// <summary>
@@ -527,12 +531,13 @@ public sealed partial class SocketIoClient : IDisposable
         action = action ?? throw new ArgumentNullException(nameof(action));
 
         var key = GetOnKey(name, customNamespace);
-        if (!TextActions.ContainsKey(key))
+        if (!TextActions.TryGetValue(key, out var value))
         {
-            TextActions[key] = new List<Action<string>>();
+            value = new List<Action<string>>();
+            TextActions[key] = value;
         }
 
-        TextActions[key].Add(action);
+        value.Add(action);
     }
 
     /// <summary>
@@ -548,12 +553,13 @@ public sealed partial class SocketIoClient : IDisposable
         action = action ?? throw new ArgumentNullException(nameof(action));
 
         var key = GetOnKey(name, customNamespace);
-        if (!Actions.ContainsKey(key))
+        if (!Actions.TryGetValue(key, out var value))
         {
-            Actions[key] = new List<Action>();
+            value = new List<Action>();
+            Actions[key] = value;
         }
 
-        Actions[key].Add(action);
+        value.Add(action);
     }
 
     /// <summary>

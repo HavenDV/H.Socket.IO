@@ -185,7 +185,11 @@ public static class EventExtensions
 
             await Task.WhenAny(tasks).ConfigureAwait(false);
             
+#if NET8_0_OR_GREATER
+            await cts.CancelAsync().ConfigureAwait(false);
+#else
             cts.Cancel();
+#endif
         }
         catch (OperationCanceledException)
         {

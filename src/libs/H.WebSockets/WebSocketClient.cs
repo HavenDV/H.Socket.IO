@@ -29,6 +29,7 @@ public sealed partial class WebSocketClient : IDisposable
     /// 
     /// </summary>
     public ClientWebSocket Socket { get; private set; } = new();
+    private readonly SemaphoreSlim SocketSemaphore = new(1, 1);
 
     /// <summary>
     /// 
@@ -95,35 +96,45 @@ public sealed partial class WebSocketClient : IDisposable
     /// <returns></returns>
     public async Task ConnectAsync(Uri? uri, CancellationToken cancellationToken = default)
     {
-        if (IsConnected)
-        {
-            return;
-        }
+        await SocketSemaphore.WaitAsync(cancellationToken).ConfigureAwait(false);
 
-        Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
-        if (Socket.State != WebSocketState.None)
+        try
         {
-            Socket.Dispose();
-            Socket = new ClientWebSocket();
-        }
 
-        LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
+            if (IsConnected)
+            {
+                return;
+            }
+
+            Socket = Socket ?? throw new ObjectDisposedException(nameof(Socket));
+            if (Socket.State != WebSocketState.None)
+            {
+                Socket.Dispose();
+                Socket = new ClientWebSocket();
+            }
+
+            LastConnectUri = uri ?? throw new ArgumentNullException(nameof(uri));
 
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
-        if (RemoteCertificateValidationCallback != null)
-        {
-            Socket.Options.RemoteCertificateValidationCallback += RemoteCertificateValidationCallback;
-        }
+            if (RemoteCertificateValidationCallback != null)
+            {
+                Socket.Options.RemoteCertificateValidationCallback += RemoteCertificateValidationCallback;
+            }
 #endif
 
-        await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
+            await Socket.ConnectAsync(uri, cancellationToken).ConfigureAwait(false);
 
-        if (ReceiveWorker.Task.IsCompleted)
-        {
-            ReceiveWorker.Start(async token => await ReceiveAsync(token).ConfigureAwait(false));
+            if (ReceiveWorker.Task.IsCompleted)
+            {
+                ReceiveWorker.Start(async token => await ReceiveAsync(token).ConfigureAwait(false));
+            }
+
+            OnConnected();
         }
-
-        OnConnected();
+        finally
+        {
+            SocketSemaphore.Release();
+        }
     }
 
     /// <summary>
@@ -287,6 +298,7 @@ public sealed partial class WebSocketClient : IDisposable
     {
         ReceiveWorker.Dispose();
         Socket.Dispose();
+        SocketSemaphore.Dispose();
     }
 
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
@@ -298,6 +310,7 @@ public sealed partial class WebSocketClient : IDisposable
     {
         await ReceiveWorker.DisposeAsync().ConfigureAwait(false);
         Socket.Dispose();
+        SocketSemaphore.Dispose();
     }
 #endif
 

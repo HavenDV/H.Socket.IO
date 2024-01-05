@@ -85,7 +85,7 @@ internal partial class TaskWorker : IDisposable
             }
 
             OnCompleted();
-        }, CancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }, CancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
     }
 
     /// <summary>

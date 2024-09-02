@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="EventGenerator.Generator" Version="0.13.0" PrivateAssets="all" ExcludeAssets="runtime">
+    <PackageReference Include="EventGenerator.Generator" Version="0.13.1" PrivateAssets="all" ExcludeAssets="runtime">
       <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>

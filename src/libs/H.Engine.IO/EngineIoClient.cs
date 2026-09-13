@@ -3,7 +3,6 @@ using System.Net.WebSockets;
 using System.Timers;
 using H.WebSockets;
 using H.WebSockets.Utilities;
-using EventGenerator;
 using System.Text.Json;
 
 namespace H.Engine.IO;
@@ -11,15 +10,6 @@ namespace H.Engine.IO;
 /// <summary>
 /// Engine.IO Client
 /// </summary>
-[Event<EngineIoOpenMessage>("Opened", PropertyNames = new []{ "Message" })]
-[Event<string, WebSocketCloseStatus?>("Closed", PropertyNames = new []{ "Reason", "Status" })]
-[Event<string>("PingSent", PropertyNames = new []{ "Message" })]
-[Event<string>("PingReceived", PropertyNames = new []{ "Message" })]
-[Event<string>("PongReceived", PropertyNames = new []{ "Message" })]
-[Event<string>("MessageReceived", PropertyNames = new []{ "Message" })]
-[Event<string>("Upgraded", PropertyNames = new []{ "Message" })]
-[Event<string>("NoopReceived", PropertyNames = new []{ "Message" })]
-[Event<Exception>("ExceptionOccurred", PropertyNames = new []{ "Exception" })]
 public sealed partial class EngineIoClient : IDisposable
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable

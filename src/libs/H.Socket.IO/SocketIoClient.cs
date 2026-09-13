@@ -4,26 +4,12 @@ using System.Text.Json;
 using H.Engine.IO;
 using H.Socket.IO.Utilities;
 using H.WebSockets.Utilities;
-using EventGenerator;
 
 namespace H.Socket.IO;
 
 /// <summary>
 /// Socket.IO Client.
 /// </summary>
-[Event<string, string, bool>("Connected", Description = "Occurs after a successful connection to each namespace.",
-    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
-[Event<string, WebSocketCloseStatus?>("Disconnected", Description = "Occurs after a disconnection.",
-    PropertyNames = new []{ "Reason", "Status" })]
-[Event<string, string, bool>("EventReceived", Description = "Occurs after new event.",
-    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
-[Event<string, string, bool>("HandledEventReceived", Description = "Occurs after new handled event(captured by any On).",
-    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
-[Event<string, string, bool>("UnhandledEventReceived", Description = "Occurs after new unhandled event(not captured by any On).",
-    PropertyNames = new []{ "Value", "Namespace", "IsHandled" })]
-[Event<string, string>("ErrorReceived", Description = "Occurs after new error.",
-    PropertyNames = new []{ "Value", "Namespace" })]
-[Event<Exception>("ExceptionOccurred", Description = "Occurs after new exception.", PropertyNames = new []{ "Exception" })]
 public sealed partial class SocketIoClient : IDisposable
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
     , IAsyncDisposable

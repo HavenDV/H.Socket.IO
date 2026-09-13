@@ -2,7 +2,6 @@
 using System.Net.WebSockets;
 using System.Text;
 using H.WebSockets.Utilities;
-using EventGenerator;
 
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
 using System.Net.Security;
@@ -13,11 +12,6 @@ namespace H.WebSockets;
 /// <summary>
 /// 
 /// </summary>
-[Event("Connected")]
-[Event<string, WebSocketCloseStatus?>("Disconnected", PropertyNames = new []{ "Reason", "Status" })]
-[Event<string>("TextReceived", PropertyNames = new[] { "Text" })]
-[Event<IReadOnlyCollection<byte>>("BytesReceived", PropertyNames = new[] { "Bytes" })]
-[Event<Exception>("ExceptionOccurred", PropertyNames = new[] { "Exception" })]
 public sealed partial class WebSocketClient : IDisposable
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable

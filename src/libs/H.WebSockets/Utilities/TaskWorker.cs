@@ -1,5 +1,3 @@
-using EventGenerator;
-
 namespace H.WebSockets.Utilities;
 
 /// <summary>
@@ -7,12 +5,6 @@ namespace H.WebSockets.Utilities;
 /// and supporting automatic cancellation after Dispose <br/>
 /// <![CDATA[Version: 1.0.0.8]]> <br/>
 /// </summary>
-[Event("Canceled", Description = "When canceled")]
-[Event("Completed", Description = "When completed(with any result)")]
-[Event("SuccessfulCompleted", Description = "When completed(without exceptions and cancellations)")]
-[Event<OperationCanceledException>("SuccessfulCompletedOrCanceled", Description = "When completed(without exceptions)", PropertyNames = new[] { "Exception" })]
-[Event<Exception>("FailedOrCanceled", Description = "When canceled or exceptions", PropertyNames = new[] { "Exception" })]
-[Event<Exception>("ExceptionOccurred", Description = "When a exception occurs(without OperationCanceledException's)", PropertyNames = new[] { "Exception" })]
 internal partial class TaskWorker : IDisposable
 #if NETSTANDARD2_1 || NET5_0_OR_GREATER
         , IAsyncDisposable

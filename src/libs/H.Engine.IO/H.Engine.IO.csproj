@@ -17,12 +17,6 @@
     <PackageTags>EngineIO, Engine.IO, WebSockets, WebSocket</PackageTags>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="EventGenerator.Generator" Version="0.13.1" PrivateAssets="all" ExcludeAssets="runtime">
-      <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)' == 'net4.6.2'">
     <PackageReference Include="System.Text.Json" Version="10.0.11" />
     <Reference Include="System.Net.Http" />
